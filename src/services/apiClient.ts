@@ -7,7 +7,7 @@ import type {
 } from "axios";
 import axios from "axios";
 
-const apiClient: AxiosInstance = axios.create({
+export const apiClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_BASE_URL || "https://example.com",
   timeout: 10000,
   headers: {
