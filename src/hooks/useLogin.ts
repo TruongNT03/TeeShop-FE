@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -17,7 +18,8 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 export const useLogin = () => {
   const [isRememberMe, setIsRememberMe] = useState(false);
   const [isShowPassword, setIsShowPassword] = useState(false);
-  const navitage = useNavigate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const form = useForm<LoginDto>({
     resolver: zodResolver(loginSchema),
@@ -31,8 +33,10 @@ export const useLogin = () => {
 
   const onSubmit = form.handleSubmit((formData) => {
     mutation.mutate(formData, {
-      onSuccess: () => {
-        navitage("/");
+      onSuccess: (response) => {
+        localStorage.setItem("accessToken", response.data.accessToken);
+        localStorage.setItem("refreshToken", response.data.refreshToken);
+        navigate("/");
       },
       onError: (error) => {
         toast(error.message);
