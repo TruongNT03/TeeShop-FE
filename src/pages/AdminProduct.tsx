@@ -28,55 +28,114 @@ import {
   Search,
   SquarePen,
 } from "lucide-react";
-import { type ProductStatus } from "@/types/productStatus";
+import { type ProductStatus } from "@/types/product/productStatus";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const tableHeaderTitles = [
-  {
-    key: "id",
-    title: "ID",
-    sortable: true,
-  },
+  // {
+  //   key: "id",
+  //   title: "ID",
+  //   sortable: true,
+  // },
   {
     key: "name",
     title: "Name",
     sortable: true,
+    render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
   },
   {
     key: "description",
     title: "Description",
     sortable: true,
+    render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
   },
   {
     key: "status",
     title: "Status",
     sortable: true,
+    render: (value: ProductStatus): React.ReactNode => (
+      <TableCell>
+        {value === "published" ? (
+          <Badge variant="outline" className="border-green-500 text-green-500">
+            Published
+          </Badge>
+        ) : (
+          <Badge
+            variant="destructive"
+            className="border-red-500 bg-transparent text-red-500"
+          >
+            Unpublished
+          </Badge>
+        )}
+      </TableCell>
+    ),
   },
   {
     key: "categories",
     title: "Categories",
     sortable: false,
+    render: (value: string[]): React.ReactNode => (
+      <TableCell>
+        <div className="flex flex-col gap-2 items-center">
+          {value.map(
+            (category, index) =>
+              index < 3 && (
+                <Badge className="border-blue-500 bg-transparent text-blue-500">
+                  {category}
+                </Badge>
+              )
+          )}
+          {value.length > 2 && (
+            <Badge className="border-blue-500 bg-transparent text-blue-500 px-7">
+              ...
+            </Badge>
+          )}
+        </div>
+      </TableCell>
+    ),
   },
   {
     key: "createdAt",
     title: "Created At",
     sortable: true,
+    render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
   },
   {
     key: "updatedAt",
     title: "Updated At",
     sortable: true,
+    render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
   },
   {
     key: "action",
     title: "Action",
     sortable: false,
+    render: (value: ProductStatus): React.ReactNode => (
+      <TableCell>
+        <div className="flex gap-2">
+          <SquarePen className="scale-75 text-blue-400 cursor-pointer" />
+          {value === "published" ? (
+            <Archive className="scale-75 text-red-500 cursor-pointer" />
+          ) : (
+            <ArchiveRestore className="scale-75 text-emerald-500 cursor-pointer" />
+          )}
+        </div>
+      </TableCell>
+    ),
   },
 ];
 
 const AdminProduct = () => {
-  const { products } = useAdminProduct();
+  const {
+    products,
+    isSelectedAllProduct,
+    setSelectedProducts,
+    setIsSelectedAllProduct,
+    selectedProducts,
+    page,
+  } = useAdminProduct();
   return (
     <div className="w-full overflow-auto py-5">
       <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
@@ -113,7 +172,21 @@ const AdminProduct = () => {
           <TableHeader className="bg-indigo-300">
             <TableRow>
               <TableHead>
-                <Checkbox className="ml-2" />
+                <Checkbox
+                  className="ml-2"
+                  checked={isSelectedAllProduct}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedProducts(products.map((p) => p.id));
+                    } else {
+                      setSelectedProducts([]);
+                    }
+                    setIsSelectedAllProduct(!!checked);
+                  }}
+                />
+              </TableHead>
+              <TableHead>
+                <div>No.</div>
               </TableHead>
               {tableHeaderTitles.map((value, index) => (
                 <TableHead key={index} className="py-5">
@@ -136,30 +209,41 @@ const AdminProduct = () => {
                 className={`${index % 2 ? "bg-gray-200" : ""}`}
               >
                 <TableCell className="py-5">
-                  <Checkbox className="ml-2" />
-                </TableCell>
-                {tableHeaderTitles.map((tableHeaderTitle) =>
-                  tableHeaderTitle.key === "action" ? (
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <SquarePen className="scale-75 text-blue-400 cursor-pointer" />
-                        {(product.status as ProductStatus) === "published" ? (
-                          <Archive className="scale-75 text-red-500 cursor-pointer" />
-                        ) : (
-                          <ArchiveRestore className="scale-75 text-emerald-500 cursor-pointer" />
-                        )}
-                      </div>
-                    </TableCell>
-                  ) : (
-                    <TableCell>
-                      {
-                        product[
-                          tableHeaderTitle.key as keyof typeof product
-                        ] as string
+                  <Checkbox
+                    className="ml-2"
+                    checked={selectedProducts.includes(product.id)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        const updated = [...selectedProducts, product.id];
+                        setSelectedProducts(updated);
+                        if (updated.length === products.length) {
+                          setIsSelectedAllProduct(true);
+                        }
+                      } else {
+                        const updated = selectedProducts.filter(
+                          (value) => value !== product.id
+                        );
+                        setSelectedProducts(updated);
+                        setIsSelectedAllProduct(false);
                       }
-                    </TableCell>
-                  )
-                )}
+                    }}
+                  />
+                </TableCell>
+                <TableCell>{(index + 1) * page}</TableCell>
+                {tableHeaderTitles.map((tableHeaderTitle) => {
+                  if (tableHeaderTitle.key !== "action") {
+                    return tableHeaderTitle.render(
+                      product[
+                        tableHeaderTitle.key as keyof typeof product
+                      ] as ProductStatus & string[]
+                    );
+                  }
+                })}
+                <TableCell>
+                  {tableHeaderTitles[tableHeaderTitles.length - 1].render(
+                    product.status as ProductStatus & string[]
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
