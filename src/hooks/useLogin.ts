@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { login } from "@/services/login";
+import * as z from "zod";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import type { LoginDto } from "@/api";
+import { loginMutation } from "@/queries/authQueries";
 
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -13,11 +15,11 @@ export const loginSchema = z.object({
 export type LoginFormData = z.infer<typeof loginSchema>;
 
 export const useLogin = () => {
-  const [isRememberMe, setIsRememberMe] = useState<boolean>(false);
-  const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRememberMe, setIsRememberMe] = useState(false);
+  const [isShowPassword, setIsShowPassword] = useState(false);
   const navitage = useNavigate();
-  const form = useForm<LoginFormData>({
+
+  const form = useForm<LoginDto>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -25,25 +27,26 @@ export const useLogin = () => {
     },
   });
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    setIsLoading(true);
-    const response = await login(data);
-    setTimeout(() => {
-      setIsLoading(false);
-      localStorage.setItem("accessToken", response.accessToken);
-      localStorage.setItem("refreshToken", response.refreshToken);
-      navitage("/");
-    }, 5000);
+  const mutation = loginMutation();
+
+  const onSubmit = form.handleSubmit((formData) => {
+    mutation.mutate(formData, {
+      onSuccess: () => {
+        navitage("/");
+      },
+      onError: (error) => {
+        toast(error.message);
+      },
+    });
   });
 
   return {
-    isRememberMe,
-    setIsRememberMe,
     form,
     onSubmit,
+    isRememberMe,
+    setIsRememberMe,
     isShowPassword,
     setIsShowPassword,
-    isLoading,
-    setIsLoading,
+    isLoading: mutation.isPending,
   };
 };

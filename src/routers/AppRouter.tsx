@@ -7,6 +7,7 @@ import NotFound from "../pages/NotFound";
 import Home from "../pages/Home";
 import AdminProduct from "@/pages/AdminProduct";
 import AdminLayout from "@/layouts/AdminLayout";
+import AdminCreateProduct from "@/pages/AdminCreateProduct";
 
 const AppRouter = () => {
   return (
@@ -24,6 +25,10 @@ const AppRouter = () => {
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminProduct />} />
             <Route path="/admin/product" element={<AdminProduct />} />
+            <Route
+              path="/admin/product/create"
+              element={<AdminCreateProduct />}
+            />
           </Route>
         </Route>
 

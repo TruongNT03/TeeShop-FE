@@ -25,13 +25,18 @@ import {
   ArrowUpDown,
   ListFilter,
   Pencil,
+  Plus,
   Search,
   SquarePen,
 } from "lucide-react";
-import { type ProductStatus } from "@/types/product/productStatus";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { convertDateTime } from "@/utils/convertDateTime";
+import { Link } from "react-router-dom";
+import type { apiClient } from "@/services/apiClient";
+import { ProductStatus } from "@/types/productStatus";
 
 const tableHeaderTitles = [
   // {
@@ -57,7 +62,7 @@ const tableHeaderTitles = [
     sortable: true,
     render: (value: ProductStatus): React.ReactNode => (
       <TableCell>
-        {value === "published" ? (
+        {value === ProductStatus.PUBLISHED ? (
           <Badge variant="outline" className="border-green-500 text-green-500">
             Published
           </Badge>
@@ -78,7 +83,7 @@ const tableHeaderTitles = [
     sortable: false,
     render: (value: string[]): React.ReactNode => (
       <TableCell>
-        <div className="flex flex-col gap-2 items-center">
+        <div className="flex flex-col gap-2 items-start">
           {value.map(
             (category, index) =>
               index < 3 && (
@@ -100,13 +105,17 @@ const tableHeaderTitles = [
     key: "createdAt",
     title: "Created At",
     sortable: true,
-    render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
+    render: (value: string): React.ReactNode => (
+      <TableCell>{convertDateTime(value)}</TableCell>
+    ),
   },
   {
     key: "updatedAt",
     title: "Updated At",
     sortable: true,
-    render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
+    render: (value: string): React.ReactNode => (
+      <TableCell>{convertDateTime(value)}</TableCell>
+    ),
   },
   {
     key: "action",
@@ -128,20 +137,25 @@ const tableHeaderTitles = [
 ];
 
 const AdminProduct = () => {
+  const [query, setQuery] = useState<
+    Parameters<typeof apiClient.api.adminProductControllerFindAll>[0]
+  >({
+    page: 1,
+    pageSize: 10,
+    categoriesIds: [],
+  });
   const {
     products,
     isSelectedAllProduct,
-    setSelectedProducts,
-    setIsSelectedAllProduct,
     selectedProducts,
-    page,
-  } = useAdminProduct();
+    setIsSelectedAllProduct,
+    setSelectedProducts,
+  } = useAdminProduct(query);
   return (
     <div className="w-full overflow-auto py-5">
       <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
         Product Master
       </div>
-
       {/* Total */}
       <div className="w-[95%] flex justify-between mx-auto gap-8 mb-10">
         <Card className="flex-1"></Card>
@@ -149,23 +163,31 @@ const AdminProduct = () => {
         <Card className="flex-1"></Card>
         <Card className="flex-1"></Card>
       </div>
-
       {/* Search and Filter */}
-      <div className="w-[95%] mx-auto mb-5 flex">
-        <div className="relative mr-5">
-          <Input
-            className="w-[400px] py-0 pl-10"
-            type="search"
-            placeholder="Search product"
-          />
-          <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
+      <div className="w-[95%] mx-auto mb-5 flex justify-between">
+        <div className="flex">
+          <div className="relative mr-5">
+            <Input
+              className="w-[400px] py-0 pl-10"
+              type="search"
+              placeholder="Search product"
+            />
+            <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
+          </div>
+          <Button variant="outline">
+            <ListFilter />
+            Filter
+          </Button>
         </div>
-        <Button variant="outline">
-          <ListFilter />
-          Filter
-        </Button>
+        <div>
+          <Link to="/admin/product/create">
+            <Button variant="outline" className="bg-blue-600 text-white">
+              <Plus />
+              Create Product
+            </Button>
+          </Link>
+        </div>
       </div>
-
       {/* Table */}
       <Card className="w-[95%] mx-auto py-0 overflow-hidden">
         <Table>
@@ -173,10 +195,10 @@ const AdminProduct = () => {
             <TableRow>
               <TableHead>
                 <Checkbox
-                  className="ml-2"
+                  className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
                   checked={isSelectedAllProduct}
                   onCheckedChange={(checked) => {
-                    if (checked) {
+                    if (checked && products) {
                       setSelectedProducts(products.map((p) => p.id));
                     } else {
                       setSelectedProducts([]);
@@ -203,14 +225,14 @@ const AdminProduct = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product, index) => (
+            {products?.map((product, index) => (
               <TableRow
                 key={index}
                 className={`${index % 2 ? "bg-gray-200" : ""}`}
               >
                 <TableCell className="py-5">
                   <Checkbox
-                    className="ml-2"
+                    className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
                     checked={selectedProducts.includes(product.id)}
                     onCheckedChange={(checked) => {
                       if (checked) {
@@ -229,7 +251,7 @@ const AdminProduct = () => {
                     }}
                   />
                 </TableCell>
-                <TableCell>{(index + 1) * page}</TableCell>
+                <TableCell>{index + 1}</TableCell>
                 {tableHeaderTitles.map((tableHeaderTitle) => {
                   if (tableHeaderTitle.key !== "action") {
                     return tableHeaderTitle.render(
