@@ -1,3 +1,4 @@
+import { Api } from "@/api";
 import type {
   AxiosError,
   AxiosInstance,
@@ -7,12 +8,26 @@ import type {
 } from "axios";
 import axios from "axios";
 
-export const apiClient: AxiosInstance = axios.create({
+//=============== USED IF NOT HAVE swagger-typescript-api ===============//
+
+// export const apiClient: AxiosInstance = axios.create({
+//   baseURL: import.meta.env.VITE_BACKEND_BASE_URL || "https://example.com",
+//   timeout: 10000,
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
+//===============                                         ===============//
+
+//=============== USED IF HAVE swagger-typescript-api     ===============//
+
+const apiClient = new Api({
   baseURL: import.meta.env.VITE_BACKEND_BASE_URL || "https://example.com",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
+  // withCredentials: true,
 });
 
 let isRefreshing = false;
@@ -30,7 +45,7 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 // Request Interceptor
-apiClient.interceptors.request.use(
+apiClient.instance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken && config.headers) {
@@ -45,7 +60,7 @@ apiClient.interceptors.request.use(
 );
 
 // Response Interceptor
-apiClient.interceptors.response.use(
+apiClient.instance.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
@@ -64,7 +79,7 @@ apiClient.interceptors.response.use(
             if (token && originalRequest.headers) {
               originalRequest.headers.Authorization = `Bearer ${token}`;
             }
-            return apiClient(originalRequest);
+            return apiClient.instance(originalRequest);
           })
           .catch((err) => Promise.reject(err));
       }
@@ -85,17 +100,17 @@ apiClient.interceptors.response.use(
         );
 
         const newAccessToken = res.data.accessToken;
-        localStorage.setItem("access_token", newAccessToken);
+        localStorage.setItem("accessToken", newAccessToken);
 
         // Cập nhật header mặc định
-        apiClient.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
+        apiClient.instance.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
 
         // Retry lại request cũ
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }
-        return apiClient(originalRequest);
+        return apiClient.instance(originalRequest);
       } catch (err) {
         processQueue(err, null);
         localStorage.removeItem("accessToken");
@@ -110,3 +125,5 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export { apiClient };

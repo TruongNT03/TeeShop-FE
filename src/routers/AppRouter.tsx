@@ -5,6 +5,9 @@ import Register from "../pages/Register";
 import Login from "../pages/Login";
 import NotFound from "../pages/NotFound";
 import Home from "../pages/Home";
+import AdminProduct from "@/pages/AdminProduct";
+import AdminLayout from "@/layouts/AdminLayout";
+import AdminCreateProduct from "@/pages/AdminCreateProduct";
 
 const AppRouter = () => {
   return (
@@ -18,7 +21,16 @@ const AppRouter = () => {
         </Route>
 
         {/* Private Routes */}
-        <Route element={<PrivateRouter />}></Route>
+        <Route element={<PrivateRouter />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminProduct />} />
+            <Route path="/admin/product" element={<AdminProduct />} />
+            <Route
+              path="/admin/product/create"
+              element={<AdminCreateProduct />}
+            />
+          </Route>
+        </Route>
 
         {/* Anonymous Routes */}
         <Route path="*" element={<NotFound />} />
