@@ -26,9 +26,10 @@ import {
 import { Collapsible, CollapsibleTrigger } from "../ui/collapsible";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const AdminSideBar = () => {
+  const navigate = useNavigate();
   return (
     <Sidebar collapsible="offcanvas" className="font-medium">
       {/* Header */}
@@ -91,11 +92,11 @@ const AdminSideBar = () => {
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       <SidebarMenuSubItem>
-                        <Link to="/admin/product">
+                        <div onClick={() => navigate("/admin/product")}>
                           <SidebarMenuSubButton>
                             Management
                           </SidebarMenuSubButton>
-                        </Link>
+                        </div>
                       </SidebarMenuSubItem>
                     </SidebarMenuSub>
 
@@ -122,9 +123,9 @@ const AdminSideBar = () => {
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
-                      <Link to="#">
+                      <div>
                         <SidebarMenuSubButton>Management</SidebarMenuSubButton>
-                      </Link>
+                      </div>
                     </SidebarMenuSubItem>
                   </SidebarMenuSub>
                 </CollapsibleContent>

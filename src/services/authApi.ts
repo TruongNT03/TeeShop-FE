@@ -1,4 +1,10 @@
-import type { LoginDto, ForgotPasswordDto, VerifyForgotPasswordDto, RegisterDto, VerifyRegisterDto } from "@/api";
+import type {
+  LoginDto,
+  ForgotPasswordDto,
+  VerifyForgotPasswordDto,
+  RegisterDto,
+  VerifyRegisterDto,
+} from "@/api";
 import { apiClient } from "./apiClient";
 
 export const authApi = {

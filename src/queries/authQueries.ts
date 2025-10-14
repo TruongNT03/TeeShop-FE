@@ -1,4 +1,8 @@
-import type { VerifyForgotPasswordDto, RegisterDto, VerifyRegisterDto } from "@/api";
+import type {
+  VerifyForgotPasswordDto,
+  RegisterDto,
+  VerifyRegisterDto,
+} from "@/api";
 import { authApi } from "@/services/authApi";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -48,7 +52,9 @@ export const registerMutation = () => {
     mutationKey: ["register"],
     mutationFn: (data: RegisterDto) => authApi.register(data),
     onError: (error) => {
-      toast.error(error.message || "Đăng ký thất bại. Email có thể đã tồn tại.");
+      toast.error(
+        error.message || "Đăng ký thất bại. Email có thể đã tồn tại."
+      );
     },
   });
 };
@@ -56,13 +62,8 @@ export const registerMutation = () => {
 export const verifyRegisterMutation = () => {
   return useMutation({
     mutationKey: ["verifyRegister"],
-    mutationFn: ({
-      token,
-      data,
-    }: {
-      token: string;
-      data: VerifyRegisterDto;
-    }) => authApi.verifyRegister(token, data),
+    mutationFn: ({ token, data }: { token: string; data: VerifyRegisterDto }) =>
+      authApi.verifyRegister(token, data),
     onError: (error) => {
       toast.error(error.message || "Mã OTP không hợp lệ hoặc đã hết hạn.");
     },
