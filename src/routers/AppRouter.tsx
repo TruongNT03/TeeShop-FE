@@ -8,6 +8,7 @@ import Home from "../pages/Home";
 import AdminProduct from "@/pages/AdminProduct";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminCreateProduct from "@/pages/AdminCreateProduct";
+import DemoPage from "@/pages/DemoPage"; // Import component DemoPage
 
 const AppRouter = () => {
   return (
@@ -18,6 +19,7 @@ const AppRouter = () => {
           <Route index path="/" element={<Home />} />{" "}
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/demo" element={<DemoPage />} /> 
         </Route>
 
         {/* Private Routes */}
