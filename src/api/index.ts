@@ -877,7 +877,7 @@ export class Api<
       },
       params: RequestParams = {}
     ) =>
-      this.request<any, ListCategoryResponseDto>({
+      this.request<ListCategoryResponseDto, ListCategoryResponseDto>({
         path: `/api/v1/admin/categories`,
         method: "GET",
         query: query,

@@ -7,7 +7,11 @@ const AdminLayout = () => {
     <SidebarProvider>
       <AdminSideBar />
       <main className="w-full">
-        <SidebarTrigger />
+        <div className="h-18  border-b-[2px] flex flex-col justify-center">
+          <div className="w-[95%] mx-auto">
+            <SidebarTrigger size="icon-lg" className="scale-150" />
+          </div>
+        </div>
         <Outlet />
       </main>
     </SidebarProvider>

@@ -10,3 +10,12 @@ export const getAllProductQuery = (
     queryFn: () => adminProductApi.findAll(query),
   });
 };
+
+export const getAllCategoryQuery = (
+  query: Parameters<typeof apiClient.api.adminCategoriesControllerFindAll>[0]
+) => {
+  return useQuery({
+    queryKey: ["category", query],
+    queryFn: () => adminProductApi.findAllCategories(query),
+  });
+};
