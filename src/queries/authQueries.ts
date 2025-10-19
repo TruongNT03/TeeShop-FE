@@ -1,3 +1,4 @@
+import type { VerifyForgotPasswordDto } from "@/api";
 import { authApi } from "@/services/authApi";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -12,6 +13,32 @@ export const loginMutation = () => {
     },
     onError: (error) => {
       toast(error.message);
+    },
+  });
+};
+
+export const forgotPasswordMutation = () => {
+  return useMutation({
+    mutationKey: ["forgotPassword"],
+    mutationFn: authApi.forgotPassword,
+    onError: (error) => {
+      toast.error(error.message || "Gửi email thất bại. Vui lòng thử lại.");
+    },
+  });
+};
+
+export const verifyForgotPasswordMutation = () => {
+  return useMutation({
+    mutationKey: ["verifyForgotPassword"],
+    mutationFn: ({
+      token,
+      data,
+    }: {
+      token: string;
+      data: VerifyForgotPasswordDto;
+    }) => authApi.verifyForgotPassword(token, data),
+    onError: (error) => {
+      toast.error(error.message || "Mã OTP không hợp lệ hoặc đã hết hạn.");
     },
   });
 };
