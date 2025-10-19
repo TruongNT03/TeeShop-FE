@@ -30,7 +30,7 @@ import {
 } from "@/queries/authQueries";
 import { CheckCircle2 } from "lucide-react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
- 
+
 const registerSchema = z
   .object({
     email: z.string().email("Địa chỉ email không hợp lệ"),
@@ -57,7 +57,7 @@ const otpSchema = z.object({
     .regex(/^\d+$/, "OTP chỉ chứa số"),
 });
 type OtpFormData = z.infer<typeof otpSchema>;
- 
+
 const Register = () => {
   const [step, setStep] = useState<"register" | "otp" | "success">("register");
   const [requestToken, setRequestToken] = useState<string | null>(null);
@@ -65,10 +65,10 @@ const Register = () => {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
- 
+
   const regMutation = registerMutation();
   const verifyMutation = verifyRegisterMutation();
- 
+
   const registerForm = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: { email: "", password: "", confirmPassword: "" },
@@ -78,15 +78,15 @@ const Register = () => {
     resolver: zodResolver(otpSchema),
     defaultValues: { OTP: "" },
   });
- 
-  const onRegisterSubmit = (data: RegisterFormData) => { 
+
+  const onRegisterSubmit = (data: RegisterFormData) => {
     const { email, password } = data;
     regMutation.mutate(
       { email, password },
       {
         onSuccess: (response) => {
           toast.success("Đã gửi OTP vào email của bạn!");
-          setRequestToken(response.data.token);  
+          setRequestToken(response.data.token);
           setUserEmail(data.email);
           setStep("otp");
         },
@@ -106,7 +106,7 @@ const Register = () => {
       {
         onSuccess: () => {
           toast.success("Xác thực thành công!");
-          setStep("success"); 
+          setStep("success");
           setTimeout(() => {
             navigate("/login");
           }, 3000);
@@ -114,7 +114,7 @@ const Register = () => {
       }
     );
   };
- 
+
   const renderRegisterStep = () => (
     <>
       <CardHeader>

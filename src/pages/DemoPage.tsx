@@ -1,15 +1,36 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Check, Copy, Loader2, Mail } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
@@ -17,9 +38,14 @@ import * as z from "zod";
 const demoFormSchema = z.object({
   username: z.string().min(2, "Tên người dùng phải có ít nhất 2 ký tự."),
   email: z.string().email("Địa chỉ email không hợp lệ."),
-  acceptTerms: z.boolean().default(false).refine((val) => val === true, {
-    message: "Bạn phải chấp nhận các điều khoản dịch vụ.",
-  }),
+  acceptTerms: z.optional(
+    z
+      .boolean()
+      .default(false)
+      .refine((val) => val === true, {
+        message: "Bạn phải chấp nhận các điều khoản dịch vụ.",
+      })
+  ),
 });
 
 type DemoFormValues = z.infer<typeof demoFormSchema>;
@@ -41,12 +67,16 @@ const DemoPage = () => {
 
   return (
     <div className="w-full py-10 px-6 sm:px-10 lg:px-16 min-h-screen bg-background">
-      <h1 className="text-3xl font-bold mb-8 text-foreground">Demo Tất cả Component UI</h1>
+      <h1 className="text-3xl font-bold mb-8 text-foreground">
+        Demo Tất cả Component UI
+      </h1>
       <Separator className="mb-8" />
 
       {/* 1. Card & Badge */}
       <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4 text-primary">1. Card & Badge</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-primary">
+          1. Card & Badge
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="p-0">
             <CardHeader className="p-6">
@@ -57,17 +87,21 @@ const DemoPage = () => {
                   Mới
                 </Badge>
               </div>
-              <CardDescription>Đây là giao diện của một Card tiêu chuẩn.</CardDescription>
+              <CardDescription>
+                Đây là giao diện của một Card tiêu chuẩn.
+              </CardDescription>
             </CardHeader>
             <CardContent className="p-6 pt-0">
               <p>Card là container cơ bản để nhóm nội dung liên quan.</p>
             </CardContent>
           </Card>
-          
+
           <Card className="p-0">
             <CardHeader className="p-6">
               <CardTitle>Các Loại Badge</CardTitle>
-              <CardDescription>Xem các biến thể màu sắc khác nhau.</CardDescription>
+              <CardDescription>
+                Xem các biến thể màu sắc khác nhau.
+              </CardDescription>
             </CardHeader>
             <CardContent className="p-6 pt-0 flex flex-wrap gap-2">
               <Badge variant="secondary">Secondary</Badge>
@@ -78,7 +112,7 @@ const DemoPage = () => {
           </Card>
         </div>
       </section>
-      
+
       <Separator className="mb-10" />
 
       {/* 2. Buttons */}
@@ -108,16 +142,22 @@ const DemoPage = () => {
 
       {/* 3. Form, Input, Textarea, Checkbox */}
       <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4 text-primary">3. Form, Input & Controls</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-primary">
+          3. Form, Input & Controls
+        </h2>
         <Card className="p-0 max-w-lg">
           <CardHeader className="p-6">
             <CardTitle>Demo Form Validation</CardTitle>
-            <CardDescription>Sử dụng `react-hook-form` và `zod`.</CardDescription>
+            <CardDescription>
+              Sử dụng `react-hook-form` và `zod`.
+            </CardDescription>
           </CardHeader>
           <CardContent className="p-6 pt-0">
             <FormProvider {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 {/* Input Field: Username */}
                 <FormField
                   control={form.control}
@@ -144,7 +184,11 @@ const DemoPage = () => {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="example@shop.com" {...field} />
+                        <Input
+                          type="email"
+                          placeholder="example@shop.com"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -196,7 +240,9 @@ const DemoPage = () => {
 
       {/* 4. Popover & Tooltip */}
       <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4 text-primary">4. Popover & Tooltip</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-primary">
+          4. Popover & Tooltip
+        </h2>
         <div className="flex gap-10">
           {/* Popover Demo */}
           <Popover>
@@ -216,7 +262,9 @@ const DemoPage = () => {
                     <div className="col-span-1 text-sm">Trạng thái</div>
                     <div className="col-span-2">Đang hoạt động</div>
                   </div>
-                  <Button size="sm" className="mt-2">Lưu thay đổi</Button>
+                  <Button size="sm" className="mt-2">
+                    Lưu thay đổi
+                  </Button>
                 </div>
               </div>
             </PopoverContent>
