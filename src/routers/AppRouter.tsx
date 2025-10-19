@@ -8,6 +8,8 @@ import Home from "../pages/Home";
 import AdminProduct from "@/pages/AdminProduct";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminCreateProduct from "@/pages/AdminCreateProduct";
+import DemoPage from "@/pages/DemoPage";
+import ForgotPassword from "@/pages/ForgotPassword";
 
 const AppRouter = () => {
   return (
@@ -18,6 +20,8 @@ const AppRouter = () => {
           <Route index path="/" element={<Home />} />{" "}
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/demo" element={<DemoPage />} /> 
         </Route>
 
         {/* Private Routes */}
