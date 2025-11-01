@@ -1,5 +1,5 @@
 import { getAllProductQuery } from "@/queries/adminProductQueries";
-import { apiClient } from "@/services/apiClient";
+import type { apiClient } from "@/services/apiClient";
 import { useState } from "react";
 
 export const useAdminProduct = (
@@ -10,6 +10,9 @@ export const useAdminProduct = (
     useState<boolean>(false);
 
   const getAllProductResponse = getAllProductQuery(query);
+
+  const paginate = getAllProductResponse.data?.data.paginate;
+
   return {
     selectedProducts,
     setSelectedProducts,
@@ -18,5 +21,12 @@ export const useAdminProduct = (
     products: getAllProductResponse.isSuccess
       ? getAllProductResponse.data.data.data
       : [],
+      
+    pagination: {
+      currentPage: paginate?.page ?? 1,
+      totalPage: paginate?.totalPage ?? 1,
+      totalItem: paginate?.totalItem ?? 0,
+    },
+    isLoading: getAllProductResponse.isLoading,
   };
 };

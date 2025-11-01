@@ -13,7 +13,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -37,6 +36,8 @@ import { convertDateTime } from "@/utils/convertDateTime";
 import { Link } from "react-router-dom";
 import type { apiClient } from "@/services/apiClient";
 import { ProductStatus } from "@/types/productStatus";
+import type { ProductResponseDto } from "@/api";
+import { Spinner } from "@/components/ui/spinner"; 
 
 const tableHeaderTitles = [
   // {
@@ -125,11 +126,11 @@ const tableHeaderTitles = [
     key: "action",
     title: "Action",
     sortable: false,
-    render: (value: ProductStatus): React.ReactNode => (
+    render: (product: ProductResponseDto): React.ReactNode => (
       <TableCell>
         <div className="flex gap-2">
           <SquarePen className="scale-75 text-blue-400 cursor-pointer" />
-          {value === "published" ? (
+          {product.status === "published" ? (
             <Archive className="scale-75 text-red-500 cursor-pointer" />
           ) : (
             <ArchiveRestore className="scale-75 text-emerald-500 cursor-pointer" />
@@ -154,7 +155,89 @@ const AdminProduct = () => {
     selectedProducts,
     setIsSelectedAllProduct,
     setSelectedProducts,
+    pagination, 
+    isLoading,
   } = useAdminProduct(query);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > pagination.totalPage) return;
+
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      page: newPage,
+    }));
+  };
+
+  const renderPaginationItems = () => {
+    const { currentPage, totalPage } = pagination;
+    const items = [];
+
+    let startPage = Math.max(1, currentPage - 1);
+    let endPage = Math.min(totalPage, currentPage + 1);
+
+    if (currentPage === 1 && totalPage > 1) {
+      endPage = Math.min(totalPage, 3);
+    }
+    if (currentPage === totalPage && totalPage > 1) {
+      startPage = Math.max(1, totalPage - 2);
+    }
+
+    if (startPage > 1) {
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink
+            onClick={() => handlePageChange(1)}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      if (startPage > 2) {
+        items.push(
+          <PaginationItem key="start-ellipsis">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            isActive={i === currentPage}
+            onClick={() => handlePageChange(i)}
+            className="cursor-pointer"
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    if (endPage < totalPage) {
+      if (endPage < totalPage - 1) {
+        items.push(
+          <PaginationItem key="end-ellipsis">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      items.push(
+        <PaginationItem key={totalPage}>
+          <PaginationLink
+            onClick={() => handlePageChange(totalPage)}
+            className="cursor-pointer"
+          >
+            {totalPage}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return items;
+  };
   return (
     <div className="w-full overflow-auto py-5">
       <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
@@ -229,65 +312,104 @@ const AdminProduct = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products?.map((product, index) => (
-              <TableRow
-                key={index}
-                className={`${index % 2 ? "bg-gray-200" : ""}`}
-              >
-                <TableCell className="py-5">
-                  <Checkbox
-                    className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
-                    checked={selectedProducts.includes(product.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        const updated = [...selectedProducts, product.id];
-                        setSelectedProducts(updated);
-                        if (updated.length === products.length) {
-                          setIsSelectedAllProduct(true);
-                        }
-                      } else {
-                        const updated = selectedProducts.filter(
-                          (value) => value !== product.id
-                        );
-                        setSelectedProducts(updated);
-                        setIsSelectedAllProduct(false);
-                      }
-                    }}
-                  />
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={tableHeaderTitles.length + 2}
+                  className="h-48 text-center"
+                >
+                  <Spinner className="w-10 h-10" />
                 </TableCell>
-                <TableCell>{index + 1}</TableCell>
-                {tableHeaderTitles.map((tableHeaderTitle) => {
-                  if (tableHeaderTitle.key !== "action") {
+              </TableRow>
+            ) : products.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={tableHeaderTitles.length + 2}
+                  className="h-48 text-center text-lg"
+                >
+                  Không tìm thấy sản phẩm nào.
+                </TableCell>
+              </TableRow>
+            ) : (
+              products.map((product, index) => (
+                <TableRow
+                  key={product.id} 
+                  className={`${index % 2 ? "bg-gray-200" : ""}`}
+                >
+                  <TableCell className="py-5">
+                    <Checkbox
+                      className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                      checked={selectedProducts.includes(product.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          const updated = [...selectedProducts, product.id];
+                          setSelectedProducts(updated);
+                          if (updated.length === products.length) {
+                            setIsSelectedAllProduct(true);
+                          }
+                        } else {
+                          const updated = selectedProducts.filter(
+                            (value) => value !== product.id
+                          );
+                          setSelectedProducts(updated);
+                          setIsSelectedAllProduct(false);
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {index + 1 + ((query.page ?? 1) - 1) * query.pageSize}
+                  </TableCell>
+
+                  {tableHeaderTitles.map((tableHeaderTitle) => {
+                    if (tableHeaderTitle.key === "action") {
+                      return (
+                        tableHeaderTitle.render as (
+                          product: ProductResponseDto
+                        ) => React.ReactNode
+                      )(product);
+                    }
+
                     return tableHeaderTitle.render(
                       product[
                         tableHeaderTitle.key as keyof typeof product
-                      ] as ProductStatus & string[]
+                      ] as any
                     );
-                  }
-                })}
-                <TableCell>
-                  {tableHeaderTitles[tableHeaderTitles.length - 1].render(
-                    product.status as ProductStatus & string[]
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
-        <div className="w-full py-3 flex justify-end">
-          <Pagination className="w-fit m-0 mr-5">
+
+        <div className="w-full py-3 flex justify-between items-center px-5">
+          <div className="text-sm text-muted-foreground">
+            Tổng: <b>{pagination.totalItem}</b> sản phẩm
+          </div>
+          <Pagination className="w-fit m-0">
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious href="#" />
+                <PaginationPrevious
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  className={
+                    pagination.currentPage === 1
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
               </PaginationItem>
+
+              {renderPaginationItems()}
+
               <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
+                <PaginationNext
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  className={
+                    pagination.currentPage === pagination.totalPage
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
