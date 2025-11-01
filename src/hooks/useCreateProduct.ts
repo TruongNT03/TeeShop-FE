@@ -1,22 +1,52 @@
-import type { CreateProductDto } from "@/api";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getAllCategoryQuery } from "@/queries/adminProductQueries";
+import {
+  getAllCategoryQuery,
+  getAllVariantsQuery,
+} from "@/queries/adminProductQueries";
 import type { apiClient } from "@/services/apiClient";
-
-export const createProductSchema = z.object({
-  name: z.string(),
+ 
+const productVariantSchema = z.object({
+  price: z.number().min(0, "Giá phải lớn hơn 0"),
+  stock: z.number().int().min(0, "Tồn kho phải là số nguyên dương"),
+  sku: z.string().min(1, "SKU là bắt buộc"),
+  variantValueIds: z
+    .array(z.number())
+    .min(1, "Phải chọn ít nhất 1 giá trị biến thể"), 
+  name: z.string().optional(),
+});
+ 
+const baseProductSchema = z.object({
+  name: z.string().min(1, "Tên sản phẩm là bắt buộc"),
   description: z.string().optional(),
   status: z.enum(["published", "unpublished"]),
-  hasVariant: z.boolean(),
-  categoryIds: z.array(z.number().int()),
-  imageUrls: z.array(z.url()).optional(),
-  sku: z.string(),
-  price: z.number().optional(),
-  stock: z.number(),
-  productVariants: z.array(z.string()).optional(),
+  categoryIds: z.array(z.number()).min(1, "Phải chọn ít nhất 1 danh mục"),
+  imageUrls: z.array(z.string().url()).optional(),  
 });
+ 
+const simpleProductSchema = baseProductSchema.extend({
+  hasVariant: z.literal(false),
+  price: z.number().min(0, "Giá phải lớn hơn 0"),
+  stock: z.number().int().min(0, "Tồn kho phải là số nguyên dương"),
+  sku: z.string().min(1, "SKU là bắt buộc"),
+  productVariants: z.array(productVariantSchema).max(0).optional(),
+});
+ 
+const variantProductSchema = baseProductSchema.extend({
+  hasVariant: z.literal(true),
+  price: z.number().optional(),
+  stock: z.number().optional(),
+  sku: z.string().optional(),
+  productVariants: z
+    .array(productVariantSchema)
+    .min(1, "Phải thêm ít nhất 1 biến thể"),
+});
+ 
+export const createProductSchema = z.discriminatedUnion("hasVariant", [
+  simpleProductSchema,
+  variantProductSchema,
+]);
 
 export type CreateProductFormData = z.infer<typeof createProductSchema>;
 
@@ -26,16 +56,17 @@ export const useCreateProduct = ({
   categoryQuery: Parameters<
     typeof apiClient.api.adminCategoriesControllerFindAll
   >[0];
-}) => {
-  const { data } = getAllCategoryQuery(categoryQuery);
-
+}) => { 
+  const categoriesResponse = getAllCategoryQuery(categoryQuery);
+  const variantsResponse = getAllVariantsQuery({ pageSize: 100 });
+ 
   const form = useForm<CreateProductFormData>({
-    resolver: zodResolver(createProductSchema),
+    resolver: zodResolver(createProductSchema),  
     defaultValues: {
       name: "",
       description: "",
       status: "unpublished",
-      hasVariant: true,
+      hasVariant: false,
       categoryIds: [],
       imageUrls: [],
       price: 0,
@@ -44,5 +75,18 @@ export const useCreateProduct = ({
       productVariants: [],
     },
   });
-  return { form, categories: data?.data.data };
+ 
+  const { fields, append, remove, update } = useFieldArray({
+    control: form.control,
+    name: "productVariants",
+  });
+
+  return {
+    form,
+    categories: categoriesResponse.data?.data.data || [],
+    categoriesLoading: categoriesResponse.isLoading,
+    variants: variantsResponse.data?.data.data || [],
+    variantsLoading: variantsResponse.isLoading,
+    variantFields: { fields, append, remove, update },
+  };
 };
