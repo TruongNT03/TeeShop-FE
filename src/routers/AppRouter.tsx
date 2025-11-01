@@ -8,6 +8,7 @@ import Home from "../pages/Home";
 import AdminProduct from "@/pages/AdminProduct";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminCreateProduct from "@/pages/AdminCreateProduct";
+import UserLayout from "@/layouts/UserLayout";
 import DemoPage from "@/pages/DemoPage";
 import ForgotPassword from "@/pages/ForgotPassword";
 
@@ -17,7 +18,9 @@ const AppRouter = () => {
       <Routes>
         {/* Public Routes */}
         <Route element={<PublicRoute />}>
-          <Route index path="/" element={<Home />} />{" "}
+          <Route element={<UserLayout />}>
+            <Route index path="/" element={<Home />} />{" "}
+          </Route>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

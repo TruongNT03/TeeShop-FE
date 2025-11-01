@@ -35,21 +35,11 @@ const Login = () => {
     isLoading,
   } = useLogin();
   return (
-    <div className="min-h-screen w-full bg-white relative overflow-hidden">
+    <div className="min-h-screen w-full bg-primary relative overflow-hidden flex">
       <Toaster />
-      {/* Soft Blue Radial Background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: "#ffffff",
-          backgroundImage: `
-       radial-gradient(circle at top center, rgba(59, 130, 246, 0.5),transparent 70%)
-     `,
-        }}
-      />
-      {/* Your Content Here */}
-      <div className="w-full min-h-screen relative z-10 flex flex-col justify-center items-center">
-        <Card className="w-96">
+      <div className="flex-1"></div>
+      <div className="w-full min-h-screen bg-white relative z-10 flex-1 flex flex-col justify-center items-center">
+        <Card className="w-96 border-0 shadow-none">
           <CardHeader>
             <CardTitle className="text-center text-3xl">LOGIN</CardTitle>
             <div className="text-center mt-5">
@@ -83,7 +73,7 @@ const Login = () => {
                       <FormControl>
                         <div className="relative">
                           <Input
-                            placeholder="password"
+                            placeholder="Password"
                             type={isShowPassword ? "text" : "password"}
                             {...field}
                           />

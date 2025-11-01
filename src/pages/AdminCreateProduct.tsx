@@ -25,6 +25,10 @@ import { useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Upload } from "antd";
+import CustomUpload from "@/components/CustomUpload";
+
+const { Dragger } = Upload;
 
 const AdminCreateProduct = () => {
   const [categoryPage, setCategoryPage] = useState<number>(1);
@@ -91,47 +95,7 @@ const AdminCreateProduct = () => {
                   <FormItem>
                     <FormLabel>Images</FormLabel>
                     <FormControl>
-                      <div
-                        className="w-full h-[160px] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-indigo-400 transition"
-                        onClick={() =>
-                          document.getElementById("file-upload")?.click()
-                        }
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-10 h-10 text-indigo-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={1.5}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 16V4m0 0l4 4m-4-4l-4 4M4 20h16"
-                          />
-                        </svg>
-                        <p className="text-sm text-gray-600">
-                          Select your file or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          png, pdf, jpg, docx accepted
-                        </p>
-                        <button
-                          type="button"
-                          className="mt-2 px-4 py-1 bg-indigo-400 text-white rounded-md hover:bg-indigo-500 text-sm"
-                        >
-                          Browse
-                        </button>
-
-                        <Input
-                          id="file-upload"
-                          type="file"
-                          multiple
-                          className="hidden"
-                          onChange={(e) => field.onChange(e.target.files)}
-                        />
-                      </div>
+                      <CustomUpload></CustomUpload>
                     </FormControl>
                   </FormItem>
                 )}
