@@ -28,7 +28,7 @@ import {
   X,
 } from "lucide-react";
 import { Editor } from "@tinymce/tinymce-react";
-import { useEffect, useRef, useState } from "react";  
+import { useEffect, useRef, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import CustomUpload from "@/components/CustomUpload";
@@ -62,7 +62,7 @@ import {
 } from "@/queries/adminProductQueries";
 import { useNavigate } from "react-router-dom";
 import type { CreateProductFormData } from "@/hooks/useCreateProduct";
- 
+
 type VariantOption = {
   variantId: number;
   name: string;
@@ -87,20 +87,20 @@ const AdminCreateProduct = () => {
   });
 
   const mutation = createProductMutation();
- 
+
   const hasVariant = form.watch("hasVariant");
- 
+
   const [selectedVariantOptions, setSelectedVariantOptions] = useState<
     VariantOption[]
   >([]);
   const [currentSelectedVariantId, setCurrentSelectedVariantId] =
     useState<number>(0);
- 
+
   const variantValuesResponse = getAllVariantValuesQuery(
     { variantId: currentSelectedVariantId, pageSize: 100 },
-    currentSelectedVariantId > 0  
+    currentSelectedVariantId > 0 
   );
- 
+
   const handleAddVariantOption = (variantId: number) => {
     const variant = variants.find((v) => v.id === variantId);
     if (
@@ -156,7 +156,6 @@ const AdminCreateProduct = () => {
   };
 
   const generateVariantRows = () => {
-    // Xóa các hàng cũ
     variantFields.remove();
 
     const selectedOptions = selectedVariantOptions
@@ -167,9 +166,9 @@ const AdminCreateProduct = () => {
       .filter((opt) => opt.values.length > 0);
 
     if (selectedOptions.length === 0) return;
- 
+
     const valueArrays = selectedOptions.map((opt) => opt.values);
- 
+
     const getCombinations = (
       arrays: VariantValueResponseDto[][]
     ): VariantValueResponseDto[][] => {
@@ -187,23 +186,23 @@ const AdminCreateProduct = () => {
     };
 
     const combinations = getCombinations(valueArrays);
- 
+
     combinations.forEach((comb) => {
       variantFields.append({
         price: 0,
         stock: 0,
         sku: "",
         variantValueIds: comb.map((v) => v.id),
-        name: comb.map((v) => v.value).join(" / "), 
+        name: comb.map((v) => v.value).join(" / "),
       });
     });
   };
- 
-  const onSubmit = (data: CreateProductFormData) => { 
+
+  const onSubmit = (data: CreateProductFormData) => {
     const description = editorRef.current
       ? (editorRef.current as any).getContent()
       : "";
-     
+    
     const finalData = { ...data, description };
     console.log(finalData);
     mutation.mutate(finalData, {
@@ -244,7 +243,7 @@ const AdminCreateProduct = () => {
                 disabled={mutation.isPending}
                 onClick={() => {
                   form.setValue("status", "published");
-                  form.handleSubmit(onSubmit)(); 
+                  form.handleSubmit(onSubmit)();
                 }}
               >
                 {mutation.isPending && form.getValues("status") === "published" ? (
@@ -283,7 +282,7 @@ const AdminCreateProduct = () => {
                         <FormLabel>Mô tả</FormLabel>
                         <FormControl>
                           <Editor
-                            apiKey="YOUR_TINYMCE_API_KEY"
+                            apiKey="6zx8a1n07j925x66iyy3gp0r8lgoywv2p8uq1fi6a7k9awsd"
                             onInit={(_evt, editor) =>
                               (editorRef.current = editor as any)
                             }
@@ -594,37 +593,13 @@ const AdminCreateProduct = () => {
                 </CardContent>
               </Card>
             </div>
-
+ 
             <div className="flex-[2] flex flex-col gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Tổ chức</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-5">
-                  <FormField
-                    control={form.control} 
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Trạng thái</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Chọn trạng thái" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="published">Xuất bản</SelectItem>
-                            <SelectItem value="unpublished">Nháp</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <CardContent className="space-y-5"> 
 
                   <FormField
                     control={form.control} 
@@ -700,7 +675,7 @@ const AdminCreateProduct = () => {
                               </CommandList>
                             </Command>
                           </PopoverContent>
-                        </Popover>
+                        </Popover> 
                         <div className="flex flex-wrap gap-1 pt-2">
                           {categories
                             .filter((cat: CategoryResponseDto) =>
