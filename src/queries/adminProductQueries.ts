@@ -1,4 +1,4 @@
-import { adminProductApi } from "@/services/getListProduct";
+import { adminProductApi } from "@/services/adminGetListProduct";
 import type { apiClient } from "@/services/apiClient";
 import { useQuery } from "@tanstack/react-query";
 

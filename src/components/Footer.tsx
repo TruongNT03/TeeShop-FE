@@ -12,6 +12,7 @@ const Footer = () => {
         ))}
         <FooterEmail />
       </div>
+      <div className="w-full h-[1px] bg-border my-[24px]"></div>
       <div className="flex justify-between">
         <div className="font-lato text-[14px]">
           <div>© 2020 NorthStar eCommerce</div>

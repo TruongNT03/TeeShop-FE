@@ -57,7 +57,7 @@ export interface LoginResponseDto {
   refreshToken: string;
 }
 
-export interface SuccessReponseDto {
+export interface SuccessResponseDto {
   success: boolean;
 }
 
@@ -241,7 +241,7 @@ export interface ListProductResponseDto {
   paginate: PaginateMetaDto;
 }
 
-export interface ProductImageDetailReponseDto {
+export interface ProductImageDetailResponseDto {
   id: number;
   url: string;
 }
@@ -289,7 +289,7 @@ export interface ProductDetailResponseDto {
   hasVariant: boolean;
   status: "unpublished" | "published";
   categories: CategoryResponseDto[];
-  productImages: ProductImageDetailReponseDto[];
+  productImages: ProductImageDetailResponseDto[];
   productVariants: ProductDetailVariantResponseDto[];
 }
 
@@ -380,6 +380,91 @@ export interface CreateConversationDto {
 export interface CreateMessageDto {
   conversationId: string;
   content: string;
+}
+
+export interface AddItemToCartDto {
+  productVariantId: string;
+  quantity: number;
+}
+
+export interface CartItemResponseDto {
+  id: string;
+  productVariant: ProductVariantResponseDto;
+  quantity: number;
+}
+
+export interface CartResponseDto {
+  id: string;
+  cartItems: CartItemResponseDto[];
+}
+
+export interface ListCartItemResponseDto {
+  data: CartItemResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface UpdateQuantityCartItemDto {
+  quantity: number;
+}
+
+export interface UpdateProductVariantCartItemDto {
+  productVariantId: string;
+}
+
+export interface UserProductResponseDto {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  productImages: ProductImageDetailResponseDto[];
+}
+
+export interface ListUserProductResponseDto {
+  data: UserProductResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface UserProductDetailResponseDto {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  totalStock: number;
+  productImages: ProductImageDetailResponseDto[];
+  productVariants: ProductVariantResponseDto[];
+}
+
+export interface ProductVariantValueResponseDto {
+  variant: string;
+  value: string[];
+}
+
+export interface CreateOrderFromCartDto {
+  cartItemIds: string[];
+  addressId: string;
+  paymentType: "qr" | "cod";
+}
+
+export interface CreateAddressDto {
+  address: string;
+}
+
+export interface AddressResponseDto {
+  id: string;
+  address: string;
+}
+
+export interface ListAddressResponseDto {
+  data: AddressResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface UpdateAddressDto {
+  address: string;
+}
+
+export interface CreatePaymentDto {
+  orderId: string;
 }
 
 import type {
@@ -636,7 +721,7 @@ export class Api<
      * @secure
      */
     authControllerLogout: (params: RequestParams = {}) =>
-      this.request<SuccessReponseDto, any>({
+      this.request<SuccessResponseDto, any>({
         path: `/api/v1/auth/logout`,
         method: "GET",
         secure: true,
@@ -714,7 +799,7 @@ export class Api<
       data: VerifyForgotPasswordDto,
       params: RequestParams = {}
     ) =>
-      this.request<SuccessReponseDto, any>({
+      this.request<SuccessResponseDto, any>({
         path: `/api/v1/auth/forgot-password/verify/${token}`,
         method: "POST",
         body: data,
@@ -736,7 +821,7 @@ export class Api<
       data: ChangePasswordDto,
       params: RequestParams = {}
     ) =>
-      this.request<SuccessReponseDto, any>({
+      this.request<SuccessResponseDto, any>({
         path: `/api/v1/auth/change-password`,
         method: "POST",
         body: data,
@@ -877,7 +962,7 @@ export class Api<
       },
       params: RequestParams = {}
     ) =>
-      this.request<ListCategoryResponseDto, ListCategoryResponseDto>({
+      this.request<any, ListCategoryResponseDto>({
         path: `/api/v1/admin/categories`,
         method: "GET",
         query: query,
@@ -996,7 +1081,7 @@ export class Api<
       data: UpdateProductDto,
       params: RequestParams = {}
     ) =>
-      this.request<SuccessReponseDto, any>({
+      this.request<SuccessResponseDto, any>({
         path: `/api/v1/admin/product/${id}`,
         method: "PUT",
         body: data,
@@ -1066,7 +1151,7 @@ export class Api<
       data: CreateVariantDto,
       params: RequestParams = {}
     ) =>
-      this.request<SuccessReponseDto, any>({
+      this.request<SuccessResponseDto, any>({
         path: `/api/v1/admin/product/option/variant`,
         method: "POST",
         body: data,
@@ -1124,7 +1209,7 @@ export class Api<
       data: CreateVariantValueDto,
       params: RequestParams = {}
     ) =>
-      this.request<SuccessReponseDto, any>({
+      this.request<SuccessResponseDto, any>({
         path: `/api/v1/admin/product/option/variant-value`,
         method: "POST",
         body: data,
@@ -1184,7 +1269,7 @@ export class Api<
       data: CreateConversationDto,
       params: RequestParams = {}
     ) =>
-      this.request<SuccessReponseDto, any>({
+      this.request<SuccessResponseDto, any>({
         path: `/api/v1/chat/conversation`,
         method: "POST",
         body: data,
@@ -1250,6 +1335,359 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] CART
+     * @name CartControllerAddItemToCart
+     * @summary [USER] ADD PRODUCT TO CART
+     * @request POST:/api/v1/carts
+     * @secure
+     */
+    cartControllerAddItemToCart: (
+      data: AddItemToCartDto,
+      params: RequestParams = {}
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/carts`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] CART
+     * @name CartControllerGetCartSummary
+     * @summary [USER] GET CART SUMMARY
+     * @request GET:/api/v1/carts
+     * @secure
+     */
+    cartControllerGetCartSummary: (params: RequestParams = {}) =>
+      this.request<CartResponseDto, any>({
+        path: `/api/v1/carts`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] CART
+     * @name CartControllerGetAllCartItem
+     * @summary [USER] GET LIST CART ITEM
+     * @request GET:/api/v1/carts/cart-item
+     * @secure
+     */
+    cartControllerGetAllCartItem: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<ListCartItemResponseDto, any>({
+        path: `/api/v1/carts/cart-item`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] CART
+     * @name CartControllerUpdateQuantityCartItem
+     * @summary [USER] UPDATE QUANTITY CART ITEM
+     * @request PATCH:/api/v1/carts/cart-item/{id}/quantity
+     * @secure
+     */
+    cartControllerUpdateQuantityCartItem: (
+      id: string,
+      data: UpdateQuantityCartItemDto,
+      params: RequestParams = {}
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/carts/cart-item/${id}/quantity`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] CART
+     * @name CartControllerUpdateProductVariantCartItem
+     * @summary [USER] UPDATE PRODUCT VARIANT CART ITEM
+     * @request PATCH:/api/v1/carts/cart-item/{id}/product-variant
+     * @secure
+     */
+    cartControllerUpdateProductVariantCartItem: (
+      id: string,
+      data: UpdateProductVariantCartItemDto,
+      params: RequestParams = {}
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/carts/cart-item/${id}/product-variant`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] CART
+     * @name CartControllerDeleteCartItem
+     * @summary [USER] DELETE CART ITEM
+     * @request DELETE:/api/v1/carts/cart-item/{id}
+     * @secure
+     */
+    cartControllerDeleteCartItem: (id: string, params: RequestParams = {}) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/carts/cart-item/${id}`,
+        method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] PRODUCT
+     * @name ProductControllerFindAll
+     * @summary [USER] FIND ALL PRODUCT
+     * @request GET:/api/v1/product
+     */
+    productControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+        search?: string;
+        categoryIds?: number[];
+        sortBy?: "name" | "createdAt" | "updatedAt" | "price";
+        sortOrder?: "DESC" | "ASC";
+        lowPrice?: number;
+        highPrice?: number;
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<ListUserProductResponseDto, any>({
+        path: `/api/v1/product`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] PRODUCT
+     * @name ProductControllerFindOne
+     * @summary [USER] FIND ONE PRODUCT
+     * @request GET:/api/v1/product/{id}
+     */
+    productControllerFindOne: (id: string, params: RequestParams = {}) =>
+      this.request<UserProductDetailResponseDto, any>({
+        path: `/api/v1/product/${id}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] PRODUCT
+     * @name ProductControllerGetProductVariantValue
+     * @summary [USER] GET VARIANT VALUE OF PRODUCT
+     * @request GET:/api/v1/product/{id}/variant-value
+     */
+    productControllerGetProductVariantValue: (
+      id: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<ProductVariantValueResponseDto[], any>({
+        path: `/api/v1/product/${id}/variant-value`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] ORDER
+     * @name OrderControllerCreateOrderFromCart
+     * @summary [USER] CREATE ORDER
+     * @request POST:/api/v1/order
+     * @secure
+     */
+    orderControllerCreateOrderFromCart: (
+      data: CreateOrderFromCartDto,
+      params: RequestParams = {}
+    ) =>
+      this.request<SaveUuidResponseDto, any>({
+        path: `/api/v1/order`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] ADDRESS
+     * @name AddressControllerCreate
+     * @summary [USER] CREATE ADDRESS
+     * @request POST:/api/v1/address
+     * @secure
+     */
+    addressControllerCreate: (
+      data: CreateAddressDto,
+      params: RequestParams = {}
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/address`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] ADDRESS
+     * @name AddressControllerFindAll
+     * @summary [USER] GET ALL ADDRESS
+     * @request GET:/api/v1/address
+     * @secure
+     */
+    addressControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<ListAddressResponseDto, any>({
+        path: `/api/v1/address`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] ADDRESS
+     * @name AddressControllerUpdate
+     * @summary [USER] UPDATE ADDRESS
+     * @request PUT:/api/v1/address/{id}
+     * @secure
+     */
+    addressControllerUpdate: (
+      id: string,
+      data: UpdateAddressDto,
+      params: RequestParams = {}
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/address/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] PAYMENT
+     * @name PaymentControllerCreate
+     * @summary [USER] CREATE PAYMENT
+     * @request POST:/api/v1/payment
+     * @secure
+     */
+    paymentControllerCreate: (
+      data: CreatePaymentDto,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/payment`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags PaymentWebhook
+     * @name PaymentWebhookControllerPayment
+     * @summary [WEBHOOK] RECEIVED PAYMENT INFORMATION
+     * @request POST:/api/v1/webhook/payment
+     */
+    paymentWebhookControllerPayment: (params: RequestParams = {}) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/webhook/payment`,
+        method: "POST",
+        format: "json",
         ...params,
       }),
   };

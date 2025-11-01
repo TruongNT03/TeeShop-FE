@@ -30,6 +30,7 @@ import {
 } from "@/queries/authQueries";
 import { CheckCircle2 } from "lucide-react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { motion } from "motion/react";
 
 const registerSchema = z
   .object({
@@ -118,10 +119,8 @@ const Register = () => {
   const renderRegisterStep = () => (
     <>
       <CardHeader>
-        <CardTitle className="text-center text-3xl">ĐĂNG KÝ</CardTitle>
-        <CardDescription className="text-center pt-2">
-          Tạo tài khoản mới của bạn
-        </CardDescription>
+        <CardTitle className="text-center text-3xl">REGISTER</CardTitle>
+        <div className="text-center pt-2">Create your account</div>
       </CardHeader>
       <CardContent>
         <Form {...registerForm}>
@@ -149,11 +148,11 @@ const Register = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mật khẩu</FormLabel>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="********"
+                        placeholder="Password"
                         type={isShowPassword ? "text" : "password"}
                         {...field}
                       />
@@ -179,11 +178,11 @@ const Register = () => {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Xác nhận Mật khẩu</FormLabel>
+                  <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="********"
+                        placeholder="Password"
                         type={isShowConfirmPassword ? "text" : "password"}
                         {...field}
                       />
@@ -210,7 +209,7 @@ const Register = () => {
               type="submit"
               disabled={regMutation.isPending}
             >
-              {regMutation.isPending ? <Spinner /> : "Đăng ký"}
+              {regMutation.isPending ? <Spinner /> : "Submit"}
             </Button>
           </form>
         </Form>
@@ -274,31 +273,39 @@ const Register = () => {
   );
 
   return (
-    <div className="min-h-screen w-full bg-white relative overflow-hidden">
-      {/* Nền xanh mờ giống trang Login [cite: 498-499] */}
-      <Toaster richColors />
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: "#ffffff",
-          backgroundImage: `
-       radial-gradient(circle at top center, rgba(59, 130, 246, 0.5),transparent 70%)
-     `,
-        }}
-      />
-      <div className="w-full min-h-screen relative z-10 flex flex-col justify-center items-center">
-        <Card className="w-96">
+    <div className="min-h-screen w-full bg-primary relative overflow-hidden flex">
+      <motion.div
+        initial={{ x: "100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 100 }}
+        transition={{ duration: 0.7, ease: "easeIn" }}
+        className="flex-1 w-full bg-white min-h-screen relative z-10 flex flex-col justify-center items-center"
+      >
+        <Card className="w-96 border-0 shadow-none">
           {step === "register" && renderRegisterStep()}
           {step === "otp" && renderOtpStep()}
           {step === "success" && renderSuccessStep()}
 
           <CardFooter className="justify-center">
             <Link to="/login">
-              <Button variant="link">Đã có tài khoản? Đăng nhập</Button>
+              <div className="text-center">
+                Don't have an account? Click{" "}
+                <span className="underline cursor-pointer text-blue-500">
+                  here
+                </span>{" "}
+                to login.
+              </div>
             </Link>
           </CardFooter>
         </Card>
-      </div>
+      </motion.div>
+      <motion.div
+        className="flex-1 bg-primary z-20 flex justify-center items-center"
+        initial={{ x: "-100%" }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.7, ease: "easeIn" }}
+      >
+        <img src="login-icon.png" alt="" className="max-w-[350px]" />
+      </motion.div>
     </div>
   );
 };

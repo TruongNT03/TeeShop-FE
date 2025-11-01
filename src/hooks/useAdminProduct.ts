@@ -9,12 +9,14 @@ export const useAdminProduct = (
   const [isSelectedAllProduct, setIsSelectedAllProduct] =
     useState<boolean>(false);
 
-  const { data } = getAllProductQuery(query);
+  const getAllProductResponse = getAllProductQuery(query);
   return {
     selectedProducts,
     setSelectedProducts,
     isSelectedAllProduct,
     setIsSelectedAllProduct,
-    products: data?.data.data,
+    products: getAllProductResponse.isSuccess
+      ? getAllProductResponse.data.data.data
+      : [],
   };
 };

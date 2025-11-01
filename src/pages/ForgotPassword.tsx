@@ -29,6 +29,7 @@ import {
   verifyForgotPasswordMutation,
 } from "@/queries/authQueries";
 import { CheckCircle2 } from "lucide-react";
+import { motion } from "motion/react";
 
 const emailSchema = z.object({
   email: z.string().email("Địa chỉ email không hợp lệ"),
@@ -69,7 +70,7 @@ const ForgotPassword = () => {
     emailMutation.mutate(data, {
       onSuccess: (response) => {
         toast.success("Đã gửi OTP vào email của bạn!");
-        setRequestToken(response.data.token); // Lưu lại UUID token 
+        setRequestToken(response.data.token); // Lưu lại UUID token
         setUserEmail(data.email);
         setStep("otp");
       },
@@ -190,30 +191,34 @@ const ForgotPassword = () => {
   );
 
   return (
-    <div className="min-h-screen w-full bg-white relative overflow-hidden">
+    <div className="min-h-screen w-full bg-white relative overflow-hidden flex">
       <Toaster richColors />
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: "#ffffff",
-          backgroundImage: `
-       radial-gradient(circle at top center, rgba(59, 130, 246, 0.5),transparent 70%)
-     `,
-        }}
-      />
-      <div className="w-full min-h-screen relative z-10 flex flex-col justify-center items-center">
-        <Card className="w-96">
+      <motion.div
+        initial={{ x: "100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 100 }}
+        transition={{ duration: 0.7, ease: "easeIn" }}
+        className="w-full flex-1 min-h-screen relative z-10 flex flex-col justify-center items-center"
+      >
+        <Card className="w-96 border-0 shadow-none">
           {step === "email" && renderEmailStep()}
           {step === "otp" && renderOtpStep()}
           {step === "success" && renderSuccessStep()}
 
           <CardFooter className="justify-center">
             <Link to="/login">
-              <Button variant="link">Quay lại Đăng nhập</Button>
+              <div className="hover:underline">Quay lại Đăng nhập</div>
             </Link>
           </CardFooter>
         </Card>
-      </div>
+      </motion.div>
+      <motion.div
+        className="flex-1 bg-primary z-20 flex justify-center items-center"
+        initial={{ x: "-100%" }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.7, ease: "easeIn" }}
+      >
+        <img src="login-icon.png" alt="" className="max-w-[350px]" />
+      </motion.div>
     </div>
   );
 };

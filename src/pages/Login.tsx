@@ -23,6 +23,7 @@ import { IoEyeOffOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 import { Spinner } from "@/components/ui/spinner";
 import { Toaster } from "@/components/ui/sonner";
+import { motion } from "motion/react";
 
 const Login = () => {
   const {
@@ -37,8 +38,20 @@ const Login = () => {
   return (
     <div className="min-h-screen w-full bg-primary relative overflow-hidden flex">
       <Toaster />
-      <div className="flex-1"></div>
-      <div className="w-full min-h-screen bg-white relative z-10 flex-1 flex flex-col justify-center items-center">
+      <motion.div
+        className="flex-1 bg-primary z-20 flex justify-center items-center"
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.7, ease: "easeIn" }}
+      >
+        <img src="login-icon.png" alt="" className="max-w-[350px]" />
+      </motion.div>
+      <motion.div
+        initial={{ x: "-100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 100 }}
+        transition={{ duration: 0.7, ease: "easeIn" }}
+        className="w-full min-h-screen bg-white relative z-10 flex-1 flex flex-col justify-center items-center"
+      >
         <Card className="w-96 border-0 shadow-none">
           <CardHeader>
             <CardTitle className="text-center text-3xl">LOGIN</CardTitle>
@@ -128,7 +141,7 @@ const Login = () => {
             </div>
           </CardFooter>
         </Card>
-      </div>
+      </motion.div>
     </div>
   );
 };

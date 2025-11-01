@@ -8,6 +8,7 @@ import { useHome } from "@/hooks/useHome";
 import { Fingerprint, LifeBuoy, RotateCcw, TruckElectric } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { motion } from "motion/react";
 
 const policies: PolicyItemProps[] = [
   {
@@ -33,15 +34,26 @@ const policies: PolicyItemProps[] = [
 ];
 
 const Home = () => {
-  const { newArrivalProducts, topSellerProducts } = useHome();
+  const {
+    newArrivalProducts,
+    topSellerProducts,
+    newArrivalProductsIsLoading,
+    topSellerProductsIsLoading,
+  } = useHome();
   return (
-    <div className="w-full">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 100 }}
+      transition={{ duration: 0.3, ease: "easeIn" }}
+      className="w-full"
+    >
       <Banner />
       <ProductSection
         title="Discover NEW Arrivals"
         descriptions="Recently added shirts!"
         itemPerRow={6}
         items={newArrivalProducts}
+        isLoading={newArrivalProductsIsLoading}
       />
       <Policy items={policies} />
       <Promo>
@@ -63,15 +75,16 @@ const Home = () => {
         descriptions="Browse our top-selling products"
         itemPerRow={4}
         items={topSellerProducts}
+        isLoading={topSellerProductsIsLoading}
       />
       <div className="w-full flex justify-center items-center">
         <Link to={"/product"} className="py-[56px]">
-          <Button className="uppercase font-lato p-8 text-[20px] border-[2px] border-custom-primary bg-custom-primary rounded-sm hover:text-custom-primary hover:bg-transparent hover:border-[2px] hover:border-custom-primary">
+          <Button className="uppercase font-lato py-7 px-8 text-[20px] border-[2px] border-custom-primary bg-custom-primary rounded-sm hover:text-custom-primary hover:bg-transparent hover:border-[2px] hover:border-custom-primary">
             Shop Now
           </Button>
         </Link>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

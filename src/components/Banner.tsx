@@ -24,7 +24,7 @@ const Banner = () => {
     <div className="w-full max-h-[700px] relative pb-[24px]">
       <Carousel
         autoplay={{ dotDuration: true }}
-        autoplaySpeed={3000}
+        autoplaySpeed={5000}
         draggable={true}
         easing="ease-in-out"
         speed={2000}

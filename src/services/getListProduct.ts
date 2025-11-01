@@ -1,11 +1,11 @@
 import { apiClient } from "./apiClient";
 
-export const adminProductApi = {
-  findAll: async (
-    query: Parameters<typeof apiClient.api.adminProductControllerFindAll>[0]
-  ) => apiClient.api.adminProductControllerFindAll(query),
+export const productApi = {
+  findDiscoverNewArrivals: async (
+    query: Parameters<typeof apiClient.api.productControllerFindAll>[0]
+  ) => apiClient.api.productControllerFindAll(query),
 
-  findAllCategories: async (
-    query: Parameters<typeof apiClient.api.adminCategoriesControllerFindAll>[0]
-  ) => apiClient.api.adminCategoriesControllerFindAll(query),
+  findTopSeller: async (
+    query: Parameters<typeof apiClient.api.productControllerFindAll>[0]
+  ) => apiClient.api.productControllerFindAll(query),
 };
