@@ -5,7 +5,7 @@ import FooterEmail from "./FooterEmail";
 const Footer = () => {
   const { footerColumns } = useFooter();
   return (
-    <div className="w-full px-[65px] py-[28px] text-[#1D1D1D]">
+    <div className="w-full px-[65px] py-[28px] text-foreground">
       <div className="flex justify-between pb-[200px]">
         {footerColumns.map((footerColumn) => (
           <FooterColumn title={footerColumn.title} items={footerColumn.items} />

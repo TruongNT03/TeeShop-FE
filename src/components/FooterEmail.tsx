@@ -9,7 +9,7 @@ const FooterEmail = () => {
       <div className="flex items-center">
         <input
           type="text"
-          className="py-[17px] w-[300px] border-b-[1px] border-black outline-0"
+          className="py-[17px] w-[300px] border-b border-border outline-0 bg-transparent"
           placeholder="Enter email"
         />
         <IoIosArrowForward className="text-[24px]" />
