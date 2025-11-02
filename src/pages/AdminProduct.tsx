@@ -90,7 +90,7 @@ const AdminProduct = () => {
           ) : (
             <Badge
               variant="destructive"
-              className="border-red-500 bg-transparent text-red-500"
+              className="border-destructive bg-transparent text-destructive"
             >
               Unpublished
             </Badge>
@@ -110,14 +110,14 @@ const AdminProduct = () => {
                 index < 3 && (
                   <Badge
                     key={index}
-                    className="border-blue-500 bg-transparent text-blue-500"
+                    className="border-primary bg-transparent text-primary"
                   >
                     {category}
                   </Badge>
                 )
             )}
             {value.length > 2 && (
-              <Badge className="border-blue-500 bg-transparent text-blue-500 px-7">
+              <Badge className="border-primary bg-transparent text-primary px-7">
                 ...
               </Badge>
             )}
@@ -148,10 +148,10 @@ const AdminProduct = () => {
       render: (product: ProductResponseDto): React.ReactNode => (
         <TableCell>
           <div className="flex gap-2">
-            <SquarePen className="scale-75 text-blue-400 cursor-pointer" />
+            <SquarePen className="scale-75 text-primary cursor-pointer" />
             {product.status === "published" ? (
               <Archive
-                className={`scale-75 text-red-500 cursor-pointer ${
+                className={`scale-75 text-destructive cursor-pointer ${
                   statusMutation.isPending
                     ? "opacity-50 pointer-events-none"
                     : ""
@@ -291,7 +291,7 @@ const AdminProduct = () => {
         </div>
         <div>
           <Link to="/admin/product/create">
-            <Button variant="outline" className="bg-blue-600 text-white">
+            <Button variant="default">
               <Plus />
               Create Product
             </Button>
@@ -301,7 +301,7 @@ const AdminProduct = () => {
       {/* Table */}
       <Card className="w-[95%] mx-auto py-0 overflow-hidden">
         <Table>
-          <TableHeader className="bg-indigo-300">
+          <TableHeader className="bg-muted">
             <TableRow>
               <TableHead>
                 <Checkbox
@@ -357,7 +357,7 @@ const AdminProduct = () => {
               products.map((product, index) => (
                 <TableRow
                   key={product.id}
-                  className={`${index % 2 ? "bg-gray-200" : ""}`}
+                  className={`${index % 2 ? "bg-muted" : ""}`}
                 >
                   <TableCell className="py-5">
                     <Checkbox
