@@ -190,7 +190,7 @@ const ForgotPassword = () => {
   );
 
   return (
-    <div className="min-h-screen w-full bg-white relative overflow-hidden flex">
+    <div className="min-h-screen w-full bg-background relative overflow-hidden flex">
       <motion.div
         initial={{ x: "100%", opacity: 0 }}
         animate={{ x: 0, opacity: 100 }}

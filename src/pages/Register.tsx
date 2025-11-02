@@ -19,7 +19,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
-import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,7 +47,6 @@ const registerSchema = z
     message: "Mật khẩu xác nhận không khớp",
     path: ["confirmPassword"], // Gắn lỗi vào trường confirmPassword
   });
-
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 const otpSchema = z.object({
@@ -273,12 +271,12 @@ const Register = () => {
   );
 
   return (
-    <div className="min-h-screen w-full bg-primary relative overflow-hidden flex">
+    <div className="min-h-screen w-full bg-background relative overflow-hidden flex">
       <motion.div
         initial={{ x: "100%", opacity: 0 }}
         animate={{ x: 0, opacity: 100 }}
         transition={{ duration: 0.7, ease: "easeIn" }}
-        className="flex-1 w-full bg-white min-h-screen relative z-10 flex flex-col justify-center items-center"
+        className="flex-1 w-full bg-background min-h-screen relative z-10 flex flex-col justify-center items-center"
       >
         <Card className="w-96 border-0 shadow-none">
           {step === "register" && renderRegisterStep()}
@@ -289,7 +287,7 @@ const Register = () => {
             <Link to="/login">
               <div className="text-center">
                 Don't have an account? Click{" "}
-                <span className="underline cursor-pointer text-blue-500">
+                <span className="underline cursor-pointer text-primary">
                   here
                 </span>{" "}
                 to login.

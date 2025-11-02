@@ -1,14 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-
 const NotFound = () => {
   return (
-    <div className="min-h-screen w-full bg-white relative overflow-hidden">
+    <div className="min-h-screen w-full bg-background relative overflow-hidden">
       {/* Soft Blue Radial Background */}
       <div
         className="absolute inset-0 z-0"
         style={{
-          background: "#ffffff",
           backgroundImage: `
        radial-gradient(circle at top center, rgba(59, 130, 246, 0.5),transparent 70%)
      `,
@@ -19,7 +17,7 @@ const NotFound = () => {
         <img src="not-found.png" alt="" className="w-96" />
         <div className="text-2xl font-bold mt-8">Đi đâu đấy bạn ơi?</div>
         <Link to={"/"}>
-          <Button variant="secondary" className="mt-8 text-blue-600 ">
+          <Button variant="secondary" className="mt-8 text-primary">
             Về trang chủ
           </Button>
         </Link>
