@@ -1,5 +1,4 @@
-// src/queries/adminProductQueries.ts
-import type { CreateProductDto } from "@/api";
+import type { CreateProductDto, UploadDto } from "@/api";
 import { adminProductApi } from "@/services/adminGetListProduct";
 import type { apiClient } from "@/services/apiClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -41,7 +40,7 @@ export const getAllVariantValuesQuery = (
   return useQuery({
     queryKey: ["variantValues", query],
     queryFn: () => adminProductApi.findAllVariantValues(query),
-    enabled: enabled, 
+    enabled: enabled,
   });
 };
 
@@ -56,6 +55,16 @@ export const createProductMutation = () => {
     },
     onError: (error) => {
       toast.error(error.message || "Tạo sản phẩm thất bại.");
+    },
+  });
+};
+
+export const uploadProductImageMutation = () => {
+  return useMutation({
+    mutationKey: ["uploadProductImage"],
+    mutationFn: (data: UploadDto) => adminProductApi.uploadProductImage(data),
+    onError: (error) => {
+      toast.error(error.message || "Tải ảnh lên thất bại.");
     },
   });
 };

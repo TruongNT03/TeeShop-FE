@@ -74,7 +74,6 @@ const AdminCreateProduct = () => {
   const [categorySearchOpen, setCategorySearchOpen] = useState<boolean>(false);
   const editorRef = useRef(null);
   const navigate = useNavigate();
-
   const {
     form,
     categories,
@@ -85,7 +84,6 @@ const AdminCreateProduct = () => {
   } = useCreateProduct({
     categoryQuery: { pageSize: 20, search: categorySearch },
   });
-
   const mutation = createProductMutation();
 
   const hasVariant = form.watch("hasVariant");
@@ -98,9 +96,8 @@ const AdminCreateProduct = () => {
 
   const variantValuesResponse = getAllVariantValuesQuery(
     { variantId: currentSelectedVariantId, pageSize: 100 },
-    currentSelectedVariantId > 0 
+    currentSelectedVariantId > 0
   );
-
   const handleAddVariantOption = (variantId: number) => {
     const variant = variants.find((v) => v.id === variantId);
     if (
@@ -137,7 +134,6 @@ const AdminCreateProduct = () => {
       setCurrentSelectedVariantId(0);
     }
   }, [variantValuesResponse.data, currentSelectedVariantId, variants]);
-
   const toggleVariantValue = (optionId: number, valueId: number) => {
     setSelectedVariantOptions((prev) =>
       prev.map((option) =>
@@ -157,18 +153,15 @@ const AdminCreateProduct = () => {
 
   const generateVariantRows = () => {
     variantFields.remove();
-
     const selectedOptions = selectedVariantOptions
       .map((opt) => ({
         ...opt,
         values: opt.values.filter((val) => val.selected),
       }))
       .filter((opt) => opt.values.length > 0);
-
     if (selectedOptions.length === 0) return;
 
     const valueArrays = selectedOptions.map((opt) => opt.values);
-
     const getCombinations = (
       arrays: VariantValueResponseDto[][]
     ): VariantValueResponseDto[][] => {
@@ -202,7 +195,7 @@ const AdminCreateProduct = () => {
     const description = editorRef.current
       ? (editorRef.current as any).getContent()
       : "";
-    
+
     const finalData = { ...data, description };
     console.log(finalData);
     mutation.mutate(finalData, {
@@ -216,9 +209,7 @@ const AdminCreateProduct = () => {
   return (
     <div className="w-[95%] mx-auto pb-10">
       <Form {...form}>
-        <form
-          className="w-full px-3"
-        >
+        <form className="w-full px-3">
           <div className="flex justify-between items-center mt-5">
             <div className="text-2xl uppercase font-semibold">
               TẠO SẢN PHẨM MỚI
@@ -233,7 +224,8 @@ const AdminCreateProduct = () => {
                   form.handleSubmit(onSubmit)();
                 }}
               >
-                {mutation.isPending && form.getValues("status") === "unpublished" ? (
+                {mutation.isPending &&
+                form.getValues("status") === "unpublished" ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
                 Lưu nháp
@@ -246,7 +238,8 @@ const AdminCreateProduct = () => {
                   form.handleSubmit(onSubmit)();
                 }}
               >
-                {mutation.isPending && form.getValues("status") === "published" ? (
+                {mutation.isPending &&
+                form.getValues("status") === "published" ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
                 Xuất bản
@@ -262,7 +255,7 @@ const AdminCreateProduct = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <FormField
-                    control={form.control} 
+                    control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
@@ -275,7 +268,7 @@ const AdminCreateProduct = () => {
                     )}
                   />
                   <FormField
-                    control={form.control} 
+                    control={form.control}
                     name="description"
                     render={({ field }) => (
                       <FormItem>
@@ -291,11 +284,24 @@ const AdminCreateProduct = () => {
                               height: 300,
                               menubar: false,
                               plugins: [
-                                "advlist", "autolink", "lists", "link", "image",
-                                "charmap", "preview", "anchor", "searchreplace",
-                                "visualblocks", "code", "fullscreen",
-                                "insertdatetime", "media", "table", "code",
-                                "help", "wordcount",
+                                "advlist",
+                                "autolink",
+                                "lists",
+                                "link",
+                                "image",
+                                "charmap",
+                                "preview",
+                                "anchor",
+                                "searchreplace",
+                                "visualblocks",
+                                "code",
+                                "fullscreen",
+                                "insertdatetime",
+                                "media",
+                                "table",
+                                "code",
+                                "help",
+                                "wordcount",
                               ],
                               toolbar:
                                 "undo redo | blocks | " +
@@ -320,12 +326,15 @@ const AdminCreateProduct = () => {
                 </CardHeader>
                 <CardContent>
                   <FormField
-                    control={form.control} 
+                    control={form.control}
                     name="imageUrls"
-                    render={() => (
+                    render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <CustomUpload />
+                          <CustomUpload
+                            value={field.value || []}
+                            onChange={field.onChange}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -368,7 +377,7 @@ const AdminCreateProduct = () => {
                   {!hasVariant && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                       <FormField
-                        control={form.control} 
+                        control={form.control}
                         name="price"
                         render={({ field }) => (
                           <FormItem>
@@ -388,7 +397,7 @@ const AdminCreateProduct = () => {
                         )}
                       />
                       <FormField
-                        control={form.control} 
+                        control={form.control}
                         name="stock"
                         render={({ field }) => (
                           <FormItem>
@@ -408,7 +417,7 @@ const AdminCreateProduct = () => {
                         )}
                       />
                       <FormField
-                        control={form.control} 
+                        control={form.control}
                         name="sku"
                         render={({ field }) => (
                           <FormItem>
@@ -543,7 +552,7 @@ const AdminCreateProduct = () => {
                                 </TableCell>
                                 <TableCell>
                                   <FormField
-                                    control={form.control} 
+                                    control={form.control}
                                     name={`productVariants.${index}.stock`}
                                     render={({ field }) => (
                                       <Input
@@ -560,7 +569,7 @@ const AdminCreateProduct = () => {
                                 </TableCell>
                                 <TableCell>
                                   <FormField
-                                    control={form.control} 
+                                    control={form.control}
                                     name={`productVariants.${index}.sku`}
                                     render={({ field }) => (
                                       <Input
@@ -593,16 +602,15 @@ const AdminCreateProduct = () => {
                 </CardContent>
               </Card>
             </div>
- 
+
             <div className="flex-[2] flex flex-col gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Tổ chức</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-5"> 
-
+                <CardContent className="space-y-5">
                   <FormField
-                    control={form.control} 
+                    control={form.control}
                     name="categoryIds"
                     render={({ field }) => (
                       <FormItem>
@@ -642,40 +650,42 @@ const AdminCreateProduct = () => {
                                   Không tìm thấy danh mục.
                                 </CommandEmpty>
                                 <CommandGroup>
-                                  {categories.map((category: CategoryResponseDto) => (
-                                    <CommandItem
-                                      key={category.id}
-                                      value={category.title}
-                                      onSelect={() => {
-                                        const currentIds = field.value || [];
-                                        const newIds = currentIds.includes(
-                                          category.id
-                                        )
-                                          ? currentIds.filter(
-                                              (id) => id !== category.id
-                                            )
-                                          : [...currentIds, category.id];
-                                        field.onChange(newIds);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          (field.value || []).includes(
+                                  {categories.map(
+                                    (category: CategoryResponseDto) => (
+                                      <CommandItem
+                                        key={category.id}
+                                        value={category.title}
+                                        onSelect={() => {
+                                          const currentIds = field.value || [];
+                                          const newIds = currentIds.includes(
                                             category.id
                                           )
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
-                                      />
-                                      {category.title}
-                                    </CommandItem>
-                                  ))}
+                                            ? currentIds.filter(
+                                                (id) => id !== category.id
+                                              )
+                                            : [...currentIds, category.id];
+                                          field.onChange(newIds);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            (field.value || []).includes(
+                                              category.id
+                                            )
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                        {category.title}
+                                      </CommandItem>
+                                    )
+                                  )}
                                 </CommandGroup>
                               </CommandList>
                             </Command>
                           </PopoverContent>
-                        </Popover> 
+                        </Popover>
                         <div className="flex flex-wrap gap-1 pt-2">
                           {categories
                             .filter((cat: CategoryResponseDto) =>

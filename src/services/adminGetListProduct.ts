@@ -1,5 +1,4 @@
-// src/services/adminGetListProduct.ts
-import type { CreateProductDto } from "@/api";
+import type { CreateProductDto, UploadDto } from "@/api";
 import { apiClient } from "./apiClient";
 
 export const adminProductApi = {
@@ -23,4 +22,7 @@ export const adminProductApi = {
       typeof apiClient.api.adminProductControllerFindAllVariantValue
     >[0]
   ) => apiClient.api.adminProductControllerFindAllVariantValue(query),
+
+  uploadProductImage: async (data: UploadDto) =>
+    apiClient.api.adminProductControllerUploadProductImage(data),
 };
