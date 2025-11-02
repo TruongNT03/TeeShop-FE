@@ -19,7 +19,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
-import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -192,7 +191,6 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen w-full bg-white relative overflow-hidden flex">
-      <Toaster richColors />
       <motion.div
         initial={{ x: "100%", opacity: 0 }}
         animate={{ x: 0, opacity: 100 }}

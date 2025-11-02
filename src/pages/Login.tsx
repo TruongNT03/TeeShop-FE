@@ -22,7 +22,6 @@ import { Link } from "react-router-dom";
 import { IoEyeOffOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 import { Spinner } from "@/components/ui/spinner";
-import { Toaster } from "@/components/ui/sonner";
 import { motion } from "motion/react";
 
 const Login = () => {
@@ -37,7 +36,6 @@ const Login = () => {
   } = useLogin();
   return (
     <div className="min-h-screen w-full bg-primary relative overflow-hidden flex">
-      <Toaster />
       <motion.div
         className="flex-1 bg-primary z-20 flex justify-center items-center"
         initial={{ x: "100%" }}
