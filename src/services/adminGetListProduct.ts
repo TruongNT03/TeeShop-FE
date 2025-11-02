@@ -1,6 +1,9 @@
-import type { CreateProductDto, UploadDto } from "@/api";
+import type {
+  CreateProductDto,
+  UpdateProductStatusDto,
+  UploadDto,
+} from "@/api";
 import { apiClient } from "./apiClient";
-
 export const adminProductApi = {
   findAll: async (
     query: Parameters<typeof apiClient.api.adminProductControllerFindAll>[0]
@@ -25,4 +28,7 @@ export const adminProductApi = {
 
   uploadProductImage: async (data: UploadDto) =>
     apiClient.api.adminProductControllerUploadProductImage(data),
+
+  updateStatus: async (id: string, data: UpdateProductStatusDto) =>
+    apiClient.api.adminProductControllerUpdateStatus(id, data),
 };

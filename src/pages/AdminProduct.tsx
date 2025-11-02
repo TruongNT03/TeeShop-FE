@@ -37,109 +37,8 @@ import { Link } from "react-router-dom";
 import type { apiClient } from "@/services/apiClient";
 import { ProductStatus } from "@/types/productStatus";
 import type { ProductResponseDto } from "@/api";
-import { Spinner } from "@/components/ui/spinner"; 
-
-const tableHeaderTitles = [
-  // {
-  //   key: "id",
-  //   title: "ID",
-  //   sortable: true,
-  // },
-  {
-    key: "name",
-    title: "Name",
-    sortable: true,
-    render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
-  },
-  {
-    key: "description",
-    title: "Description",
-    sortable: true,
-    render: (value: string): React.ReactNode => (
-      <TableCell className="max-w-[200px] overflow-hidden truncate">
-        {value}
-      </TableCell>
-    ),
-  },
-  {
-    key: "status",
-    title: "Status",
-    sortable: true,
-    render: (value: ProductStatus): React.ReactNode => (
-      <TableCell>
-        {value === ProductStatus.PUBLISHED ? (
-          <Badge variant="outline" className="border-green-500 text-green-500">
-            Published
-          </Badge>
-        ) : (
-          <Badge
-            variant="destructive"
-            className="border-red-500 bg-transparent text-red-500"
-          >
-            Unpublished
-          </Badge>
-        )}
-      </TableCell>
-    ),
-  },
-  {
-    key: "categories",
-    title: "Categories",
-    sortable: false,
-    render: (value: string[]): React.ReactNode => (
-      <TableCell>
-        <div className="flex flex-col gap-2 items-start">
-          {value.map(
-            (category, index) =>
-              index < 3 && (
-                <Badge className="border-blue-500 bg-transparent text-blue-500">
-                  {category}
-                </Badge>
-              )
-          )}
-          {value.length > 2 && (
-            <Badge className="border-blue-500 bg-transparent text-blue-500 px-7">
-              ...
-            </Badge>
-          )}
-        </div>
-      </TableCell>
-    ),
-  },
-  {
-    key: "createdAt",
-    title: "Created At",
-    sortable: true,
-    render: (value: string): React.ReactNode => (
-      <TableCell>{convertDateTime(value)}</TableCell>
-    ),
-  },
-  {
-    key: "updatedAt",
-    title: "Updated At",
-    sortable: true,
-    render: (value: string): React.ReactNode => (
-      <TableCell>{convertDateTime(value)}</TableCell>
-    ),
-  },
-  {
-    key: "action",
-    title: "Action",
-    sortable: false,
-    render: (product: ProductResponseDto): React.ReactNode => (
-      <TableCell>
-        <div className="flex gap-2">
-          <SquarePen className="scale-75 text-blue-400 cursor-pointer" />
-          {product.status === "published" ? (
-            <Archive className="scale-75 text-red-500 cursor-pointer" />
-          ) : (
-            <ArchiveRestore className="scale-75 text-emerald-500 cursor-pointer" />
-          )}
-        </div>
-      </TableCell>
-    ),
-  },
-];
+import { Spinner } from "@/components/ui/spinner";
+import { updateProductStatusMutation } from "@/queries/adminProductQueries";
 
 const AdminProduct = () => {
   const [query, setQuery] = useState<
@@ -155,13 +54,138 @@ const AdminProduct = () => {
     selectedProducts,
     setIsSelectedAllProduct,
     setSelectedProducts,
-    pagination, 
+    pagination,
     isLoading,
   } = useAdminProduct(query);
 
+  const statusMutation = updateProductStatusMutation();
+
+  const tableHeaderTitles = [
+    {
+      key: "name",
+      title: "Name",
+      sortable: true,
+      render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
+    },
+    {
+      key: "description",
+      title: "Description",
+      sortable: true,
+      render: (value: string): React.ReactNode => (
+        <TableCell className="max-w-[200px] overflow-hidden truncate">
+          {value}
+        </TableCell>
+      ),
+    },
+    {
+      key: "status",
+      title: "Status",
+      sortable: true,
+      render: (value: ProductStatus): React.ReactNode => (
+        <TableCell>
+          {value === ProductStatus.PUBLISHED ? (
+            <Badge variant="outline" className="border-green-500 text-green-500">
+              Published
+            </Badge>
+          ) : (
+            <Badge
+              variant="destructive"
+              className="border-red-500 bg-transparent text-red-500"
+            >
+              Unpublished
+            </Badge>
+          )}
+        </TableCell>
+      ),
+    },
+    {
+      key: "categories",
+      title: "Categories",
+      sortable: false,
+      render: (value: string[]): React.ReactNode => (
+        <TableCell>
+          <div className="flex flex-col gap-2 items-start">
+            {value.map(
+              (category, index) =>
+                index < 3 && (
+                  <Badge
+                    key={index}
+                    className="border-blue-500 bg-transparent text-blue-500"
+                  >
+                    {category}
+                  </Badge>
+                )
+            )}
+            {value.length > 2 && (
+              <Badge className="border-blue-500 bg-transparent text-blue-500 px-7">
+                ...
+              </Badge>
+            )}
+          </div>
+        </TableCell>
+      ),
+    },
+    {
+      key: "createdAt",
+      title: "Created At",
+      sortable: true,
+      render: (value: string): React.ReactNode => (
+        <TableCell>{convertDateTime(value)}</TableCell>
+      ),
+    },
+    {
+      key: "updatedAt",
+      title: "Updated At",
+      sortable: true,
+      render: (value: string): React.ReactNode => (
+        <TableCell>{convertDateTime(value)}</TableCell>
+      ),
+    },
+    {
+      key: "action",
+      title: "Action",
+      sortable: false,
+      render: (product: ProductResponseDto): React.ReactNode => (
+        <TableCell>
+          <div className="flex gap-2">
+            <SquarePen className="scale-75 text-blue-400 cursor-pointer" />
+            {product.status === "published" ? (
+              <Archive
+                className={`scale-75 text-red-500 cursor-pointer ${
+                  statusMutation.isPending
+                    ? "opacity-50 pointer-events-none"
+                    : ""
+                }`}
+                onClick={() =>
+                  statusMutation.mutate({
+                    id: product.id,
+                    data: { status: "unpublished" },
+                  })
+                }
+              />
+            ) : (
+              <ArchiveRestore
+                className={`scale-75 text-emerald-500 cursor-pointer ${
+                  statusMutation.isPending
+                    ? "opacity-50 pointer-events-none"
+                    : ""
+                }`}
+                onClick={() =>
+                  statusMutation.mutate({
+                    id: product.id,
+                    data: { status: "published" },
+                  })
+                }
+              />
+            )}
+          </div>
+        </TableCell>
+      ),
+    },
+  ];
+
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPage) return;
-
     setQuery((prevQuery) => ({
       ...prevQuery,
       page: newPage,
@@ -174,7 +198,6 @@ const AdminProduct = () => {
 
     let startPage = Math.max(1, currentPage - 1);
     let endPage = Math.min(totalPage, currentPage + 1);
-
     if (currentPage === 1 && totalPage > 1) {
       endPage = Math.min(totalPage, 3);
     }
@@ -333,7 +356,7 @@ const AdminProduct = () => {
             ) : (
               products.map((product, index) => (
                 <TableRow
-                  key={product.id} 
+                  key={product.id}
                   className={`${index % 2 ? "bg-gray-200" : ""}`}
                 >
                   <TableCell className="py-5">
