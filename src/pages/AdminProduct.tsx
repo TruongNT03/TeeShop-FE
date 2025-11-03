@@ -13,7 +13,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -37,108 +36,9 @@ import { convertDateTime } from "@/utils/convertDateTime";
 import { Link } from "react-router-dom";
 import type { apiClient } from "@/services/apiClient";
 import { ProductStatus } from "@/types/productStatus";
-
-const tableHeaderTitles = [
-  // {
-  //   key: "id",
-  //   title: "ID",
-  //   sortable: true,
-  // },
-  {
-    key: "name",
-    title: "Name",
-    sortable: true,
-    render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
-  },
-  {
-    key: "description",
-    title: "Description",
-    sortable: true,
-    render: (value: string): React.ReactNode => (
-      <TableCell className="max-w-[200px] overflow-hidden truncate">
-        {value}
-      </TableCell>
-    ),
-  },
-  {
-    key: "status",
-    title: "Status",
-    sortable: true,
-    render: (value: ProductStatus): React.ReactNode => (
-      <TableCell>
-        {value === ProductStatus.PUBLISHED ? (
-          <Badge variant="outline" className="border-green-500 text-green-500">
-            Published
-          </Badge>
-        ) : (
-          <Badge
-            variant="destructive"
-            className="border-red-500 bg-transparent text-red-500"
-          >
-            Unpublished
-          </Badge>
-        )}
-      </TableCell>
-    ),
-  },
-  {
-    key: "categories",
-    title: "Categories",
-    sortable: false,
-    render: (value: string[]): React.ReactNode => (
-      <TableCell>
-        <div className="flex flex-col gap-2 items-start">
-          {value.map(
-            (category, index) =>
-              index < 3 && (
-                <Badge className="border-blue-500 bg-transparent text-blue-500">
-                  {category}
-                </Badge>
-              )
-          )}
-          {value.length > 2 && (
-            <Badge className="border-blue-500 bg-transparent text-blue-500 px-7">
-              ...
-            </Badge>
-          )}
-        </div>
-      </TableCell>
-    ),
-  },
-  {
-    key: "createdAt",
-    title: "Created At",
-    sortable: true,
-    render: (value: string): React.ReactNode => (
-      <TableCell>{convertDateTime(value)}</TableCell>
-    ),
-  },
-  {
-    key: "updatedAt",
-    title: "Updated At",
-    sortable: true,
-    render: (value: string): React.ReactNode => (
-      <TableCell>{convertDateTime(value)}</TableCell>
-    ),
-  },
-  {
-    key: "action",
-    title: "Action",
-    sortable: false,
-    render: (value: ProductStatus): React.ReactNode => (
-      <TableCell>
-        <div className="flex gap-2">
-          <SquarePen className="scale-75 text-blue-400 cursor-pointer" />
-          {value === "published" ? (
-            <Archive className="scale-75 text-red-500 cursor-pointer" />
-          ) : (
-            <ArchiveRestore className="scale-75 text-emerald-500 cursor-pointer" />
-          )}
-        </div>
-      </TableCell>
-    ),
-  },
-];
+import type { ProductResponseDto } from "@/api";
+import { Spinner } from "@/components/ui/spinner";
+import { updateProductStatusMutation } from "@/queries/adminProductQueries";
 
 const AdminProduct = () => {
   const [query, setQuery] = useState<
@@ -154,7 +54,213 @@ const AdminProduct = () => {
     selectedProducts,
     setIsSelectedAllProduct,
     setSelectedProducts,
+    pagination,
+    isLoading,
   } = useAdminProduct(query);
+
+  const statusMutation = updateProductStatusMutation();
+
+  const tableHeaderTitles = [
+    {
+      key: "name",
+      title: "Name",
+      sortable: true,
+      render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
+    },
+    {
+      key: "description",
+      title: "Description",
+      sortable: true,
+      render: (value: string): React.ReactNode => (
+        <TableCell className="max-w-[200px] overflow-hidden truncate">
+          {value}
+        </TableCell>
+      ),
+    },
+    {
+      key: "status",
+      title: "Status",
+      sortable: true,
+      render: (value: ProductStatus): React.ReactNode => (
+        <TableCell>
+          {value === ProductStatus.PUBLISHED ? (
+            <Badge variant="outline" className="border-green-500 text-green-500">
+              Published
+            </Badge>
+          ) : (
+            <Badge
+              variant="destructive"
+              className="border-destructive bg-transparent text-destructive"
+            >
+              Unpublished
+            </Badge>
+          )}
+        </TableCell>
+      ),
+    },
+    {
+      key: "categories",
+      title: "Categories",
+      sortable: false,
+      render: (value: string[]): React.ReactNode => (
+        <TableCell>
+          <div className="flex flex-col gap-2 items-start">
+            {value.map(
+              (category, index) =>
+                index < 3 && (
+                  <Badge
+                    key={index}
+                    className="border-primary bg-transparent text-primary"
+                  >
+                    {category}
+                  </Badge>
+                )
+            )}
+            {value.length > 2 && (
+              <Badge className="border-primary bg-transparent text-primary px-7">
+                ...
+              </Badge>
+            )}
+          </div>
+        </TableCell>
+      ),
+    },
+    {
+      key: "createdAt",
+      title: "Created At",
+      sortable: true,
+      render: (value: string): React.ReactNode => (
+        <TableCell>{convertDateTime(value)}</TableCell>
+      ),
+    },
+    {
+      key: "updatedAt",
+      title: "Updated At",
+      sortable: true,
+      render: (value: string): React.ReactNode => (
+        <TableCell>{convertDateTime(value)}</TableCell>
+      ),
+    },
+    {
+      key: "action",
+      title: "Action",
+      sortable: false,
+      render: (product: ProductResponseDto): React.ReactNode => (
+        <TableCell>
+          <div className="flex gap-2">
+            <SquarePen className="scale-75 text-primary cursor-pointer" />
+            {product.status === "published" ? (
+              <Archive
+                className={`scale-75 text-destructive cursor-pointer ${
+                  statusMutation.isPending
+                    ? "opacity-50 pointer-events-none"
+                    : ""
+                }`}
+                onClick={() =>
+                  statusMutation.mutate({
+                    id: product.id,
+                    data: { status: "unpublished" },
+                  })
+                }
+              />
+            ) : (
+              <ArchiveRestore
+                className={`scale-75 text-emerald-500 cursor-pointer ${
+                  statusMutation.isPending
+                    ? "opacity-50 pointer-events-none"
+                    : ""
+                }`}
+                onClick={() =>
+                  statusMutation.mutate({
+                    id: product.id,
+                    data: { status: "published" },
+                  })
+                }
+              />
+            )}
+          </div>
+        </TableCell>
+      ),
+    },
+  ];
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > pagination.totalPage) return;
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      page: newPage,
+    }));
+  };
+
+  const renderPaginationItems = () => {
+    const { currentPage, totalPage } = pagination;
+    const items = [];
+
+    let startPage = Math.max(1, currentPage - 1);
+    let endPage = Math.min(totalPage, currentPage + 1);
+    if (currentPage === 1 && totalPage > 1) {
+      endPage = Math.min(totalPage, 3);
+    }
+    if (currentPage === totalPage && totalPage > 1) {
+      startPage = Math.max(1, totalPage - 2);
+    }
+
+    if (startPage > 1) {
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink
+            onClick={() => handlePageChange(1)}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      if (startPage > 2) {
+        items.push(
+          <PaginationItem key="start-ellipsis">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            isActive={i === currentPage}
+            onClick={() => handlePageChange(i)}
+            className="cursor-pointer"
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    if (endPage < totalPage) {
+      if (endPage < totalPage - 1) {
+        items.push(
+          <PaginationItem key="end-ellipsis">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      items.push(
+        <PaginationItem key={totalPage}>
+          <PaginationLink
+            onClick={() => handlePageChange(totalPage)}
+            className="cursor-pointer"
+          >
+            {totalPage}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return items;
+  };
   return (
     <div className="w-full overflow-auto py-5">
       <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
@@ -185,7 +291,7 @@ const AdminProduct = () => {
         </div>
         <div>
           <Link to="/admin/product/create">
-            <Button variant="outline" className="bg-blue-600 text-white">
+            <Button variant="default">
               <Plus />
               Create Product
             </Button>
@@ -195,7 +301,7 @@ const AdminProduct = () => {
       {/* Table */}
       <Card className="w-[95%] mx-auto py-0 overflow-hidden">
         <Table>
-          <TableHeader className="bg-indigo-300">
+          <TableHeader className="bg-muted">
             <TableRow>
               <TableHead>
                 <Checkbox
@@ -229,65 +335,104 @@ const AdminProduct = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products?.map((product, index) => (
-              <TableRow
-                key={index}
-                className={`${index % 2 ? "bg-gray-200" : ""}`}
-              >
-                <TableCell className="py-5">
-                  <Checkbox
-                    className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
-                    checked={selectedProducts.includes(product.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        const updated = [...selectedProducts, product.id];
-                        setSelectedProducts(updated);
-                        if (updated.length === products.length) {
-                          setIsSelectedAllProduct(true);
-                        }
-                      } else {
-                        const updated = selectedProducts.filter(
-                          (value) => value !== product.id
-                        );
-                        setSelectedProducts(updated);
-                        setIsSelectedAllProduct(false);
-                      }
-                    }}
-                  />
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={tableHeaderTitles.length + 2}
+                  className="h-48 text-center"
+                >
+                  <Spinner className="w-10 h-10" />
                 </TableCell>
-                <TableCell>{index + 1}</TableCell>
-                {tableHeaderTitles.map((tableHeaderTitle) => {
-                  if (tableHeaderTitle.key !== "action") {
+              </TableRow>
+            ) : products.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={tableHeaderTitles.length + 2}
+                  className="h-48 text-center text-lg"
+                >
+                  Không tìm thấy sản phẩm nào.
+                </TableCell>
+              </TableRow>
+            ) : (
+              products.map((product, index) => (
+                <TableRow
+                  key={product.id}
+                  className={`${index % 2 ? "bg-muted" : ""}`}
+                >
+                  <TableCell className="py-5">
+                    <Checkbox
+                      className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                      checked={selectedProducts.includes(product.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          const updated = [...selectedProducts, product.id];
+                          setSelectedProducts(updated);
+                          if (updated.length === products.length) {
+                            setIsSelectedAllProduct(true);
+                          }
+                        } else {
+                          const updated = selectedProducts.filter(
+                            (value) => value !== product.id
+                          );
+                          setSelectedProducts(updated);
+                          setIsSelectedAllProduct(false);
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {index + 1 + ((query.page ?? 1) - 1) * query.pageSize}
+                  </TableCell>
+
+                  {tableHeaderTitles.map((tableHeaderTitle) => {
+                    if (tableHeaderTitle.key === "action") {
+                      return (
+                        tableHeaderTitle.render as (
+                          product: ProductResponseDto
+                        ) => React.ReactNode
+                      )(product);
+                    }
+
                     return tableHeaderTitle.render(
                       product[
                         tableHeaderTitle.key as keyof typeof product
-                      ] as ProductStatus & string[]
+                      ] as any
                     );
-                  }
-                })}
-                <TableCell>
-                  {tableHeaderTitles[tableHeaderTitles.length - 1].render(
-                    product.status as ProductStatus & string[]
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
-        <div className="w-full py-3 flex justify-end">
-          <Pagination className="w-fit m-0 mr-5">
+
+        <div className="w-full py-3 flex justify-between items-center px-5">
+          <div className="text-sm text-muted-foreground">
+            Tổng: <b>{pagination.totalItem}</b> sản phẩm
+          </div>
+          <Pagination className="w-fit m-0">
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious href="#" />
+                <PaginationPrevious
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  className={
+                    pagination.currentPage === 1
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
               </PaginationItem>
+
+              {renderPaginationItems()}
+
               <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
+                <PaginationNext
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  className={
+                    pagination.currentPage === pagination.totalPage
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>

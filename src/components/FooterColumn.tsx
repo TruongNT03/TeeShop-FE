@@ -18,7 +18,7 @@ const FooterColumn = (props: FooterColumnProps) => {
         {props.items?.map((item) => (
           <Link
             to={item.to ? item.to : "#"}
-            className="hover:text-custom-primary"
+            className="hover:text-primary"
           >
             {item.title}
           </Link>

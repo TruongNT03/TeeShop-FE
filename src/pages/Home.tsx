@@ -79,7 +79,7 @@ const Home = () => {
       />
       <div className="w-full flex justify-center items-center">
         <Link to={"/product"} className="py-[56px]">
-          <Button className="uppercase font-lato py-7 px-8 text-[20px] border-[2px] border-custom-primary bg-custom-primary rounded-sm hover:text-custom-primary hover:bg-transparent hover:border-[2px] hover:border-custom-primary">
+          <Button className="uppercase font-lato py-7 px-8 text-[20px] border-[2px] border-primary bg-primary rounded-sm hover:text-primary hover:bg-transparent hover:border-[2px] hover:border-primary">
             Shop Now
           </Button>
         </Link>

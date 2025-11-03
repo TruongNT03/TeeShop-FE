@@ -22,7 +22,6 @@ import { Link } from "react-router-dom";
 import { IoEyeOffOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 import { Spinner } from "@/components/ui/spinner";
-import { Toaster } from "@/components/ui/sonner";
 import { motion } from "motion/react";
 
 const Login = () => {
@@ -36,8 +35,7 @@ const Login = () => {
     isLoading,
   } = useLogin();
   return (
-    <div className="min-h-screen w-full bg-primary relative overflow-hidden flex">
-      <Toaster />
+    <div className="min-h-screen w-full bg-background relative overflow-hidden flex">
       <motion.div
         className="flex-1 bg-primary z-20 flex justify-center items-center"
         initial={{ x: "100%" }}
@@ -50,7 +48,7 @@ const Login = () => {
         initial={{ x: "-100%", opacity: 0 }}
         animate={{ x: 0, opacity: 100 }}
         transition={{ duration: 0.7, ease: "easeIn" }}
-        className="w-full min-h-screen bg-white relative z-10 flex-1 flex flex-col justify-center items-center"
+        className="w-full min-h-screen bg-background relative z-10 flex-1 flex flex-col justify-center items-center"
       >
         <Card className="w-96 border-0 shadow-none">
           <CardHeader>
@@ -134,7 +132,7 @@ const Login = () => {
           <CardFooter>
             <div className="text-center mt-4">
               Don't have an account? Click{" "}
-              <Link to="/register" className="underline text-blue-400">
+              <Link to="/register" className="underline text-primary">
                 here
               </Link>{" "}
               to register.

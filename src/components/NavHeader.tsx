@@ -34,7 +34,7 @@ const NavHeader = () => {
       <div
         className={`w-full ${
           isHiddenHeaderNotification ? "h-0" : "h-[33px]"
-        } flex items-center justify-center bg-custom-primary text-white uppercase overflow-hidden transition-all duration-300`}
+        } flex items-center justify-center bg-primary text-primary-foreground uppercase overflow-hidden transition-all duration-300`}
       >
         <div className="hover:underline cursor-pointer">
           Free Shipping & Returns On All US Orders
@@ -46,7 +46,7 @@ const NavHeader = () => {
       </div>
 
       <div
-        className={`w-full bg-white flex justify-between items-center px-[65px] h-[88px] transition-all shadow-sm ${
+        className={`w-full bg-background flex justify-between items-center px-[65px] h-[88px] transition-all shadow-sm ${
           isHiddenHeaderNotification ? "" : "mt-0"
         }`}
       >
@@ -54,20 +54,18 @@ const NavHeader = () => {
           <div className="text-3xl uppercase cursor-pointer">Tee Shop</div>
 
           <ul className="flex items-center font-arimo gap-16 text-sm uppercase font-semibold ml-[156px]">
-            <li className="cursor-pointer hover:text-custom-primary">Home</li>
-            <li className="cursor-pointer hover:text-custom-primary">About</li>
-            <li className="cursor-pointer hover:text-custom-primary">
-              Contact Us
-            </li>
+            <li className="cursor-pointer hover:text-primary">Home</li>
+            <li className="cursor-pointer hover:text-primary">About</li>
+            <li className="cursor-pointer hover:text-primary">Contact Us</li>
           </ul>
         </div>
 
         <div className="flex gap-[20px] ml-8">
           <Link to={localStorage.getItem("accessToken") ? "/profile" : "login"}>
-            <User className="cursor-pointer hover:text-custom-primary" />
+            <User className="cursor-pointer hover:text-primary" />
           </Link>
-          <ShoppingBag className="cursor-pointer hover:text-custom-primary" />
-          <Menu className="cursor-pointer hover:text-custom-primary" />
+          <ShoppingBag className="cursor-pointer hover:text-primary" />
+          <Menu className="cursor-pointer hover:text-primary" />
         </div>
       </div>
     </div>
