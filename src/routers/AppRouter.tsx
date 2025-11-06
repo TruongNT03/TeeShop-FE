@@ -12,6 +12,7 @@ import UserLayout from "@/layouts/UserLayout";
 import DemoPage from "@/pages/DemoPage";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ProductDetail from "@/pages/ProductDetail";
+import CartPage from "@/pages/CartPage";
 
 const AppRouter = () => {
   return (
@@ -21,6 +22,7 @@ const AppRouter = () => {
           <Route element={<UserLayout />}>
             <Route index path="/" element={<Home />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/cart" element={<CartPage />} />
           </Route>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
