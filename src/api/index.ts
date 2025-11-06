@@ -373,13 +373,52 @@ export interface ListVariantValueResponseDto {
   paginate: PaginateMetaDto;
 }
 
-export interface CreateConversationDto {
-  userId: string;
+export interface AdminConversationUserResponseDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+}
+
+export interface AdminConversationResponseDto {
+  id: string;
+  user: AdminConversationUserResponseDto;
+  latestMessage: string;
+}
+
+export interface AdminListConversationResponseDto {
+  data: AdminConversationResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface MessageResponseDto {
+  id: string;
+  content: string;
+  senderId: string;
+  /** @format date-time */
+  createdAt: string;
+}
+
+export interface ListMessageResponseDto {
+  data: MessageResponseDto[];
+  paginate: PaginateMetaDto;
 }
 
 export interface CreateMessageDto {
   conversationId: string;
   content: string;
+}
+
+export interface ConversationUserResponseDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+}
+
+export interface ConversationResponseDto {
+  id: string;
+  users: ConversationUserResponseDto[];
 }
 
 export interface AddItemToCartDto {
@@ -1259,22 +1298,106 @@ export class Api<
     /**
      * No description
      *
+     * @tags [ADMIN] CHAT
+     * @name AdminChatControllerGetListConversation
+     * @summary [ADMIN] GET LIST CONVERSATION
+     * @request GET:/api/v1/admin-chat/conversation
+     * @secure
+     */
+    adminChatControllerGetListConversation: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<AdminListConversationResponseDto, any>({
+        path: `/api/v1/admin-chat/conversation`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHAT
+     * @name AdminChatControllerGetListMessages
+     * @summary [ADMIN] GET LIST MESSAGES BY CONVERSATION ID
+     * @request GET:/api/v1/admin-chat/conversation/{id}/messages
+     * @secure
+     */
+    adminChatControllerGetListMessages: (
+      id: string,
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<ListMessageResponseDto, any>({
+        path: `/api/v1/admin-chat/conversation/${id}/messages`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHAT
+     * @name AdminChatControllerCreateMessage
+     * @summary [ADMIN] CREATE MESSAGE
+     * @request POST:/api/v1/admin-chat/message
+     * @secure
+     */
+    adminChatControllerCreateMessage: (
+      data: CreateMessageDto,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/admin-chat/message`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags CHAT
      * @name ChatControllerCreateConversation
      * @summary CREATE CONVERSATION
      * @request POST:/api/v1/chat/conversation
      * @secure
      */
-    chatControllerCreateConversation: (
-      data: CreateConversationDto,
-      params: RequestParams = {}
-    ) =>
+    chatControllerCreateConversation: (params: RequestParams = {}) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/chat/conversation`,
         method: "POST",
-        body: data,
         secure: true,
-        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -1283,16 +1406,17 @@ export class Api<
      * No description
      *
      * @tags CHAT
-     * @name ChatControllerFindAllConversations
-     * @summary GET ALL CONVERSATION
+     * @name ChatControllerGetConversation
+     * @summary [USER] GET CONVERSATION
      * @request GET:/api/v1/chat/conversation
      * @secure
      */
-    chatControllerFindAllConversations: (params: RequestParams = {}) =>
-      this.request<void, any>({
+    chatControllerGetConversation: (params: RequestParams = {}) =>
+      this.request<ConversationResponseDto, any>({
         path: `/api/v1/chat/conversation`,
         method: "GET",
         secure: true,
+        format: "json",
         ...params,
       }),
 
@@ -1300,19 +1424,32 @@ export class Api<
      * No description
      *
      * @tags CHAT
-     * @name ChatControllerFindOneConversation
-     * @summary GET DETAIL CONVERSATION
-     * @request GET:/api/v1/chat/{id}
+     * @name ChatControllerGetListMessages
+     * @summary [USER] GET LIST MESSAGES
+     * @request GET:/api/v1/chat/message
      * @secure
      */
-    chatControllerFindOneConversation: (
-      id: string,
+    chatControllerGetListMessages: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
       params: RequestParams = {}
     ) =>
-      this.request<void, any>({
-        path: `/api/v1/chat/${id}`,
+      this.request<ListMessageResponseDto, any>({
+        path: `/api/v1/chat/message`,
         method: "GET",
+        query: query,
         secure: true,
+        format: "json",
         ...params,
       }),
 
@@ -1335,6 +1472,26 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags CHAT
+     * @name ChatControllerFindOneConversation
+     * @summary GET DETAIL CONVERSATION
+     * @request GET:/api/v1/chat/{id}
+     * @secure
+     */
+    chatControllerFindOneConversation: (
+      id: string,
+      params: RequestParams = {}
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/chat/${id}`,
+        method: "GET",
+        secure: true,
         ...params,
       }),
 
