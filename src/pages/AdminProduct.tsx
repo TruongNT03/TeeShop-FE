@@ -65,7 +65,9 @@ const AdminProduct = () => {
       key: "name",
       title: "Name",
       sortable: true,
-      render: (value: string): React.ReactNode => <TableCell>{value}</TableCell>,
+      render: (value: string): React.ReactNode => (
+        <TableCell>{value}</TableCell>
+      ),
     },
     {
       key: "description",
@@ -84,7 +86,10 @@ const AdminProduct = () => {
       render: (value: ProductStatus): React.ReactNode => (
         <TableCell>
           {value === ProductStatus.PUBLISHED ? (
-            <Badge variant="outline" className="border-green-500 text-green-500">
+            <Badge
+              variant="outline"
+              className="border-green-500 text-green-500"
+            >
               Published
             </Badge>
           ) : (
