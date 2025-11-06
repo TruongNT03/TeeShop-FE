@@ -237,7 +237,7 @@ export interface ProductResponseDto {
 }
 
 export interface ListProductResponseDto {
-  data: ProductResponseDto[];
+  data: ProductResponseDto;
   paginate: PaginateMetaDto;
 }
 
@@ -373,13 +373,52 @@ export interface ListVariantValueResponseDto {
   paginate: PaginateMetaDto;
 }
 
-export interface CreateConversationDto {
-  userId: string;
+export interface AdminConversationUserResponseDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+}
+
+export interface AdminConversationResponseDto {
+  id: string;
+  user: AdminConversationUserResponseDto;
+  latestMessage: string;
+}
+
+export interface AdminListConversationResponseDto {
+  data: AdminConversationResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface MessageResponseDto {
+  id: string;
+  content: string;
+  senderId: string;
+  /** @format date-time */
+  createdAt: string;
+}
+
+export interface ListMessageResponseDto {
+  data: MessageResponseDto[];
+  paginate: PaginateMetaDto;
 }
 
 export interface CreateMessageDto {
   conversationId: string;
   content: string;
+}
+
+export interface ConversationUserResponseDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+}
+
+export interface ConversationResponseDto {
+  id: string;
+  users: ConversationUserResponseDto[];
 }
 
 export interface AddItemToCartDto {
@@ -502,7 +541,7 @@ export type RequestParams = Omit<
 export interface ApiConfig<SecurityDataType = unknown>
   extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
-    securityData: SecurityDataType | null
+    securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
   secure?: boolean;
   format?: ResponseType;
@@ -544,7 +583,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   protected mergeRequestParams(
     params1: AxiosRequestConfig,
-    params2?: AxiosRequestConfig
+    params2?: AxiosRequestConfig,
   ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
@@ -585,7 +624,7 @@ export class HttpClient<SecurityDataType = unknown> {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
         formData.append(
           key,
-          isFileType ? formItem : this.stringifyFormItem(formItem)
+          isFileType ? formItem : this.stringifyFormItem(formItem),
         );
       }
 
@@ -650,7 +689,7 @@ export class HttpClient<SecurityDataType = unknown> {
  * My Shop API description
  */
 export class Api<
-  SecurityDataType extends unknown
+  SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
   api = {
     /**
@@ -682,7 +721,7 @@ export class Api<
     authControllerVerifyRegister: (
       id: string,
       data: VerifyRegisterDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SaveEntityResponseDto, any>({
         path: `/api/v1/auth/register/verify/${id}`,
@@ -775,7 +814,7 @@ export class Api<
      */
     authControllerForgotPassword: (
       data: ForgotPasswordDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<ForgotPasswordResponseDto, any>({
         path: `/api/v1/auth/forgot-password`,
@@ -797,7 +836,7 @@ export class Api<
     authControllerVerifyForgotPassword: (
       token: string,
       data: VerifyForgotPasswordDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/auth/forgot-password/verify/${token}`,
@@ -819,7 +858,7 @@ export class Api<
      */
     authControllerChangePassword: (
       data: ChangePasswordDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/auth/change-password`,
@@ -862,7 +901,7 @@ export class Api<
      */
     authControllerUpdateProfile: (
       data: UpdateProfileDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SaveEntityResponseDto, any>({
         path: `/api/v1/auth/update-profile`,
@@ -899,7 +938,7 @@ export class Api<
         sortBy?: "email" | "createdAt";
         sortOrder?: "DESC" | "ASC";
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<UserListResponseDto, any>({
         path: `/api/v1/user`,
@@ -921,7 +960,7 @@ export class Api<
      */
     adminCategoriesControllerCreate: (
       data: SaveCategoryDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<any, SaveEntityResponseDto>({
         path: `/api/v1/admin/categories`,
@@ -960,7 +999,7 @@ export class Api<
         /** Availabel order direaction for sort */
         orderBy?: "DESC" | "ASC";
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<any, ListCategoryResponseDto>({
         path: `/api/v1/admin/categories`,
@@ -981,7 +1020,7 @@ export class Api<
      */
     adminCategoriesControllerUpload: (
       data: UploadDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<any, UploadResponseDto>({
         path: `/api/v1/admin/categories/upload`,
@@ -1003,7 +1042,7 @@ export class Api<
      */
     adminProductControllerCreate: (
       data: CreateProductDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SaveUuidResponseDto, any>({
         path: `/api/v1/admin/product`,
@@ -1038,7 +1077,7 @@ export class Api<
         pageSize: number;
         categoriesIds?: string[];
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<ListProductResponseDto, any>({
         path: `/api/v1/admin/product`,
@@ -1079,7 +1118,7 @@ export class Api<
     adminProductControllerUpdate: (
       id: string,
       data: UpdateProductDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/admin/product/${id}`,
@@ -1103,7 +1142,7 @@ export class Api<
     adminProductControllerUpdateStatus: (
       id: string,
       data: UpdateProductStatusDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SaveUuidResponseDto, any>({
         path: `/api/v1/admin/product/${id}`,
@@ -1126,7 +1165,7 @@ export class Api<
      */
     adminProductControllerUploadProductImage: (
       data: UploadDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<UploadResponseDto, any>({
         path: `/api/v1/admin/product/image/upload`,
@@ -1149,7 +1188,7 @@ export class Api<
      */
     adminProductControllerCreateVariant: (
       data: CreateVariantDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/admin/product/option/variant`,
@@ -1185,7 +1224,7 @@ export class Api<
         /** @example "Size" */
         keyword?: string;
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<ListVariantResponseDto, any>({
         path: `/api/v1/admin/product/option/variant`,
@@ -1207,7 +1246,7 @@ export class Api<
      */
     adminProductControllerCreateVariantValue: (
       data: CreateVariantValueDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/admin/product/option/variant-value`,
@@ -1245,7 +1284,7 @@ export class Api<
         /** @example 1 */
         variantId: number;
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<ListVariantValueResponseDto, any>({
         path: `/api/v1/admin/product/option/variant-value`,
@@ -1259,22 +1298,106 @@ export class Api<
     /**
      * No description
      *
+     * @tags [ADMIN] CHAT
+     * @name AdminChatControllerGetListConversation
+     * @summary [ADMIN] GET LIST CONVERSATION
+     * @request GET:/api/v1/admin-chat/conversation
+     * @secure
+     */
+    adminChatControllerGetListConversation: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminListConversationResponseDto, any>({
+        path: `/api/v1/admin-chat/conversation`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHAT
+     * @name AdminChatControllerGetListMessages
+     * @summary [ADMIN] GET LIST MESSAGES BY CONVERSATION ID
+     * @request GET:/api/v1/admin-chat/conversation/{id}/messages
+     * @secure
+     */
+    adminChatControllerGetListMessages: (
+      id: string,
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ListMessageResponseDto, any>({
+        path: `/api/v1/admin-chat/conversation/${id}/messages`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHAT
+     * @name AdminChatControllerCreateMessage
+     * @summary [ADMIN] CREATE MESSAGE
+     * @request POST:/api/v1/admin-chat/message
+     * @secure
+     */
+    adminChatControllerCreateMessage: (
+      data: CreateMessageDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/admin-chat/message`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags CHAT
      * @name ChatControllerCreateConversation
      * @summary CREATE CONVERSATION
      * @request POST:/api/v1/chat/conversation
      * @secure
      */
-    chatControllerCreateConversation: (
-      data: CreateConversationDto,
-      params: RequestParams = {}
-    ) =>
+    chatControllerCreateConversation: (params: RequestParams = {}) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/chat/conversation`,
         method: "POST",
-        body: data,
         secure: true,
-        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -1283,16 +1406,17 @@ export class Api<
      * No description
      *
      * @tags CHAT
-     * @name ChatControllerFindAllConversations
-     * @summary GET ALL CONVERSATION
+     * @name ChatControllerGetConversation
+     * @summary [USER] GET CONVERSATION
      * @request GET:/api/v1/chat/conversation
      * @secure
      */
-    chatControllerFindAllConversations: (params: RequestParams = {}) =>
-      this.request<void, any>({
+    chatControllerGetConversation: (params: RequestParams = {}) =>
+      this.request<ConversationResponseDto, any>({
         path: `/api/v1/chat/conversation`,
         method: "GET",
         secure: true,
+        format: "json",
         ...params,
       }),
 
@@ -1300,19 +1424,32 @@ export class Api<
      * No description
      *
      * @tags CHAT
-     * @name ChatControllerFindOneConversation
-     * @summary GET DETAIL CONVERSATION
-     * @request GET:/api/v1/chat/{id}
+     * @name ChatControllerGetListMessages
+     * @summary [USER] GET LIST MESSAGES
+     * @request GET:/api/v1/chat/message
      * @secure
      */
-    chatControllerFindOneConversation: (
-      id: string,
-      params: RequestParams = {}
+    chatControllerGetListMessages: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {},
     ) =>
-      this.request<void, any>({
-        path: `/api/v1/chat/${id}`,
+      this.request<ListMessageResponseDto, any>({
+        path: `/api/v1/chat/message`,
         method: "GET",
+        query: query,
         secure: true,
+        format: "json",
         ...params,
       }),
 
@@ -1327,7 +1464,7 @@ export class Api<
      */
     chatControllerCreateMessage: (
       data: CreateMessageDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<void, any>({
         path: `/api/v1/chat/message`,
@@ -1335,6 +1472,26 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags CHAT
+     * @name ChatControllerFindOneConversation
+     * @summary GET DETAIL CONVERSATION
+     * @request GET:/api/v1/chat/{id}
+     * @secure
+     */
+    chatControllerFindOneConversation: (
+      id: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/chat/${id}`,
+        method: "GET",
+        secure: true,
         ...params,
       }),
 
@@ -1349,7 +1506,7 @@ export class Api<
      */
     cartControllerAddItemToCart: (
       data: AddItemToCartDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/carts`,
@@ -1401,7 +1558,7 @@ export class Api<
          */
         pageSize: number;
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<ListCartItemResponseDto, any>({
         path: `/api/v1/carts/cart-item`,
@@ -1424,7 +1581,7 @@ export class Api<
     cartControllerUpdateQuantityCartItem: (
       id: string,
       data: UpdateQuantityCartItemDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/carts/cart-item/${id}/quantity`,
@@ -1448,7 +1605,7 @@ export class Api<
     cartControllerUpdateProductVariantCartItem: (
       id: string,
       data: UpdateProductVariantCartItemDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/carts/cart-item/${id}/product-variant`,
@@ -1505,7 +1662,7 @@ export class Api<
         lowPrice?: number;
         highPrice?: number;
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<ListUserProductResponseDto, any>({
         path: `/api/v1/product`,
@@ -1541,7 +1698,7 @@ export class Api<
      */
     productControllerGetProductVariantValue: (
       id: string,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<ProductVariantValueResponseDto[], any>({
         path: `/api/v1/product/${id}/variant-value`,
@@ -1561,7 +1718,7 @@ export class Api<
      */
     orderControllerCreateOrderFromCart: (
       data: CreateOrderFromCartDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SaveUuidResponseDto, any>({
         path: `/api/v1/order`,
@@ -1584,7 +1741,7 @@ export class Api<
      */
     addressControllerCreate: (
       data: CreateAddressDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/address`,
@@ -1618,7 +1775,7 @@ export class Api<
          */
         pageSize: number;
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<ListAddressResponseDto, any>({
         path: `/api/v1/address`,
@@ -1641,7 +1798,7 @@ export class Api<
     addressControllerUpdate: (
       id: string,
       data: UpdateAddressDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/address/${id}`,
@@ -1664,7 +1821,7 @@ export class Api<
      */
     paymentControllerCreate: (
       data: CreatePaymentDto,
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<void, any>({
         path: `/api/v1/payment`,
