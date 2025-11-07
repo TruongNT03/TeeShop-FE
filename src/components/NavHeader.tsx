@@ -64,7 +64,9 @@ const NavHeader = () => {
           <Link to={localStorage.getItem("accessToken") ? "/profile" : "login"}>
             <User className="cursor-pointer hover:text-primary" />
           </Link>
-          <ShoppingBag className="cursor-pointer hover:text-primary" />
+          <Link to="/cart">
+            <ShoppingBag className="cursor-pointer hover:text-primary" /> 
+          </Link>
           <Menu className="cursor-pointer hover:text-primary" />
         </div>
       </div>

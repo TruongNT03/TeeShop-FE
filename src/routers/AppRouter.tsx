@@ -17,10 +17,11 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
         <Route element={<PublicRoute />}>
           <Route element={<UserLayout />}>
-            <Route index path="/" element={<Home />} />{' '}
+            <Route index path="/" element={<Home />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/cart" element={<CartPage />} />
           </Route>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
@@ -28,7 +29,6 @@ const AppRouter = () => {
           <Route path="/demo" element={<DemoPage />} />
         </Route>
 
-        {/* Private Routes */}
         <Route element={<PrivateRouter />}>
           <Route element={<UserLayout />}>
             <Route path="/profile" element={<ProfilePage />} />
@@ -40,7 +40,6 @@ const AppRouter = () => {
           </Route>
         </Route>
 
-        {/* Anonymous Routes */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

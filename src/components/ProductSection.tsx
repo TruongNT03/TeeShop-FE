@@ -5,6 +5,7 @@ import { useId } from "react";
 import type { UserProductResponseDto } from "@/api";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { capitalizeWords } from "@/utils/capitalizeWords";
+import { Link } from "react-router-dom"; 
 
 interface ProductSectionProps {
   title?: string;
@@ -19,7 +20,6 @@ const ProductSection = (props: ProductSectionProps) => {
   const imageHeight = { 4: 300, 6: 200, 8: 150 };
 
   const skeletonCount = props.itemPerRow * 2;
-
   return (
     <section id={sectionId} className="w-full pb-[24px]">
       <div className="flex flex-col gap-4 justify-center items-center py-8">
@@ -68,20 +68,22 @@ const ProductSection = (props: ProductSectionProps) => {
                   ${props.itemPerRow === 8 ? "basis-1/8" : ""} 
                 `}
               >
-                <Card>
-                  <CardTitle className="text-center px-2">
-                    {capitalizeWords(item.name)}
-                  </CardTitle>
-                  <Image
-                    height={imageHeight[props.itemPerRow]}
-                    src={item.productImages[0].url}
-                    alt={`Product ${index}`}
-                    className="!w-full !h-full object-cover rounded-3xl p-3"
-                  />
-                  <CardDescription className="text-center">
-                    {formatPriceVND(item.price)}
-                  </CardDescription>
-                </Card>
+                <Link to={`/product/${item.id}`}>
+                  <Card>
+                    <CardTitle className="text-center px-2">
+                      {capitalizeWords(item.name)}
+                    </CardTitle>
+                    <Image
+                      height={imageHeight[props.itemPerRow]}
+                      src={item.productImages[0].url}
+                      alt={`Product ${index}`}
+                      className="!w-full !h-full object-cover rounded-3xl p-3"
+                    />
+                    <CardDescription className="text-center">
+                      {formatPriceVND(item.price)}
+                    </CardDescription>
+                  </Card>
+                </Link>
               </div>
             ))}
       </div>

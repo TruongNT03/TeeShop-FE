@@ -19,3 +19,22 @@ export const findTopSellerQuery = (
     queryFn: () => productApi.findTopSeller(query),
   });
 };
+
+export const findProductByIdQuery = (id: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: ["userProductDetail", id],
+    queryFn: () => productApi.findById(id),
+    enabled: enabled,
+  });
+};
+
+export const findProductVariantOptionsQuery = (
+  id: string,
+  enabled: boolean
+) => {
+  return useQuery({
+    queryKey: ["userProductVariantOptions", id],
+    queryFn: () => productApi.findVariantOptions(id),
+    enabled: enabled,
+  });
+};
