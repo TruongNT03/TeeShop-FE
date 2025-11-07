@@ -1,9 +1,16 @@
-import { MessageSquareText, SendHorizontal, X, Loader2 } from "lucide-react";
+import {
+  MessageSquareText,
+  SendHorizontal,
+  X,
+  Loader2,
+  LoaderCircle,
+} from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useAdminChatWidget } from "@/hooks/useAdminChatWidget";
 import { AnimatePresence, motion } from "motion/react";
+import useImageExists from "@/hooks/useImageExists";
 
 const AdminChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,7 +23,8 @@ const AdminChatWidget = () => {
     chatMessages,
     message,
     setMessage,
-    onSendMessage,
+    isSendMessagePending,
+    sendMessageMutation,
   } = useAdminChatWidget();
 
   return (
@@ -27,7 +35,7 @@ const AdminChatWidget = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
           onClick={() => setIsOpen(true)}
-          className="w-14 h-14 rounded-full bg-primary flex justify-center items-center text-white drop-shadow-2xl hover:bg-primary/80 cursor-pointer transition-transform active:scale-95"
+          className="w-14 h-14 rounded-full bg-primary flex justify-center items-center text-white drop-shadow-2xl hover:bg-primary/80 cursor-pointer transition-transform active:scale-95 hover:scale-110"
         >
           <MessageSquareText />
         </motion.div>
@@ -72,6 +80,9 @@ const AdminChatWidget = () => {
                       onClick={() => setConversationId(conversation.id)}
                     >
                       <img
+                        onError={(e) =>
+                          (e.currentTarget.src = "default-user-avatar.jpg")
+                        }
                         src={conversation?.user?.avatar}
                         className="w-[40px] h-[40px] rounded-md"
                       />
@@ -123,27 +134,33 @@ const AdminChatWidget = () => {
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        onSendMessage.mutate({
+                        sendMessageMutation({
                           content: message,
                           conversationId,
                         });
                         setMessage("");
                       }
                     }}
-                    disabled={!conversationId}
+                    disabled={!conversationId || isSendMessagePending}
                   />
                   <Button
                     className="transition-transform active:scale-95"
-                    disabled={!message || !conversationId}
+                    disabled={
+                      !message || !conversationId || isSendMessagePending
+                    }
                     onClick={() => {
-                      onSendMessage.mutate({
+                      sendMessageMutation({
                         content: message,
                         conversationId,
                       });
                       setMessage("");
                     }}
                   >
-                    <SendHorizontal />
+                    {isSendMessagePending ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      <SendHorizontal />
+                    )}
                   </Button>
                 </div>
               </div>

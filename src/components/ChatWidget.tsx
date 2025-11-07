@@ -1,4 +1,10 @@
-import { MessageSquareText, SendHorizontal, X, Loader2 } from "lucide-react";
+import {
+  MessageSquareText,
+  SendHorizontal,
+  X,
+  Loader2,
+  LoaderCircle,
+} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -10,20 +16,22 @@ const ChatWidget = () => {
 
   const {
     chatMessages,
-    sendMessage,
     message,
     setMessage,
     conversation,
-    createConversation,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isSendMessagePending,
+    sendMessageMute,
+    messagesContainerRef,
+    conversationId,
+    createConversationMutate,
+    isCreateConversationPending,
   } = useChatWidget();
 
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const isLoadingMoreRef = useRef(false); // ✅ flag để phân biệt đang load thêm tin nhắn cũ
+  const isLoadingMoreRef = useRef(false);
 
-  // ⚙️ Scroll xuống cuối cùng
   const scrollToBottom = () => {
     const div = messagesContainerRef.current;
     if (!div) return;
@@ -32,50 +40,32 @@ const ChatWidget = () => {
     });
   };
 
-  // 🔄 Khi mở khung chat → scroll xuống dưới cùng
   useEffect(() => {
     if (isOpen) {
       setTimeout(scrollToBottom, 200);
     }
   }, [isOpen]);
 
-  // 📩 Khi có tin nhắn mới → scroll xuống dưới, trừ khi đang load thêm page
   useEffect(() => {
     if (!isLoadingMoreRef.current) {
       scrollToBottom();
     }
-  }, [chatMessages.length]);
+  }, [chatMessages]);
 
-  // 🧭 Khi cuộn lên top → fetch page mới
   const handleScrollTop = async (e: React.UIEvent<HTMLDivElement>) => {
     const div = e.currentTarget;
 
     if (div.scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
       const prevScrollHeight = div.scrollHeight;
-      isLoadingMoreRef.current = true; // 🔒 bật cờ trước khi fetch
+      isLoadingMoreRef.current = true;
 
       await fetchNextPage();
 
       requestAnimationFrame(() => {
         const newScrollHeight = div.scrollHeight;
         div.scrollTop = newScrollHeight - prevScrollHeight;
-        isLoadingMoreRef.current = false; // 🔓 tắt cờ sau khi xử lý xong
+        isLoadingMoreRef.current = false;
       });
-    }
-  };
-
-  // 📤 Gửi tin nhắn
-  const handleSend = async () => {
-    if (!message.trim() || !conversation?.id) return;
-    try {
-      await sendMessage({
-        content: message,
-        conversationId: conversation.id,
-      });
-      setMessage("");
-      scrollToBottom();
-    } catch (err) {
-      console.error("Send message failed", err);
     }
   };
 
@@ -87,7 +77,7 @@ const ChatWidget = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
           onClick={() => setIsOpen(true)}
-          className="w-14 h-14 rounded-full bg-primary flex justify-center items-center text-white drop-shadow-2xl hover:bg-primary/80 cursor-pointer transition-transform active:scale-95"
+          className="w-14 h-14 rounded-full bg-primary flex justify-center items-center text-white drop-shadow-2xl hover:bg-primary/80 cursor-pointer transition-transform active:scale-95 hover:scale-110"
         >
           <MessageSquareText />
         </motion.div>
@@ -107,7 +97,7 @@ const ChatWidget = () => {
               opacity: 0,
               transition: { duration: 0.2 },
             }}
-            className="w-[300px] h-[400px] bg-white rounded-md shadow-2xl shadow-black/70 overflow-hidden flex flex-col animate-in fade-in-50 zoom-in-95 duration-200"
+            className="w-[300px] h-[400px] bg-white rounded-md shadow-2xl shadow-black/70 overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="w-full flex justify-between items-center px-2 py-1 bg-primary">
@@ -136,8 +126,12 @@ const ChatWidget = () => {
 
               {!conversation?.id && (
                 <div className="flex justify-center mt-10">
-                  <Button onClick={() => createConversation.mutate()}>
-                    Start chat
+                  <Button onClick={() => createConversationMutate()}>
+                    {isCreateConversationPending ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      "Start chat"
+                    )}
                   </Button>
                 </div>
               )}
@@ -169,21 +163,43 @@ const ChatWidget = () => {
                 placeholder="Type a message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                disabled={!conversation?.id}
+                disabled={!conversation?.id || isSendMessagePending}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    handleSend();
+                    conversationId &&
+                      sendMessageMute(
+                        {
+                          content: message,
+                          conversationId,
+                        },
+                        {
+                          onSuccess: () =>
+                            chatMessages.push({ content: message }),
+                        }
+                      );
+                    setMessage("");
                   }
                 }}
               />
               <Button
                 className="transition-transform active:scale-95"
                 type="submit"
-                disabled={!message || !conversation?.id}
-                onClick={handleSend}
+                disabled={!message || !conversation?.id || isSendMessagePending}
+                onClick={() => {
+                  conversationId &&
+                    sendMessageMute({
+                      content: message,
+                      conversationId,
+                    });
+                  setMessage("");
+                }}
               >
-                <SendHorizontal />
+                {isSendMessagePending ? (
+                  <LoaderCircle className="animate-spin" />
+                ) : (
+                  <SendHorizontal />
+                )}
               </Button>
             </div>
           </motion.div>

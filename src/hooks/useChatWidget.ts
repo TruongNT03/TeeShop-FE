@@ -11,7 +11,7 @@ import { io, type Socket } from "socket.io-client";
 
 export const useChatWidget = () => {
   const [message, setMessage] = useState<string>("");
-
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
   const queryClient = useQueryClient();
 
@@ -53,54 +53,38 @@ export const useChatWidget = () => {
       socket.disconnect();
       socketRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // First get (or create) conversation for current user
-  const conversationQuery = getConversationQuery();
+  const { data: conversation, isSuccess: isGetConversationSuccess } =
+    getConversationQuery();
 
-  const conversationId = conversationQuery.isSuccess
-    ? (conversationQuery.data.data as any)?.id
-    : undefined;
+  const conversationId = conversation?.data.id;
 
-  // Messages infinite query (pages). We'll load page 1 first (latest) and fetchNextPage to load older pages
   const chatMessagesInfinite = getListMessagesInfiniteQuery({ pageSize: 10 });
 
-  const onSendMessage = sendMessageMutation();
+  const { isPending: isSendMessagePending, mutate: sendMessageMute } =
+    sendMessageMutation();
 
-  const conversation = conversationQuery;
-
-  const createConversation = createConversationMutation();
-
-  // wrapper to send message and refresh the list after success
-  const sendMessageAndRefresh = async (
-    body: Parameters<typeof onSendMessage.mutateAsync>[0]
-  ) => {
-    const res = await onSendMessage.mutateAsync(body);
-    // after sending, invalidate message lists so UI will refresh
-    await queryClient.invalidateQueries(["chatMessages"] as any);
-    await queryClient.invalidateQueries(["chatMessagesInfinite"] as any);
-    return res;
-  };
+  const {
+    isPending: isCreateConversationPending,
+    mutate: createConversationMutate,
+  } = createConversationMutation();
 
   return {
-    // flatten pages into a single array of messages (oldest->newest after sorting in UI)
     chatMessages: chatMessagesInfinite.isSuccess
       ? chatMessagesInfinite.data.pages.flatMap((p: any) => p.data.data)
       : [],
-    // pagination helpers from useInfiniteQuery
     fetchNextPage: chatMessagesInfinite.fetchNextPage,
     hasNextPage: chatMessagesInfinite.hasNextPage,
     isFetchingNextPage: chatMessagesInfinite.isFetchingNextPage,
-    // keep backwards-compatible mutation object
-    onSendMessage: onSendMessage,
-    // convenience wrapper that sends and then refreshes the list
-    sendMessage: sendMessageAndRefresh,
+    isSendMessagePending,
+    sendMessageMute,
+    conversationId,
     message,
     setMessage,
-    conversation: conversation.isSuccess
-      ? conversation.data.data
-      : ({} as ConversationResponseDto),
-    createConversation,
+    conversation: conversation?.data,
+    isCreateConversationPending,
+    createConversationMutate,
+    messagesContainerRef,
   };
 };

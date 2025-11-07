@@ -56,11 +56,15 @@ export const useAdminChatWidget = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const { data, isLoading, isError, isSuccess } =
-    adminGetListConversationsQuery({
-      page: 1,
-      pageSize: 20,
-    });
+  const {
+    data: conversations,
+    isLoading,
+    isError,
+    isSuccess,
+  } = adminGetListConversationsQuery({
+    page: 1,
+    pageSize: 20,
+  });
 
   const { data: messagesData } = adminGetListMessagesQuery(
     {
@@ -70,10 +74,18 @@ export const useAdminChatWidget = () => {
     conversationId
   );
 
-  const onSendMessage = adminSendMessageMutation();
+  const { isPending: isSendMessagePending, mutate: sendMessageMutation } =
+    adminSendMessageMutation();
+
+  useEffect(() => {
+    if (isSuccess && conversations?.data?.data?.length > 0 && !conversationId) {
+      setConversationId(conversations.data.data[0].id);
+    }
+  }, [isSuccess, conversations, conversationId]);
 
   return {
-    conversations: data?.data.data || ([] as AdminConversationResponseDto[]),
+    conversations:
+      conversations?.data.data || ([] as AdminConversationResponseDto[]),
     isLoading,
     isError,
     conversationId,
@@ -81,6 +93,7 @@ export const useAdminChatWidget = () => {
     chatMessages: messagesData?.data.data || ([] as MessageResponseDto[]),
     message,
     setMessage,
-    onSendMessage,
+    isSendMessagePending,
+    sendMessageMutation,
   };
 };

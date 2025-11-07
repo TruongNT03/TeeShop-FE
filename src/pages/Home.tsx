@@ -1,56 +1,58 @@
-import Banner from '@/components/Banner'
-import ProductSection from '@/components/ProductSection'
-import Policy from '@/components/Policy'
-import type { PolicyItemProps } from '@/components/PolicyItem'
-import Promo from '@/components/Promo'
-import PromoItem from '@/components/PromoItem'
-import { useHome } from '@/hooks/useHome'
-import { Fingerprint, LifeBuoy, RotateCcw, TruckElectric, UserRound } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Link } from 'react-router-dom'
-import { motion } from 'motion/react'
+import Banner from "@/components/Banner";
+import ProductSection from "@/components/ProductSection";
+import Policy from "@/components/Policy";
+import type { PolicyItemProps } from "@/components/PolicyItem";
+import Promo from "@/components/Promo";
+import PromoItem from "@/components/PromoItem";
+import { useHome } from "@/hooks/useHome";
+import {
+  Fingerprint,
+  LifeBuoy,
+  RotateCcw,
+  TruckElectric,
+  UserRound,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { motion } from "motion/react";
 
 const policies: PolicyItemProps[] = [
   {
     icon: <TruckElectric />,
-    title: 'Free Shipping',
-    description: 'Enjoy free shipping on all orders above $100',
+    title: "Free Shipping",
+    description: "Enjoy free shipping on all orders above $100",
   },
   {
     icon: <LifeBuoy />,
-    title: 'SUPPORT 24/7',
-    description: 'Our support team is there to help you for queries',
+    title: "SUPPORT 24/7",
+    description: "Our support team is there to help you for queries",
   },
   {
     icon: <RotateCcw />,
-    title: '30 DAYS RETURN',
-    description: 'Simply return it within 30 days for an exchange.',
+    title: "30 DAYS RETURN",
+    description: "Simply return it within 30 days for an exchange.",
   },
   {
     icon: <Fingerprint />,
-    title: '100% PAYMENT SECURE',
-    description: 'Our payments are secured with 256 bit encryption',
+    title: "100% PAYMENT SECURE",
+    description: "Our payments are secured with 256 bit encryption",
   },
-]
+];
 
 const Home = () => {
-  const { newArrivalProducts, topSellerProducts, newArrivalProductsIsLoading, topSellerProductsIsLoading } = useHome()
+  const {
+    newArrivalProducts,
+    topSellerProducts,
+    newArrivalProductsIsLoading,
+    topSellerProductsIsLoading,
+  } = useHome();
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3, ease: 'easeIn' }}
+      transition={{ duration: 0.3, ease: "easeIn" }}
       className="w-full"
     >
-      <div className="flex w-full justify-end px-6 pt-6">
-        <Link
-          to="/profile"
-          className="group inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 shadow-md shadow-slate-200/70 transition hover:-translate-y-0.5 hover:shadow-xl"
-        >
-          <UserRound className="h-5 w-5 text-primary transition group-hover:scale-110" aria-hidden />
-          <span>My Profile</span>
-        </Link>
-      </div>
       <Banner />
       <ProductSection
         title="Discover NEW Arrivals"
@@ -82,14 +84,14 @@ const Home = () => {
         isLoading={topSellerProductsIsLoading}
       />
       <div className="w-full flex justify-center items-center">
-        <Link to={'/product'} className="py-14">
+        <Link to={"/product"} className="py-14">
           <Button className="uppercase font-lato py-7 px-8 text-[20px] border-2 border-primary bg-primary rounded-sm hover:text-primary hover:bg-transparent hover:border-2 hover:border-primary">
             Shop Now
           </Button>
         </Link>
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
