@@ -1,18 +1,17 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import PublicRoute from "./PublicRoute";
-import PrivateRouter from "./PrivateRouter";
-import Register from "../pages/Register";
-import Login from "../pages/Login";
-import NotFound from "../pages/NotFound";
-import Home from "../pages/Home";
-import AdminProduct from "@/pages/AdminProduct";
-import AdminLayout from "@/layouts/AdminLayout";
-import AdminCreateProduct from "@/pages/AdminCreateProduct";
-import UserLayout from "@/layouts/UserLayout";
-import DemoPage from "@/pages/DemoPage";
-import ForgotPassword from "@/pages/ForgotPassword";
-import ProductDetail from "@/pages/ProductDetail";
-import CartPage from "@/pages/CartPage";
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import PublicRoute from './PublicRoute'
+import PrivateRouter from './PrivateRouter'
+import Register from '../pages/Register'
+import Login from '../pages/Login'
+import NotFound from '../pages/NotFound'
+import Home from '../pages/Home'
+import AdminProduct from '@/pages/AdminProduct'
+import AdminLayout from '@/layouts/AdminLayout'
+import AdminCreateProduct from '@/pages/AdminCreateProduct'
+import UserLayout from '@/layouts/UserLayout'
+import DemoPage from '@/pages/DemoPage'
+import ForgotPassword from '@/pages/ForgotPassword'
+import ProfilePage from '@/pages/ProfilePage'
 
 const AppRouter = () => {
   return (
@@ -31,20 +30,20 @@ const AppRouter = () => {
         </Route>
 
         <Route element={<PrivateRouter />}>
+          <Route element={<UserLayout />}>
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminProduct />} />
             <Route path="/admin/product" element={<AdminProduct />} />
-            <Route
-              path="/admin/product/create"
-              element={<AdminCreateProduct />}
-            />
+            <Route path="/admin/product/create" element={<AdminCreateProduct />} />
           </Route>
         </Route>
 
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
-  );
-};
+  )
+}
 
-export default AppRouter;
+export default AppRouter
