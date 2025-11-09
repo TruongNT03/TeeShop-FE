@@ -1,9 +1,11 @@
 import type {
   CreateProductDto,
+  UpdateProductDto, // Giữ lại để tham chiếu
   UpdateProductStatusDto,
   UploadDto,
 } from "@/api";
 import { apiClient } from "./apiClient";
+
 export const adminProductApi = {
   findAll: async (
     query: Parameters<typeof apiClient.api.adminProductControllerFindAll>[0]
@@ -31,4 +33,10 @@ export const adminProductApi = {
 
   updateStatus: async (id: string, data: UpdateProductStatusDto) =>
     apiClient.api.adminProductControllerUpdateStatus(id, data),
+
+  findById: async (id: string) =>
+    apiClient.api.adminProductControllerFindOne(id),
+
+  update: async (id: string, data: CreateProductDto) =>
+    apiClient.api.adminProductControllerUpdate(id, data as any),
 };

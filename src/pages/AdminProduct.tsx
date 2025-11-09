@@ -48,6 +48,7 @@ const AdminProduct = () => {
     pageSize: 10,
     categoriesIds: [],
   });
+
   const {
     products,
     isSelectedAllProduct,
@@ -57,7 +58,6 @@ const AdminProduct = () => {
     pagination,
     isLoading,
   } = useAdminProduct(query);
-
   const statusMutation = updateProductStatusMutation();
 
   const tableHeaderTitles = [
@@ -152,8 +152,10 @@ const AdminProduct = () => {
       sortable: false,
       render: (product: ProductResponseDto): React.ReactNode => (
         <TableCell>
-          <div className="flex gap-2">
-            <SquarePen className="scale-75 text-primary cursor-pointer" />
+          <div className="flex gap-2"> 
+            <Link to={`/admin/product/edit/${product.id}`}>
+              <SquarePen className="scale-75 text-primary cursor-pointer" />
+            </Link> 
             {product.status === "published" ? (
               <Archive
                 className={`scale-75 text-destructive cursor-pointer ${

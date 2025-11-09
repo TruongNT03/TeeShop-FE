@@ -1,5 +1,6 @@
 import type {
   CreateProductDto,
+  UpdateProductDto,
   UpdateProductStatusDto,
   UploadDto,
 } from "@/api";
@@ -7,6 +8,7 @@ import { adminProductApi } from "@/services/adminGetListProduct";
 import type { apiClient } from "@/services/apiClient";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
 export const getAllProductQuery = (
   query: Parameters<typeof apiClient.api.adminProductControllerFindAll>[0]
 ) => {
@@ -47,6 +49,14 @@ export const getAllVariantValuesQuery = (
   });
 };
 
+export const getAdminProductByIdQuery = (id: string) => {
+  return useQuery({
+    queryKey: ["adminProduct", id],
+    queryFn: () => adminProductApi.findById(id),
+    enabled: !!id,
+  });
+};
+
 export const createProductMutation = () => {
   return useMutation({
     mutationKey: ["createProduct"],
@@ -58,6 +68,25 @@ export const createProductMutation = () => {
     },
     onError: (error) => {
       toast.error(error.message || "Tạo sản phẩm thất bại.");
+    },
+  });
+};
+
+export const updateProductMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["updateProduct"],
+    mutationFn: ({ id, data }: { id: string; data: CreateProductDto }) =>
+      adminProductApi.update(id, data),
+    onSuccess: (_response, variables) => {
+      toast.success("Cập nhật sản phẩm thành công!");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({
+        queryKey: ["adminProduct", variables.id],
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Cập nhật sản phẩm thất bại.");
     },
   });
 };
@@ -74,7 +103,6 @@ export const uploadProductImageMutation = () => {
 
 export const updateProductStatusMutation = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationKey: ["updateProductStatus"],
     mutationFn: ({ id, data }: { id: string; data: UpdateProductStatusDto }) =>
