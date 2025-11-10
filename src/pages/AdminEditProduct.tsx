@@ -131,16 +131,35 @@ const AdminEditProduct = () => {
     const description = editorRef.current
       ? (editorRef.current as any).getContent()
       : "";
-    const finalData = { ...data, description };
 
+    const originalImages = productData?.data.productImages || [];
+
+    const transformedImageUrls = data.imageUrls?.map((url) => {
+    // Tìm ảnh gốc để lấy id
+      const originalImage = originalImages.find((img) => img.url === url);
+      return {
+        id: originalImage ? originalImage.id : 0, // Gửi 0 (hoặc bỏ qua id) nếu là ảnh mới?
+                                                  // API của bạn có thể cần logic xử lý ảnh mới/cũ khác nhau.
+                                                  // Giả sử API chỉ cần URL và ID của ảnh đã có.
+        url: url,
+      };
+    }) || [];
+    
+    const finalData = {
+      ...data,
+      description,
+      imageUrls: transformedImageUrls, // Sử dụng dữ liệu đã biến đổi
+    };
+    
     mutation.mutate(
-      { id: id!, data: finalData },
+      { id: id!, data: finalData as any},
       {
         onSuccess: () => {
           navigate("/admin/product");
         },
       }
     );
+  
   };
 
   if (isLoadingProduct || (productData && variantsLoading)) {
