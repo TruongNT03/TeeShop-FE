@@ -135,12 +135,9 @@ const AdminEditProduct = () => {
     const originalImages = productData?.data.productImages || [];
 
     const transformedImageUrls = data.imageUrls?.map((url) => {
-    // Tìm ảnh gốc để lấy id
       const originalImage = originalImages.find((img) => img.url === url);
       return {
-        id: originalImage ? originalImage.id : 0, // Gửi 0 (hoặc bỏ qua id) nếu là ảnh mới?
-                                                  // API của bạn có thể cần logic xử lý ảnh mới/cũ khác nhau.
-                                                  // Giả sử API chỉ cần URL và ID của ảnh đã có.
+        id: originalImage ? originalImage.id : undefined, 
         url: url,
       };
     }) || [];
@@ -148,7 +145,7 @@ const AdminEditProduct = () => {
     const finalData = {
       ...data,
       description,
-      imageUrls: transformedImageUrls, // Sử dụng dữ liệu đã biến đổi
+      imageUrls: transformedImageUrls, 
     };
     
     mutation.mutate(

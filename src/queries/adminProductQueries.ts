@@ -76,7 +76,7 @@ export const updateProductMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["updateProduct"],
-    mutationFn: ({ id, data }: { id: string; data: CreateProductDto }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateProductDto }) =>
       adminProductApi.update(id, data),
     onSuccess: (_response, variables) => {
       toast.success("Cập nhật sản phẩm thành công!");
