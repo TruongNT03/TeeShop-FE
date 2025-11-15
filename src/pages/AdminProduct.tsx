@@ -27,27 +27,71 @@ import {
   Plus,
   Search,
   SquarePen,
+  Check,
+  ChevronDown,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { convertDateTime } from "@/utils/convertDateTime";
 import { Link } from "react-router-dom";
 import type { apiClient } from "@/services/apiClient";
 import { ProductStatus } from "@/types/productStatus";
-import type { ProductResponseDto } from "@/api";
+import type { ProductResponseDto, CategoryResponseDto } from "@/api";
 import { Spinner } from "@/components/ui/spinner";
-import { updateProductStatusMutation } from "@/queries/adminProductQueries";
+import {
+  updateProductStatusMutation,
+  getAllCategoryQuery,
+} from "@/queries/adminProductQueries";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { useDebounce } from "@/hooks/useDebounce";
+import { cn } from "@/lib/utils";
+
+export enum AdminProductSortField {
+  NAME = "name",
+  DESCRIPTION = "description",
+  STATUS = "status",
+  CREATED_AT = "createdAt",
+  UPDATED_AT = "updatedAt",
+}
+
+export enum SortOrder {
+  DESC = "DESC",
+  ASC = "ASC",
+}
+
+type AdminProductQuery = Omit<
+  Parameters<typeof apiClient.api.adminProductControllerFindAll>[0],
+  "categoriesIds"
+> & {
+  categoriesIds?: number[];
+};
 
 const AdminProduct = () => {
-  const [query, setQuery] = useState<
-    Parameters<typeof apiClient.api.adminProductControllerFindAll>[0]
-  >({
+  const [query, setQuery] = useState<AdminProductQuery>({
     page: 1,
     pageSize: 10,
-    categoriesIds: [],
+    categoriesIds: [], 
+    search: "",
+    sortBy: "createdAt",
+    sortOrder: "DESC",
   });
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const {
     products,
@@ -57,8 +101,45 @@ const AdminProduct = () => {
     setSelectedProducts,
     pagination,
     isLoading,
-  } = useAdminProduct(query);
+  } = useAdminProduct(query as any); 
+ 
   const statusMutation = updateProductStatusMutation();
+
+  const [categorySearch, setCategorySearch] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    getAllCategoryQuery({ pageSize: 100, search: categorySearch });
+  const categories = categoriesData?.data.data || [];
+
+  useEffect(() => {
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      search: debouncedSearchTerm,
+      page: 1,
+    }));
+  }, [debouncedSearchTerm]);
+
+  const handleSort = (field: AdminProductSortField) => {
+    const isCurrentSort = query.sortBy === field;
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      sortBy: field,
+      sortOrder:
+        isCurrentSort && prevQuery.sortOrder === "DESC" ? "ASC" : "DESC",
+    }));
+  };
+
+  const handleCategorySelect = (categoryId: number) => {
+    setQuery((prevQuery) => {
+      const currentIds = prevQuery.categoriesIds || [];
+      const newIds = currentIds.includes(categoryId)
+        ? currentIds.filter((id) => id !== categoryId)
+        : [...currentIds, categoryId];
+
+      return { ...prevQuery, categoriesIds: newIds, page: 1 };
+    });
+  };
 
   const tableHeaderTitles = [
     {
@@ -152,10 +233,10 @@ const AdminProduct = () => {
       sortable: false,
       render: (product: ProductResponseDto): React.ReactNode => (
         <TableCell>
-          <div className="flex gap-2"> 
+          <div className="flex gap-2">
             <Link to={`/admin/product/edit/${product.id}`}>
               <SquarePen className="scale-75 text-primary cursor-pointer" />
-            </Link> 
+            </Link>
             {product.status === "published" ? (
               <Archive
                 className={`scale-75 text-destructive cursor-pointer ${
@@ -268,6 +349,7 @@ const AdminProduct = () => {
 
     return items;
   };
+
   return (
     <div className="w-full overflow-auto py-5">
       <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
@@ -287,15 +369,64 @@ const AdminProduct = () => {
             <Input
               className="w-[400px] py-0 pl-10"
               type="search"
-              placeholder="Search product"
+              placeholder="Tìm theo tên, mô tả..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
           </div>
-          <Button variant="outline">
-            <ListFilter />
-            Filter
-          </Button>
+
+          <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <ListFilter className="mr-2 h-4 w-4" />
+                Lọc theo danh mục
+                {query.categoriesIds && query.categoriesIds.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {query.categoriesIds.length}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-0">
+              <Command>
+                <CommandInput
+                  placeholder="Tìm danh mục..."
+                  value={categorySearch}
+                  onValueChange={setCategorySearch}
+                />
+                <CommandList>
+                  {categoriesLoading && (
+                    <div className="p-2 text-center">
+                      <Spinner />
+                    </div>
+                  )}
+                  <CommandEmpty>Không tìm thấy danh mục.</CommandEmpty>
+                  <CommandGroup>
+                    {categories.map((category: CategoryResponseDto) => (
+                      <CommandItem
+                        key={category.id}
+                        value={category.title}
+                        onSelect={() => handleCategorySelect(category.id)}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            (query.categoriesIds || []).includes(category.id)
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        {category.title}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
+
         <div>
           <Link to="/admin/product/create">
             <Button variant="default">
@@ -316,7 +447,9 @@ const AdminProduct = () => {
                   checked={isSelectedAllProduct}
                   onCheckedChange={(checked) => {
                     if (checked && products) {
-                      setSelectedProducts(products.map((p) => p.id));
+                      setSelectedProducts(
+                        (products as ProductResponseDto[]).map((p) => p.id)
+                      );
                     } else {
                       setSelectedProducts([]);
                     }
@@ -329,11 +462,20 @@ const AdminProduct = () => {
               </TableHead>
               {tableHeaderTitles.map((value, index) => (
                 <TableHead key={index} className="py-5">
-                  <div className="flex items-center">
+                  <div
+                    className={cn(
+                      "flex items-center",
+                      value.sortable ? "cursor-pointer" : ""
+                    )}
+                    onClick={() =>
+                      value.sortable &&
+                      handleSort(value.key as AdminProductSortField)
+                    }
+                  >
                     {value.title}{" "}
                     {value.sortable && (
-                      <span>
-                        <ArrowUpDown className="scale-[60%] cursor-pointer" />
+                      <span className="ml-1">
+                        <ArrowUpDown className="scale-[60%]" />
                       </span>
                     )}
                   </div>
@@ -351,7 +493,7 @@ const AdminProduct = () => {
                   <Spinner className="w-10 h-10" />
                 </TableCell>
               </TableRow>
-            ) : products.length === 0 ? (
+            ) : (products as ProductResponseDto[]).length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={tableHeaderTitles.length + 2}
@@ -361,7 +503,7 @@ const AdminProduct = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              products.map((product, index) => (
+              (products as ProductResponseDto[]).map((product, index) => (
                 <TableRow
                   key={product.id}
                   className={`${index % 2 ? "bg-muted" : ""}`}
@@ -374,7 +516,10 @@ const AdminProduct = () => {
                         if (checked) {
                           const updated = [...selectedProducts, product.id];
                           setSelectedProducts(updated);
-                          if (updated.length === products.length) {
+                          if (
+                            updated.length ===
+                            (products as ProductResponseDto[]).length
+                          ) {
                             setIsSelectedAllProduct(true);
                           }
                         } else {
