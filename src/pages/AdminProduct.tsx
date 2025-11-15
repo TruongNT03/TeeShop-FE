@@ -150,16 +150,16 @@ const AdminProduct = () => {
         <TableCell>{value}</TableCell>
       ),
     },
-    {
-      key: "description",
-      title: "Description",
-      sortable: true,
-      render: (value: string): React.ReactNode => (
-        <TableCell className="max-w-[200px] overflow-hidden truncate">
-          {value}
-        </TableCell>
-      ),
-    },
+    // {
+    //   key: "description",
+    //   title: "Description",
+    //   sortable: true,
+    //   render: (value: string): React.ReactNode => (
+    //     <TableCell className="max-w-[200px] overflow-hidden truncate">
+    //       {value}
+    //     </TableCell>
+    //   ),
+    // },
     {
       key: "status",
       title: "Status",
