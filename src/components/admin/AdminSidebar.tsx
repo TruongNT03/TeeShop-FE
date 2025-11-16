@@ -103,7 +103,9 @@ const AdminSideBar = () => {
                     <SidebarMenuSub>
                       <SidebarMenuSubItem>
                         <SidebarMenuSubItem>
-                          <SidebarMenuSubButton>Category</SidebarMenuSubButton>
+                          <div onClick={() => navigate("/admin/category")}>
+                            <SidebarMenuSubButton>Category</SidebarMenuSubButton>
+                          </div>
                         </SidebarMenuSubItem>
                       </SidebarMenuSubItem>
                     </SidebarMenuSub>

@@ -8,6 +8,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationControl, 
 } from "@/components/ui/pagination";
 import {
   Table,
@@ -149,76 +150,6 @@ const AdminCategory = () => {
       ),
     },
   ];
-
-  const renderPaginationItems = () => {
-    const { currentPage, totalPage } = pagination;
-    const items = [];
-
-    let startPage = Math.max(1, currentPage - 1);
-    let endPage = Math.min(totalPage, currentPage + 1);
-    if (currentPage === 1 && totalPage > 1) {
-      endPage = Math.min(totalPage, 3);
-    }
-    if (currentPage === totalPage && totalPage > 1) {
-      startPage = Math.max(1, totalPage - 2);
-    }
-
-    if (startPage > 1) {
-      items.push(
-        <PaginationItem key={1}>
-          <PaginationLink
-            onClick={() => handlePageChange(1)}
-            className="cursor-pointer"
-          >
-            1
-          </PaginationLink>
-        </PaginationItem>
-      );
-      if (startPage > 2) {
-        items.push(
-          <PaginationItem key="start-ellipsis">
-            <PaginationEllipsis />
-          </PaginationItem>
-        );
-      }
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      items.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            isActive={i === currentPage}
-            onClick={() => handlePageChange(i)}
-            className="cursor-pointer"
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    if (endPage < totalPage) {
-      if (endPage < totalPage - 1) {
-        items.push(
-          <PaginationItem key="end-ellipsis">
-            <PaginationEllipsis />
-          </PaginationItem>
-        );
-      }
-      items.push(
-        <PaginationItem key={totalPage}>
-          <PaginationLink
-            onClick={() => handlePageChange(totalPage)}
-            className="cursor-pointer"
-          >
-            {totalPage}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return items;
-  };
 
   return (
     <div className="w-full overflow-auto py-5">
@@ -364,33 +295,12 @@ const AdminCategory = () => {
           <div className="text-sm text-muted-foreground">
             Tổng: <b>{pagination.totalItem}</b> danh mục
           </div>
-          <Pagination className="w-fit m-0">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => handlePageChange(pagination.currentPage - 1)}
-                  className={
-                    pagination.currentPage === 1
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
 
-              {renderPaginationItems()}
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => handlePageChange(pagination.currentPage + 1)}
-                  className={
-                    pagination.currentPage === pagination.totalPage
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <PaginationControl
+            currentPage={pagination.page}
+            totalPage={pagination.totalPage}
+            onPageChange={handlePageChange}
+          />
         </div>
       </Card>
     </div>
