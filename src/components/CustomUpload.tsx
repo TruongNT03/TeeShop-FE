@@ -92,7 +92,7 @@ const CustomUpload = ({ value = [], onChange }: CustomUploadProps) => {
       });
 
       (file as UploadFile).url = fileUrl;
-      onSuccess?.({ fileUrl }, file);
+      onSuccess?.({ fileUrl }, file as any);
     } catch (error: any) {
       console.error("Upload failed:", error);
       toast.error("Tải ảnh lên thất bại.");

@@ -13,6 +13,8 @@ import DemoPage from "@/pages/DemoPage";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ProfilePage from "@/pages/ProfilePage";
 import ProductDetail from "@/pages/ProductDetail";
+import AdminEditProduct from "@/pages/AdminEditProduct"; // Import
+import CartPage from "@/pages/CartPage";
 import AdminConfig from "@/pages/AdminConfig";
 
 const AppRouter = () => {
@@ -33,6 +35,7 @@ const AppRouter = () => {
         <Route element={<PrivateRouter />}>
           <Route element={<UserLayout />}>
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/cart" element={<CartPage />} />
           </Route>
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminProduct />} />
@@ -40,6 +43,10 @@ const AppRouter = () => {
             <Route
               path="/admin/product/create"
               element={<AdminCreateProduct />}
+            />
+            <Route
+              path="/admin/product/edit/:id"
+              element={<AdminEditProduct />}
             />
             <Route path="admin/configuration" element={<AdminConfig />} />
           </Route>
