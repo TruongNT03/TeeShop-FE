@@ -6,6 +6,7 @@ import {
   LogOut,
   UserPen,
   UserRound,
+  Wrench,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -130,6 +131,13 @@ const AdminSideBar = () => {
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </Collapsible>
+
+              <Link to="admin/configuration">
+                <SidebarMenuButton className="group">
+                  <Wrench />
+                  <span>Configuration</span>
+                </SidebarMenuButton>
+              </Link>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

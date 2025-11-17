@@ -13,6 +13,7 @@ import DemoPage from "@/pages/DemoPage";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ProfilePage from "@/pages/ProfilePage";
 import ProductDetail from "@/pages/ProductDetail";
+import AdminConfig from "@/pages/AdminConfig";
 
 const AppRouter = () => {
   return (
@@ -40,6 +41,7 @@ const AppRouter = () => {
               path="/admin/product/create"
               element={<AdminCreateProduct />}
             />
+            <Route path="admin/configuration" element={<AdminConfig />} />
           </Route>
         </Route>
 

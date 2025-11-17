@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cartApi } from "@/services/cartApi";
 import type { AddItemToCartDto, UpdateQuantityCartItemDto } from "@/api";
+import { apiClient } from "@/services/apiClient";
 
 export const addItemToCartMutation = () => {
   const queryClient = useQueryClient();
@@ -18,11 +19,10 @@ export const addItemToCartMutation = () => {
   });
 };
 
-export const getCartSummaryQuery = (enabled: boolean) => {
+export const getCartSummaryQuery = () => {
   return useQuery({
     queryKey: ["cartSummary"],
-    queryFn: () => cartApi.getCartSummary(),
-    enabled: enabled,
+    queryFn: () => apiClient.api.cartControllerGetCartSummary(),
   });
 };
 
@@ -30,8 +30,13 @@ export const updateCartItemQuantityMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["updateCartItemQuantity"],
-    mutationFn: ({ id, data }: { id: string; data: UpdateQuantityCartItemDto }) =>
-      cartApi.updateItemQuantity(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateQuantityCartItemDto;
+    }) => cartApi.updateItemQuantity(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cartSummary"] });
     },
