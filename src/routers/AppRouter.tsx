@@ -16,6 +16,7 @@ import ProductDetail from "@/pages/ProductDetail";
 import AdminEditProduct from "@/pages/AdminEditProduct"; // Import
 import CartPage from "@/pages/CartPage";
 import AdminConfig from "@/pages/AdminConfig";
+import Checkout from "@/pages/Checkout";
 
 const AppRouter = () => {
   return (
@@ -36,6 +37,7 @@ const AppRouter = () => {
           <Route element={<UserLayout />}>
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<Checkout />} />
           </Route>
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminProduct />} />

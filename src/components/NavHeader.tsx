@@ -131,7 +131,7 @@ const NavHeader = () => {
                         />
                       </div>
                       <div className="flex flex-col gap-2 justify-center">
-                        <div className="font-semibold">
+                        <div className="font-semibold uppercase">
                           {cartItem.product.name}
                         </div>
                         <div className="flex gap-4 items-center">
