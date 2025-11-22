@@ -1,5 +1,6 @@
 import type {
   CreateProductDto,
+  SaveCategoryDto,
   UpdateProductDto,
   UpdateProductStatusDto,
   UploadDto,
@@ -54,6 +55,21 @@ export const getAdminProductByIdQuery = (id: string) => {
     queryKey: ["adminProduct", id],
     queryFn: () => adminProductApi.findById(id),
     enabled: !!id,
+  });
+};
+
+export const createCategoryMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["createCategory"],
+    mutationFn: (data: SaveCategoryDto) => adminProductApi.createCategory(data),
+    onSuccess: () => {
+      toast.success("Tạo danh mục thành công!");
+      queryClient.invalidateQueries({ queryKey: ["category"] });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Tạo danh mục thất bại.");
+    },
   });
 };
 

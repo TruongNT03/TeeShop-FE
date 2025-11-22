@@ -1,13 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
   PaginationControl, 
 } from "@/components/ui/pagination";
 import {
@@ -27,13 +20,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { convertDateTime } from "@/utils/convertDateTime";
-import { Link } from "react-router-dom";
 import type { apiClient } from "@/services/apiClient";
 import type { CategoryResponseDto } from "@/api";
 import { Spinner } from "@/components/ui/spinner";
 import { getAllCategoryQuery } from "@/queries/adminProductQueries";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
+import { AdminCategoryCreateDialog } from "@/components/admin/AdminCategoryCreateDialog";
 
 export enum ListCategorySortField {
   TITLE = "title",
@@ -66,6 +59,7 @@ const AdminCategory = () => {
 
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [isSelectedAll, setIsSelectedAll] = useState<boolean>(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { data: categoriesData, isLoading } = getAllCategoryQuery(query as any);
   const categories = categoriesData?.data.data || [];
@@ -142,7 +136,7 @@ const AdminCategory = () => {
       key: "createdAt",
       title: "Created At",
       sortable: true,
-      widthClass: "w-auto whitespace-nowrap",
+      widthClass: "w-auto whitespace-nowrap",      
       render: (value: string): React.ReactNode => (
         <TableCell className="w-auto whitespace-nowrap">
           {convertDateTime(value)}
@@ -172,12 +166,10 @@ const AdminCategory = () => {
         </div>
 
         <div>
-          <Link to="/admin/category/create">
-            <Button variant="default">
-              <Plus />
-              Create Category
-            </Button>
-          </Link>
+          <Button variant="default" onClick={() => setIsCreateOpen(true)}>
+            <Plus />
+            Create Category
+          </Button>
         </div>
       </div>
       {/* Table */}
@@ -303,6 +295,11 @@ const AdminCategory = () => {
           />
         </div>
       </Card>
+
+      <AdminCategoryCreateDialog 
+        open={isCreateOpen} 
+        onClose={() => setIsCreateOpen(false)} 
+      />
     </div>
   );
 };

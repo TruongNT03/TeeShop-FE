@@ -1,5 +1,6 @@
 import type {
   CreateProductDto,
+  SaveCategoryDto, 
   UpdateProductDto,
   UpdateProductStatusDto,
   UploadDto,
@@ -14,6 +15,9 @@ export const adminProductApi = {
   findAllCategories: async (
     query: Parameters<typeof apiClient.api.adminCategoriesControllerFindAll>[0]
   ) => apiClient.api.adminCategoriesControllerFindAll(query),
+
+  createCategory: async (data: SaveCategoryDto) =>
+    apiClient.api.adminCategoriesControllerCreate(data),
 
   create: async (data: CreateProductDto) =>
     apiClient.api.adminProductControllerCreate(data),
