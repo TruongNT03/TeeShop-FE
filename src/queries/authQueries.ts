@@ -81,6 +81,6 @@ export const logoutMutation = () => {
 export const getProfileQuery = () => {
   return useQuery({
     queryKey: ["profile"],
-    queryFn: () => apiClient.api.authControllerGetProfile(),
+    queryFn: async () => (await apiClient.api.authControllerGetProfile()).data,
   });
 };

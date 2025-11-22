@@ -1,11 +1,12 @@
 import { findAllCartItemsQuery } from "@/queries/cartQueries";
-import { useState } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 
 export const useCart = () => {
   const [selectedCartItemIds, setSelectedCartItemIds] = useState<string[]>(
-    localStorage.getItem("selectedCartItemIds")
-      ? JSON.parse(localStorage.getItem("selectedCartItemIds")!)
-      : []
+    () => {
+      const saved = localStorage.getItem("selectedCartItemIds");
+      return saved ? JSON.parse(saved) : [];
+    }
   );
 
   const {
@@ -16,57 +17,70 @@ export const useCart = () => {
     isFetchingNextPage,
   } = findAllCartItemsQuery({ pageSize: 10 });
 
-  const handleCheckedChange = (
-    checkboxValue: string | boolean,
-    selectedCartItemId: string
-  ) => {
-    if (checkboxValue) {
-      setSelectedCartItemIds([...selectedCartItemIds, selectedCartItemId]);
-      localStorage.setItem(
-        "selectedCartItemIds",
-        JSON.stringify(selectedCartItemIds)
-      );
-    } else {
-      setSelectedCartItemIds(
-        selectedCartItemIds.filter((id) => id !== selectedCartItemId)
-      );
-      localStorage.setItem(
-        "selectedCartItemIds",
-        JSON.stringify(selectedCartItemIds)
-      );
-    }
-  };
+  // Sync to localStorage whenever selection changes
+  useEffect(() => {
+    localStorage.setItem(
+      "selectedCartItemIds",
+      JSON.stringify(selectedCartItemIds)
+    );
+  }, [selectedCartItemIds]);
 
-  const checkoutSummaryCalculator = () => {
+  // Memoize flattened cart items
+  const flatCartItems = useMemo(
+    () => listCartItems?.pages.flatMap((page) => page.data.data) || [],
+    [listCartItems]
+  );
+
+  const handleCheckedChange = useCallback(
+    (checkboxValue: string | boolean, selectedCartItemId: string) => {
+      setSelectedCartItemIds((prev) => {
+        if (checkboxValue) {
+          return [...prev, selectedCartItemId];
+        } else {
+          return prev.filter((id) => id !== selectedCartItemId);
+        }
+      });
+    },
+    []
+  );
+
+  // Memoize checkout summary calculation
+  const checkoutSummaryCalculator = useMemo(() => {
     let totalAmount = 0;
     let totalQuantity = 0;
 
-    listCartItems?.pages.forEach((page) => {
-      page.data.data.forEach((item) => {
-        if (selectedCartItemIds.includes(item.id)) {
-          totalAmount += item.productVariant.price * item.quantity;
-          totalQuantity += item.quantity;
-        }
-      });
+    flatCartItems.forEach((item) => {
+      if (selectedCartItemIds.includes(item.id)) {
+        totalAmount += item.productVariant.price * item.quantity;
+        totalQuantity += item.quantity;
+      }
     });
-    return { totalAmount, totalQuantity };
-  };
 
-  const handleCheckAll = (checked: string | boolean) => {
-    if (checked) {
-      const allIds = listCartItems?.pages
-        .flatMap((page) => page.data.data)
-        .map((item) => item.id);
-      setSelectedCartItemIds(allIds || []);
-      localStorage.setItem("selectedCartItemIds", JSON.stringify(allIds));
-    } else {
-      setSelectedCartItemIds([]);
-      localStorage.setItem("selectedCartItemIds", JSON.stringify([]));
-    }
-  };
+    return { totalAmount, totalQuantity };
+  }, [flatCartItems, selectedCartItemIds]);
+
+  const handleCheckAll = useCallback(
+    (checked: string | boolean) => {
+      if (checked) {
+        const allIds = flatCartItems.map((item) => item.id);
+        setSelectedCartItemIds(allIds);
+      } else {
+        setSelectedCartItemIds([]);
+      }
+    },
+    [flatCartItems]
+  );
+
+  // Check if all items are selected
+  const isAllSelected = useMemo(
+    () =>
+      flatCartItems.length > 0 &&
+      selectedCartItemIds.length === flatCartItems.length,
+    [flatCartItems, selectedCartItemIds]
+  );
 
   return {
-    listCartItems: listCartItems?.pages.flatMap((page) => page.data.data) || [],
+    listCartItems: flatCartItems,
     isCartItemSuccess,
     fetchNextPage,
     hasNextPage,
@@ -76,5 +90,6 @@ export const useCart = () => {
     handleCheckedChange,
     checkoutSummaryCalculator,
     handleCheckAll,
+    isAllSelected,
   };
 };

@@ -17,6 +17,11 @@ import AdminEditProduct from "@/pages/AdminEditProduct"; // Import
 import CartPage from "@/pages/CartPage";
 import AdminConfig from "@/pages/AdminConfig";
 import Checkout from "@/pages/Checkout";
+import { ProfileLayout } from "@/layouts/ProfileLayout";
+import { ProfileInfo } from "@/pages/profile/ProfileInfo";
+import { ProfileOrders } from "@/pages/profile/ProfileOrders";
+import { ProfileChangePassword } from "@/pages/profile/ProfileChangePassword";
+import { ProfileAddresses } from "@/pages/profile/ProfileAddresses";
 
 const AppRouter = () => {
   return (
@@ -35,9 +40,18 @@ const AppRouter = () => {
 
         <Route element={<PrivateRouter />}>
           <Route element={<UserLayout />}>
-            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<Checkout />} />
+
+            <Route path="/profile" element={<ProfileLayout />}>
+              <Route path="info" element={<ProfileInfo />} />
+              <Route path="orders" element={<ProfileOrders />} />
+              <Route
+                path="change-password"
+                element={<ProfileChangePassword />}
+              />
+              <Route path="addresses" element={<ProfileAddresses />} />
+            </Route>
           </Route>
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminProduct />} />

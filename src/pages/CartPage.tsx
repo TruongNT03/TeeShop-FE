@@ -22,10 +22,10 @@ const CartPage = () => {
     listCartItems,
     isCartItemSuccess,
     selectedCartItemIds,
-    setSelectedCartItemIds,
     handleCheckedChange,
     checkoutSummaryCalculator,
     handleCheckAll,
+    isAllSelected,
   } = useCart();
 
   const {
@@ -34,7 +34,7 @@ const CartPage = () => {
     setProductWannaSeeVariantId,
   } = useProductVariantValue();
 
-  const { totalAmount, totalQuantity } = checkoutSummaryCalculator();
+  const { totalAmount, totalQuantity } = checkoutSummaryCalculator;
 
   return (
     <motion.div
@@ -53,9 +53,8 @@ const CartPage = () => {
               <tr className="bg-white rounded-2xl">
                 <th className="py-5 pl-5 text-left rounded-l-sm">
                   <Checkbox
-                    onCheckedChange={(value) => {
-                      handleCheckAll(value);
-                    }}
+                    checked={isAllSelected}
+                    onCheckedChange={handleCheckAll}
                   />
                 </th>
                 <th className="py-5 font-normal text-left">Products</th>

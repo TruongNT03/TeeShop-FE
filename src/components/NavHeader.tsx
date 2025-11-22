@@ -1,4 +1,14 @@
-import { Menu, ShoppingBag, User, X } from "lucide-react";
+import {
+  Menu,
+  ShoppingBag,
+  User,
+  X,
+  UserCircle,
+  Package,
+  Lock,
+  MapPin,
+  LogOut,
+} from "lucide-react";
 import { use, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -84,27 +94,61 @@ const NavHeader = () => {
         </div>
 
         <div className="flex gap-[20px] ml-8">
-          {profile?.data?.lastName ? (
+          {profile?.name ? (
             <div className="flex items-center font-medium w-fit text-nowrap">
-              {`Hello, ${profile?.data?.lastName}`}
+              {`Hello, ${profile?.name}`}
             </div>
           ) : null}
-          <Link to={localStorage.getItem("accessToken") ? "/profile" : "login"}>
-            <Tooltip>
-              <TooltipTrigger asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                to={localStorage.getItem("accessToken") ? "/profile" : "login"}
+              >
                 <User className="cursor-pointer hover:text-primary" />
-              </TooltipTrigger>
-              <TooltipContent className="bg-white text-black border-border border-[1px] text-base">
-                <div className="flex flex-col gap-4 p-2">
-                  <Link to="/profile">My profile</Link>
-
-                  <Link to="/" onClick={handleLogout}>
-                    Logout
-                  </Link>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </Link>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent className="bg-white border border-slate-200 shadow-lg rounded-lg p-2 text-sm">
+              <div className="flex flex-col min-w-[200px] gap-1">
+                <Link
+                  to="/profile/info"
+                  className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700 hover:text-slate-900"
+                >
+                  <User className="h-4 w-4" />
+                  <span>Thông tin cá nhân</span>
+                </Link>
+                <Link
+                  to="/profile/orders"
+                  className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700 hover:text-slate-900"
+                >
+                  <Package className="h-4 w-4" />
+                  <span>Đơn hàng của tôi</span>
+                </Link>
+                <Link
+                  to="/profile/change-password"
+                  className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700 hover:text-slate-900"
+                >
+                  <Lock className="h-4 w-4" />
+                  <span>Đổi mật khẩu</span>
+                </Link>
+                <Link
+                  to="/profile/addresses"
+                  className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700 hover:text-slate-900"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span>Địa chỉ nhận hàng</span>
+                </Link>
+                <div className="h-px bg-slate-200 my-1"></div>
+                <Link
+                  to="/"
+                  onClick={handleLogout}
+                  className="px-3 py-2 rounded-md hover:bg-red-50 transition-colors flex items-center gap-2 text-red-600 hover:text-red-700 font-medium"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Đăng xuất</span>
+                </Link>
+              </div>
+            </TooltipContent>
+          </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>

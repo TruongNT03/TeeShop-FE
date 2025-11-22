@@ -61,24 +61,16 @@ export interface SuccessResponseDto {
   success: boolean;
 }
 
-export interface RoleResponseDto {
-  id: number;
-  name: string;
-  /** @format date-time */
-  createdAt: string;
-  /** @format date-time */
-  updatedAt: string;
-}
-
 export interface UserResponseDto {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  name: string;
+  phoneNumber: string;
   avatar: string;
-  roles: RoleResponseDto[];
+  gender: "male" | "female" | "other";
+  roles: string[];
+  /** @format date-time */
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface RefreshTokenResponseDto {
@@ -99,7 +91,13 @@ export interface VerifyForgotPasswordDto {
 }
 
 export interface ChangePasswordDto {
+  password: string;
   newPassword: string;
+}
+
+export interface ChangePasswordResponseDto {
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface UploadDto {
@@ -113,9 +111,10 @@ export interface UploadResponseDto {
 }
 
 export interface UpdateProfileDto {
-  firstName: string;
-  lastName: string;
-  avatar: string;
+  name: string;
+  phoneNumber: string;
+  avatar?: string;
+  gender: "male" | "female" | "other";
 }
 
 export interface PaginateMetaDto {
@@ -862,7 +861,7 @@ export class Api<
       data: ChangePasswordDto,
       params: RequestParams = {},
     ) =>
-      this.request<SuccessResponseDto, any>({
+      this.request<ChangePasswordResponseDto, any>({
         path: `/api/v1/auth/change-password`,
         method: "POST",
         body: data,
@@ -905,7 +904,7 @@ export class Api<
       data: UpdateProfileDto,
       params: RequestParams = {},
     ) =>
-      this.request<SaveEntityResponseDto, any>({
+      this.request<SuccessResponseDto, any>({
         path: `/api/v1/auth/update-profile`,
         method: "PUT",
         body: data,
