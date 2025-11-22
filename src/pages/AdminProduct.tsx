@@ -1,15 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationControl, 
-} from "@/components/ui/pagination";
+import { PaginationControl } from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -24,19 +15,16 @@ import {
   ArchiveRestore,
   ArrowUpDown,
   ListFilter,
-  Pencil,
   Plus,
   Search,
   SquarePen,
   Check,
-  ChevronDown,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { convertDateTime } from "@/utils/convertDateTime";
-import { Link } from "react-router-dom";
 import type { apiClient } from "@/services/apiClient";
 import { ProductStatus } from "@/types/productStatus";
 import type { ProductResponseDto, CategoryResponseDto } from "@/api";
@@ -60,6 +48,8 @@ import {
 } from "@/components/ui/command";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
+import { AdminProductEditDialog } from "@/components/admin/AdminProductEditDialog";
+import { AdminProductCreateDialog } from "@/components/admin/AdminProductCreateDialog";
 
 export enum AdminProductSortField {
   NAME = "name",
@@ -94,6 +84,11 @@ const AdminProduct = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
+  // State quản lý các Modal
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+
   const {
     products,
     isSelectedAllProduct,
@@ -103,12 +98,12 @@ const AdminProduct = () => {
     pagination,
     isLoading,
   } = useAdminProduct(query as any);
- 
+
   const statusMutation = updateProductStatusMutation();
 
   const [categorySearch, setCategorySearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
-
+  
   const { data: categoriesData, isLoading: categoriesLoading } =
     getAllCategoryQuery({ pageSize: 100, search: categorySearch });
   const categories = categoriesData?.data.data || [];
@@ -235,9 +230,15 @@ const AdminProduct = () => {
       render: (product: ProductResponseDto): React.ReactNode => (
         <TableCell>
           <div className="flex gap-2">
-            <Link to={`/admin/product/edit/${product.id}`}>
-              <SquarePen className="scale-75 text-primary cursor-pointer" />
-            </Link>
+            <div
+              onClick={() => {
+                setEditingProductId(product.id);
+                setIsEditOpen(true);
+              }}
+              className="cursor-pointer"
+            >
+              <SquarePen className="scale-75 text-primary" />
+            </div>
             {product.status === "published" ? (
               <Archive
                 className={`scale-75 text-destructive cursor-pointer ${
@@ -359,12 +360,10 @@ const AdminProduct = () => {
         </div>
 
         <div>
-          <Link to="/admin/product/create">
-            <Button variant="default">
-              <Plus />
-              Create Product
-            </Button>
-          </Link>
+          <Button variant="default" onClick={() => setIsCreateOpen(true)}>
+            <Plus />
+            Create Product
+          </Button>
         </div>
       </div>
       {/* Table */}
@@ -500,6 +499,20 @@ const AdminProduct = () => {
           />
         </div>
       </Card>
+
+      <AdminProductCreateDialog
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+      />
+
+      <AdminProductEditDialog
+        open={isEditOpen}
+        onClose={() => {
+          setIsEditOpen(false);
+          setEditingProductId(null);
+        }}
+        productId={editingProductId}
+      />
     </div>
   );
 };
