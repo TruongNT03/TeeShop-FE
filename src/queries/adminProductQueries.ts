@@ -7,7 +7,12 @@ import type {
 } from "@/api";
 import { adminProductApi } from "@/services/adminGetListProduct";
 import type { apiClient } from "@/services/apiClient";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const getAllProductQuery = (
@@ -16,6 +21,7 @@ export const getAllProductQuery = (
   return useQuery({
     queryKey: ["products", query],
     queryFn: () => adminProductApi.findAll(query),
+    placeholderData: keepPreviousData, 
   });
 };
 
@@ -25,6 +31,7 @@ export const getAllCategoryQuery = (
   return useQuery({
     queryKey: ["category", query],
     queryFn: () => adminProductApi.findAllCategories(query),
+    placeholderData: keepPreviousData, 
   });
 };
 
@@ -129,7 +136,7 @@ export const updateProductStatusMutation = () => {
         `Cập nhật trạng thái thành ${
           newStatus === "published" ? "published" : "unpublished"
         }`
-      );
+      );      
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError: (error) => {

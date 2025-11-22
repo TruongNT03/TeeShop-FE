@@ -19,6 +19,7 @@ import {
   Search,
   SquarePen,
   Check,
+  Loader2, 
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -97,13 +98,14 @@ const AdminProduct = () => {
     setSelectedProducts,
     pagination,
     isLoading,
+    isFetching, 
   } = useAdminProduct(query as any);
-
+  
   const statusMutation = updateProductStatusMutation();
 
   const [categorySearch, setCategorySearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
-  
+
   const { data: categoriesData, isLoading: categoriesLoading } =
     getAllCategoryQuery({ pageSize: 100, search: categorySearch });
   const categories = categoriesData?.data.data || [];
@@ -305,7 +307,11 @@ const AdminProduct = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
+            {isFetching ? (
+               <Loader2 className="scale-75 absolute top-[18%] left-2 text-primary animate-spin" />
+            ) : (
+               <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
+            )}
           </div>
 
           <Popover open={filterOpen} onOpenChange={setFilterOpen}>

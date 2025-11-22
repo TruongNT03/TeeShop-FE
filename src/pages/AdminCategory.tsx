@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import {
   ArrowUpDown,
+  Loader2,
   Plus,
   Search,
 } from "lucide-react";
@@ -61,7 +62,7 @@ const AdminCategory = () => {
   const [isSelectedAll, setIsSelectedAll] = useState<boolean>(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { data: categoriesData, isLoading } = getAllCategoryQuery(query as any);
+  const { data: categoriesData, isLoading, isFetching } = getAllCategoryQuery(query as any);
   const categories = categoriesData?.data.data || [];
   const pagination = categoriesData?.data.paginate || {
     page: 1,
@@ -161,7 +162,11 @@ const AdminCategory = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
+            {isFetching ? (
+               <Loader2 className="scale-75 absolute top-[18%] left-2 text-primary animate-spin" />
+            ) : (
+               <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
+            )}
           </div>
         </div>
 

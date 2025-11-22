@@ -28,5 +28,6 @@ export const useAdminProduct = (
       totalItem: paginate?.totalItem ?? 0,
     },
     isLoading: getAllProductResponse.isLoading,
+    isFetching: getAllProductResponse.isFetching, 
   };
 };
