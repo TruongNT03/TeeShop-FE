@@ -8,7 +8,7 @@ import {
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AdminCreateProduct = () => {
+const AdminProductCreate = () => {
   const editorRef = useRef(null);
   const navigate = useNavigate();
   const mutation = createProductMutation();
@@ -78,4 +78,4 @@ const AdminCreateProduct = () => {
   );
 };
 
-export default AdminCreateProduct;
+export default AdminProductCreate;

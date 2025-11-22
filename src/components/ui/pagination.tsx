@@ -124,4 +124,117 @@ export {
   PaginationPrevious,
   PaginationNext,
   PaginationEllipsis,
+};
+
+export interface PaginationControlProps {
+  currentPage: number;
+  totalPage: number;
+  onPageChange: (page: number) => void;
+  className?: string;
+}
+
+export function PaginationControl({
+  currentPage,
+  totalPage,
+  onPageChange,
+  className,
+}: PaginationControlProps) {
+  const renderPaginationItems = () => {
+    const items = [];
+    let startPage = Math.max(1, currentPage - 1);
+    let endPage = Math.min(totalPage, currentPage + 1);
+
+    if (currentPage === 1 && totalPage > 1) {
+      endPage = Math.min(totalPage, 3);
+    }
+    if (currentPage === totalPage && totalPage > 1) {
+      startPage = Math.max(1, totalPage - 2);
+    }
+
+    if (startPage > 1) {
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink
+            onClick={() => onPageChange(1)}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      if (startPage > 2) {
+        items.push(
+          <PaginationItem key="start-ellipsis">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            isActive={i === currentPage}
+            onClick={() => onPageChange(i)}
+            className="cursor-pointer"
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    if (endPage < totalPage) {
+      if (endPage < totalPage - 1) {
+        items.push(
+          <PaginationItem key="end-ellipsis">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      items.push(
+        <PaginationItem key={totalPage}>
+          <PaginationLink
+            onClick={() => onPageChange(totalPage)}
+            className="cursor-pointer"
+          >
+            {totalPage}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    return items;
+  };
+
+  return (
+    <Pagination className={cn("w-fit m-0", className)}>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            onClick={() => onPageChange(currentPage - 1)}
+            className={cn(
+              currentPage === 1
+                ? "pointer-events-none opacity-50"
+                : "cursor-pointer"
+            )}
+          />
+        </PaginationItem>
+
+        {renderPaginationItems()}
+
+        <PaginationItem>
+          <PaginationNext
+            onClick={() => onPageChange(currentPage + 1)}
+            className={cn(
+              currentPage === totalPage || totalPage === 0
+                ? "pointer-events-none opacity-50"
+                : "cursor-pointer"
+            )}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  );
 }
