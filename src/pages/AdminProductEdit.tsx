@@ -47,7 +47,7 @@ const transformDtoToFormData = (
   }
 };
 
-const AdminEditProduct = () => {
+const AdminProductEdit = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const editorRef = useRef(null);
@@ -194,4 +194,4 @@ const AdminEditProduct = () => {
   );
 };
 
-export default AdminEditProduct;
+export default AdminProductEdit;

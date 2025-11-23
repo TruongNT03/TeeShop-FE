@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate:api": "swagger-typescript-api generate -p http://54.206.176.239:8080/swagger-json -o src/api -n index.ts --axios"
+    "generate:api": "swagger-typescript-api generate -p ./swagger.json -o src/api -n index.ts --axios"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
