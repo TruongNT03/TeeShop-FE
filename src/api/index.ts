@@ -236,7 +236,7 @@ export interface ProductResponseDto {
 }
 
 export interface ListProductResponseDto {
-  data: ProductResponseDto;
+  data: ProductResponseDto[];
   paginate: PaginateMetaDto;
 }
 
