@@ -46,7 +46,7 @@ export const useLogin = () => {
         navigate("/");
       },
       onError: (error) => {
-        toast(error.message);
+        toast("Tài khoản hoặc mật khẩu không đúng. Vui lòng thử lại.");
       },
     });
   });

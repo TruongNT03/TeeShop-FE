@@ -374,8 +374,7 @@ export interface ListVariantValueResponseDto {
 
 export interface AdminConversationUserResponseDto {
   id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   avatar: string;
 }
 
@@ -486,12 +485,18 @@ export interface CreateOrderFromCartDto {
 }
 
 export interface CreateAddressDto {
-  address: string;
+  detail: string;
+  phoneNumber: string;
+  name: string;
+  isDefault: boolean;
 }
 
 export interface AddressResponseDto {
   id: string;
-  address: string;
+  detail: string;
+  name: string;
+  phoneNumber: string;
+  isDefault: boolean;
 }
 
 export interface ListAddressResponseDto {
@@ -500,7 +505,10 @@ export interface ListAddressResponseDto {
 }
 
 export interface UpdateAddressDto {
-  address: string;
+  detail: string;
+  phoneNumber: string;
+  name: string;
+  isDefault: boolean;
 }
 
 export interface CreatePaymentDto {
@@ -1810,6 +1818,27 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] ADDRESS
+     * @name AddressControllerUpdateToDefault
+     * @summary [USER] UPDATE TO DEFAULT ADDRESS
+     * @request PUT:/api/v1/address/{id}/default
+     * @secure
+     */
+    addressControllerUpdateToDefault: (
+      id: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/address/${id}/default`,
+        method: "PUT",
+        secure: true,
         format: "json",
         ...params,
       }),

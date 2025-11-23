@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { MapPin, Plus, Edit2, Trash2, CheckCircle } from "lucide-react";
+import {
+  MapPin,
+  Plus,
+  Edit2,
+  Trash2,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,105 +22,130 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
-type Address = {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  isDefault: boolean;
-};
-
-const mockAddresses: Address[] = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    phone: "0901234567",
-    address: "123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh",
-    isDefault: true,
-  },
-  {
-    id: 2,
-    name: "Nguyễn Văn A",
-    phone: "0901234567",
-    address: "456 Lê Lợi, Quận 3, TP. Hồ Chí Minh",
-    isDefault: false,
-  },
-];
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/services/apiClient";
+import type {
+  AddressResponseDto,
+  CreateAddressDto,
+  UpdateAddressDto,
+} from "@/api";
 
 export const ProfileAddresses: React.FC = () => {
-  const [addresses, setAddresses] = useState<Address[]>(mockAddresses);
+  const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [editingAddress, setEditingAddress] =
+    useState<AddressResponseDto | null>(null);
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
-    address: "",
+    phoneNumber: "",
+    detail: "",
+    isDefault: false,
   });
 
-  const handleOpenDialog = (address?: Address) => {
+  // Fetch addresses
+  const { data: addressesData, isLoading } = useQuery({
+    queryKey: ["addresses"],
+    queryFn: async () => {
+      const res = await apiClient.api.addressControllerFindAll({
+        pageSize: 100,
+      });
+      return res.data;
+    },
+  });
+
+  const addresses = addressesData?.data ?? [];
+
+  // Create address mutation
+  const createMutation = useMutation({
+    mutationFn: (data: CreateAddressDto) =>
+      apiClient.api.addressControllerCreate(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
+      toast.success("Thêm địa chỉ mới thành công!");
+      setDialogOpen(false);
+    },
+    onError: () => {
+      toast.error("Thêm địa chỉ thất bại!");
+    },
+  });
+
+  // Update address mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateAddressDto }) =>
+      apiClient.api.addressControllerUpdate(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
+      toast.success("Cập nhật địa chỉ thành công!");
+      setDialogOpen(false);
+    },
+    onError: () => {
+      toast.error("Cập nhật địa chỉ thất bại!");
+    },
+  });
+
+  // Set default address mutation
+  const setDefaultMutation = useMutation({
+    mutationFn: (id: string) =>
+      apiClient.api.addressControllerUpdateToDefault(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
+      toast.success("Đã đặt làm địa chỉ mặc định!");
+    },
+    onError: () => {
+      toast.error("Đặt địa chỉ mặc định thất bại!");
+    },
+  });
+
+  const handleOpenDialog = (address?: AddressResponseDto) => {
     if (address) {
       setEditingAddress(address);
       setFormData({
-        name: address.name,
-        phone: address.phone,
-        address: address.address,
+        name: address.name || "",
+        phoneNumber: address.phoneNumber || "",
+        detail: address.detail || "",
+        isDefault: address.isDefault || false,
       });
     } else {
       setEditingAddress(null);
-      setFormData({ name: "", phone: "", address: "" });
+      setFormData({ name: "", phoneNumber: "", detail: "", isDefault: false });
     }
     setDialogOpen(true);
   };
 
   const handleSave = () => {
-    if (!formData.name || !formData.phone || !formData.address) {
+    if (
+      !formData.name.trim() ||
+      !formData.phoneNumber.trim() ||
+      !formData.detail.trim()
+    ) {
       toast.error("Vui lòng điền đầy đủ thông tin!");
       return;
     }
 
     if (editingAddress) {
       // Update existing address
-      setAddresses(
-        addresses.map((addr) =>
-          addr.id === editingAddress.id ? { ...addr, ...formData } : addr
-        )
-      );
-      toast.success("Cập nhật địa chỉ thành công!");
+      updateMutation.mutate({
+        id: editingAddress.id,
+        data: {
+          name: formData.name,
+          phoneNumber: formData.phoneNumber,
+          detail: formData.detail,
+          isDefault: formData.isDefault,
+        },
+      });
     } else {
-      // Add new address
-      const newAddress: Address = {
-        id: Date.now(),
-        ...formData,
-        isDefault: addresses.length === 0,
-      };
-      setAddresses([...addresses, newAddress]);
-      toast.success("Thêm địa chỉ mới thành công!");
+      // Create new address
+      createMutation.mutate({
+        name: formData.name,
+        phoneNumber: formData.phoneNumber,
+        detail: formData.detail,
+        isDefault: formData.isDefault || addresses.length === 0,
+      });
     }
-
-    setDialogOpen(false);
   };
 
-  const handleDelete = (id: number) => {
-    const address = addresses.find((addr) => addr.id === id);
-    if (address?.isDefault && addresses.length > 1) {
-      toast.error(
-        "Không thể xóa địa chỉ mặc định! Vui lòng chọn địa chỉ mặc định khác trước."
-      );
-      return;
-    }
-    setAddresses(addresses.filter((addr) => addr.id !== id));
-    toast.success("Xóa địa chỉ thành công!");
-  };
-
-  const handleSetDefault = (id: number) => {
-    setAddresses(
-      addresses.map((addr) => ({
-        ...addr,
-        isDefault: addr.id === id,
-      }))
-    );
-    toast.success("Đã đặt làm địa chỉ mặc định!");
+  const handleSetDefault = (id: string) => {
+    setDefaultMutation.mutate(id);
   };
 
   return (
@@ -138,72 +170,86 @@ export const ProfileAddresses: React.FC = () => {
         </Button>
       </div>
 
-      <div className="space-y-4">
-        {addresses.map((address, index) => (
-          <motion.div
-            key={address.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.3,
-            }}
-            className={cn(
-              "rounded-lg border p-4 shadow-sm hover:shadow-md",
-              address.isDefault
-                ? "border-primary bg-primary/5"
-                : "border-slate-200 bg-white hover:border-primary/50"
-            )}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <p className="font-semibold text-slate-900">{address.name}</p>
-                  {address.isDefault && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-white">
-                      <CheckCircle className="h-3 w-3" />
-                      Mặc định
+      {isLoading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {addresses.map((address, index) => {
+            const isDefault = address.isDefault;
+
+            return (
+              <motion.div
+                key={address.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.3,
+                }}
+                className={cn(
+                  "rounded-lg border-2 p-5",
+                  isDefault
+                    ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
+                    : "border-slate-200 bg-white shadow-sm hover:shadow-md hover:border-slate-300"
+                )}
+              >
+                {isDefault && (
+                  <div className="flex items-center gap-2 mb-4 pb-3 border-b border-primary/20">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <span className="font-semibold text-primary uppercase tracking-wide text-sm">
+                      ĐỊA CHỈ MẶC ĐỊNH
                     </span>
-                  )}
+                  </div>
+                )}
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="mb-3">
+                      <p className="font-semibold text-slate-900 text-base">
+                        {address.name}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-slate-600">
+                        SĐT: {address.phoneNumber}
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        Địa chỉ: {address.detail}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleOpenDialog(address)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                    {!isDefault && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSetDefault(address.id)}
+                        disabled={setDefaultMutation.isPending}
+                        className="text-xs whitespace-nowrap"
+                      >
+                        {setDefaultMutation.isPending ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          "Đặt mặc định"
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <p className="text-sm text-slate-600 mb-1">{address.phone}</p>
-                <p className="text-sm text-slate-600">{address.address}</p>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleOpenDialog(address)}
-                  className="h-8 w-8 p-0"
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(address.id)}
-                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            {!address.isDefault && (
-              <div className="mt-3 pt-3 border-t">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleSetDefault(address.id)}
-                  className="text-xs"
-                >
-                  Đặt làm mặc định
-                </Button>
-              </div>
-            )}
-          </motion.div>
-        ))}
-      </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
 
       {addresses.length === 0 && (
         <div className="text-center py-12">
@@ -234,7 +280,7 @@ export const ProfileAddresses: React.FC = () => {
               <Label htmlFor="name">Họ tên người nhận</Label>
               <Input
                 id="name"
-                placeholder="Nhập họ tên"
+                placeholder="Nhập họ tên người nhận"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -243,37 +289,68 @@ export const ProfileAddresses: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Số điện thoại</Label>
+              <Label htmlFor="phoneNumber">Số điện thoại</Label>
               <Input
-                id="phone"
+                id="phoneNumber"
                 placeholder="Nhập số điện thoại"
-                value={formData.phone}
+                value={formData.phoneNumber}
                 onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
+                  setFormData({ ...formData, phoneNumber: e.target.value })
                 }
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Địa chỉ chi tiết</Label>
+              <Label htmlFor="detail">Địa chỉ chi tiết</Label>
               <Textarea
-                id="address"
+                id="detail"
                 placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"
-                value={formData.address}
+                value={formData.detail}
                 onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
+                  setFormData({ ...formData, detail: e.target.value })
                 }
                 rows={3}
               />
             </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="isDefault"
+                checked={formData.isDefault}
+                onChange={(e) =>
+                  setFormData({ ...formData, isDefault: e.target.checked })
+                }
+                className="h-4 w-4 rounded border-slate-300"
+              />
+              <Label htmlFor="isDefault" className="cursor-pointer">
+                Đặt làm địa chỉ mặc định
+              </Label>
+            </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setDialogOpen(false)}
+              disabled={createMutation.isPending || updateMutation.isPending}
+            >
               Hủy
             </Button>
-            <Button onClick={handleSave}>
-              {editingAddress ? "Cập nhật" : "Thêm địa chỉ"}
+            <Button
+              onClick={handleSave}
+              disabled={createMutation.isPending || updateMutation.isPending}
+            >
+              {createMutation.isPending || updateMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : editingAddress ? (
+                "Cập nhật"
+              ) : (
+                "Thêm địa chỉ"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

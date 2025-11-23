@@ -11,7 +11,6 @@ import AdminCreateProduct from "@/pages/AdminCreateProduct";
 import UserLayout from "@/layouts/UserLayout";
 import DemoPage from "@/pages/DemoPage";
 import ForgotPassword from "@/pages/ForgotPassword";
-import ProfilePage from "@/pages/ProfilePage";
 import ProductDetail from "@/pages/ProductDetail";
 import AdminEditProduct from "@/pages/AdminEditProduct"; // Import
 import CartPage from "@/pages/CartPage";

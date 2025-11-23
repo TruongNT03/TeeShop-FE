@@ -40,6 +40,7 @@ import {
   createAddressMutation,
 } from "@/queries/addressQueries";
 import { apiClient } from "@/services/apiClient";
+import type { AddressResponseDto } from "@/api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -58,22 +59,22 @@ const Checkout = () => {
 
   // Form state for new address
   const [newAddressData, setNewAddressData] = useState({
-    address: "",
-    city: "",
-    district: "",
-    ward: "",
+    name: "",
+    phoneNumber: "",
+    detail: "",
+    isDefault: false,
   });
   const [notes, setNotes] = useState("");
 
   // Queries & Mutations
   const { data: addressesData, isLoading: isLoadingAddresses } =
-    getAddressesQuery();
+    getAddressesQuery(100);
   const { mutate: createOrder, isPending: isCreatingOrder } =
     createOrderFromCartMutation();
   const { mutate: createAddress, isPending: isCreatingAddress } =
     createAddressMutation();
 
-  const addresses = addressesData?.data || [];
+  const addresses: AddressResponseDto[] = addressesData?.data || [];
 
   // Load cart item IDs from localStorage
   useEffect(() => {
@@ -112,30 +113,25 @@ const Checkout = () => {
 
   // Handle add new address
   const handleAddNewAddress = () => {
-    const { address, city, district, ward } = newAddressData;
+    const { name, phoneNumber, detail } = newAddressData;
 
-    if (!address || !city || !district || !ward) {
-      toast.error("Please fill in all required address fields");
+    if (!name || !phoneNumber || !detail) {
+      toast.error("Vui lòng điền đầy đủ thông tin địa chỉ");
       return;
     }
 
-    const fullAddress = `${address}, ${ward}, ${district}, ${city}`;
-
-    createAddress(
-      { address: fullAddress },
-      {
-        onSuccess: () => {
-          setShowAddAddressModal(false);
-          setNewAddressData({
-            address: "",
-            city: "",
-            district: "",
-            ward: "",
-          });
-          // Address list will auto-refresh and user can select it
-        },
-      }
-    );
+    createAddress(newAddressData, {
+      onSuccess: () => {
+        setShowAddAddressModal(false);
+        setNewAddressData({
+          name: "",
+          phoneNumber: "",
+          detail: "",
+          isDefault: false,
+        });
+        // Address list will auto-refresh and user can select it
+      },
+    });
   };
 
   // Handle place order
@@ -285,14 +281,21 @@ const Checkout = () => {
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <div className="flex-1">
                       <p className="font-medium text-sm text-green-900 mb-1">
-                        Selected Address
+                        Địa chỉ đã chọn
                       </p>
-                      <p className="text-sm text-green-700">
-                        {
-                          addresses.find((a: any) => a.id === selectedAddressId)
-                            ?.address
-                        }
-                      </p>
+                      {(() => {
+                        const addr = addresses.find(
+                          (a) => a.id === selectedAddressId
+                        );
+                        return addr ? (
+                          <div className="text-sm text-green-700 space-y-1">
+                            <p className="font-medium">
+                              {addr.name} - {addr.phoneNumber}
+                            </p>
+                            <p>{addr.detail}</p>
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
                   </div>
                 </Card>
@@ -597,7 +600,7 @@ const Checkout = () => {
                 <Loader className="w-8 h-8 animate-spin" />
               </div>
             ) : addresses.length > 0 ? (
-              addresses.map((addr: any) => (
+              addresses.map((addr) => (
                 <div
                   key={addr.id}
                   onClick={() => {
@@ -611,8 +614,16 @@ const Checkout = () => {
                   }`}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium">{addr.address}</p>
+                    <div className="flex-1 space-y-1">
+                      <p className="font-medium">
+                        {addr.name} - {addr.phoneNumber}
+                      </p>
+                      <p className="text-sm text-gray-600">{addr.detail}</p>
+                      {addr.isDefault && (
+                        <span className="inline-block text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                          Mặc định
+                        </span>
+                      )}
                     </div>
                     {selectedAddressId === addr.id && (
                       <Check className="w-5 h-5 text-primary flex-shrink-0 ml-3" />
@@ -655,83 +666,44 @@ const Checkout = () => {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="modalAddress">
-                Street Address <span className="text-red-500">*</span>
+              <Label htmlFor="modalName">
+                Họ và tên <span className="text-red-500">*</span>
               </Label>
-              <Textarea
-                id="modalAddress"
-                placeholder="House number, street name, building..."
-                rows={2}
-                value={newAddressData.address}
+              <Input
+                id="modalName"
+                placeholder="Nguyễn Văn A"
+                value={newAddressData.name}
+                onChange={(e) => handleNewAddressChange("name", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="modalPhone">
+                Số điện thoại <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="modalPhone"
+                placeholder="0123456789"
+                value={newAddressData.phoneNumber}
                 onChange={(e) =>
-                  handleNewAddressChange("address", e.target.value)
+                  handleNewAddressChange("phoneNumber", e.target.value)
                 }
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="modalCity">
-                  City <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  value={newAddressData.city}
-                  onValueChange={(value) =>
-                    handleNewAddressChange("city", value)
-                  }
-                >
-                  <SelectTrigger id="modalCity">
-                    <SelectValue placeholder="Select city" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Hà Nội">Hà Nội</SelectItem>
-                    <SelectItem value="TP. Hồ Chí Minh">
-                      TP. Hồ Chí Minh
-                    </SelectItem>
-                    <SelectItem value="Đà Nẵng">Đà Nẵng</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="modalDistrict">
-                  District <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  value={newAddressData.district}
-                  onValueChange={(value) =>
-                    handleNewAddressChange("district", value)
-                  }
-                >
-                  <SelectTrigger id="modalDistrict">
-                    <SelectValue placeholder="Select district" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Quận 1">Quận 1</SelectItem>
-                    <SelectItem value="Quận 2">Quận 2</SelectItem>
-                    <SelectItem value="Quận 3">Quận 3</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="modalWard">
-                  Ward <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  value={newAddressData.ward}
-                  onValueChange={(value) =>
-                    handleNewAddressChange("ward", value)
-                  }
-                >
-                  <SelectTrigger id="modalWard">
-                    <SelectValue placeholder="Select ward" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Phường 1">Phường 1</SelectItem>
-                    <SelectItem value="Phường 2">Phường 2</SelectItem>
-                    <SelectItem value="Phường 3">Phường 3</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="modalDetail">
+                Địa chỉ chi tiết <span className="text-red-500">*</span>
+              </Label>
+              <Textarea
+                id="modalDetail"
+                placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố..."
+                rows={3}
+                value={newAddressData.detail}
+                onChange={(e) =>
+                  handleNewAddressChange("detail", e.target.value)
+                }
+              />
             </div>
           </div>
 

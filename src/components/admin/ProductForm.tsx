@@ -139,12 +139,21 @@ export const ProductForm = ({
     }
   );
 
+  const [createVariantOpen, setCreateVariantOpen] = React.useState(false);
+  const [newVariantName, setNewVariantName] = React.useState("");
+
+  const [createVariantValueOpen, setCreateVariantValueOpen] =
+    React.useState(false);
+  const [newVariantValue, setNewVariantValue] = React.useState("");
+  const [selectedVariantIdForValue, setSelectedVariantIdForValue] =
+    React.useState<number>(0);
+
   const createCategoryMutation = useMutation({
     mutationFn: (data: SaveCategoryDto) =>
       apiClient.api.adminCategoriesControllerCreate(data),
     onSuccess: (response) => {
       toast.success("Tạo danh mục thành công!");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["category"] });
 
       // Auto-select the newly created category
       const currentIds = form.getValues("categoryIds") || [];
@@ -158,6 +167,92 @@ export const ProductForm = ({
       toast.error("Tạo danh mục thất bại!");
     },
   });
+
+  const createVariantMutation = useMutation({
+    mutationFn: (name: string) =>
+      apiClient.api.adminProductControllerCreateVariant({ name }),
+    onSuccess: () => {
+      toast.success("Tạo variant thành công!");
+      queryClient.invalidateQueries({ queryKey: ["variants"] });
+      setNewVariantName("");
+      setCreateVariantOpen(false);
+    },
+    onError: () => {
+      toast.error("Tạo variant thất bại!");
+    },
+  });
+
+  const handleCreateVariant = () => {
+    if (!newVariantName.trim()) {
+      toast.error("Vui lòng nhập tên variant!");
+      return;
+    }
+    createVariantMutation.mutate(newVariantName);
+  };
+
+  const createVariantValueMutation = useMutation({
+    mutationFn: (data: { value: string; variantId: number }) =>
+      apiClient.api.adminProductControllerCreateVariantValue(data),
+    onSuccess: async (response, variables) => {
+      toast.success("Tạo giá trị variant thành công!");
+
+      // Fetch fresh data for this variant
+      const freshData =
+        await apiClient.api.adminProductControllerFindAllVariantValue({
+          variantId: variables.variantId,
+          pageSize: 100,
+        });
+
+      // Update selectedVariantOptions with fresh data
+      setSelectedVariantOptions((prev) =>
+        prev.map((option) =>
+          option.variantId === variables.variantId
+            ? {
+                ...option,
+                values: freshData.data.data.map((val: any) => ({
+                  ...val,
+                  selected:
+                    option.values.find((v: any) => v.id === val.id)?.selected ||
+                    false,
+                })),
+              }
+            : option
+        )
+      );
+
+      // Also invalidate queries for other components
+      queryClient.invalidateQueries({
+        queryKey: ["variantValues"],
+      });
+
+      setNewVariantValue("");
+      setCreateVariantValueOpen(false);
+    },
+    onError: () => {
+      toast.error("Tạo giá trị variant thất bại!");
+    },
+  });
+
+  const handleCreateVariantValue = () => {
+    if (!newVariantValue.trim()) {
+      toast.error("Vui lòng nhập giá trị!");
+      return;
+    }
+    if (selectedVariantIdForValue === 0) {
+      toast.error("Lỗi: Chưa chọn variant!");
+      return;
+    }
+    createVariantValueMutation.mutate({
+      value: newVariantValue,
+      variantId: selectedVariantIdForValue,
+    });
+  };
+
+  const handleOpenCreateVariantValue = (variantId: number) => {
+    setSelectedVariantIdForValue(variantId);
+    setNewVariantValue("");
+    setCreateVariantValueOpen(true);
+  };
 
   const handleCreateCategory = () => {
     if (
@@ -499,34 +594,56 @@ export const ProductForm = ({
                         <Card key={option.variantId} className="p-4">
                           <div className="flex justify-between items-center mb-2">
                             <FormLabel>{option.name}</FormLabel>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() =>
-                                setSelectedVariantOptions((prev) =>
-                                  prev.filter(
-                                    (o) => o.variantId !== option.variantId
+                            <div className="flex gap-1">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() =>
+                                  handleOpenCreateVariantValue(option.variantId)
+                                }
+                                title="Thêm giá trị mới"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() =>
+                                  setSelectedVariantOptions((prev) =>
+                                    prev.filter(
+                                      (o) => o.variantId !== option.variantId
+                                    )
                                   )
-                                )
-                              }
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
+                                }
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {option.values.map((val) => (
-                              <Badge
-                                key={val.id}
-                                variant={val.selected ? "default" : "outline"}
-                                onClick={() =>
-                                  toggleVariantValue(option.variantId, val.id)
-                                }
-                                className="cursor-pointer"
-                              >
-                                {val.value}
-                              </Badge>
-                            ))}
+                            {option.values.length > 0 ? (
+                              option.values.map((val) => (
+                                <Badge
+                                  key={val.id}
+                                  variant={val.selected ? "default" : "outline"}
+                                  onClick={() =>
+                                    toggleVariantValue(option.variantId, val.id)
+                                  }
+                                  className="cursor-pointer"
+                                >
+                                  {val.value}
+                                </Badge>
+                              ))
+                            ) : (
+                              <p className="text-sm text-muted-foreground italic">
+                                Chưa có giá trị biến thể nào. Nhấn nút + để tạo
+                                mới.
+                              </p>
+                            )}
                           </div>
                         </Card>
                       ))}
@@ -544,7 +661,7 @@ export const ProductForm = ({
                           <SelectContent>
                             {variantsLoading ? (
                               <Loader2 className="mx-auto h-4 w-4 animate-spin" />
-                            ) : (
+                            ) : variants.length > 0 ? (
                               variants.map((v) => (
                                 <SelectItem
                                   key={v.id}
@@ -556,9 +673,22 @@ export const ProductForm = ({
                                   {v.name}
                                 </SelectItem>
                               ))
+                            ) : (
+                              <div className="p-2 text-center text-sm text-muted-foreground italic">
+                                Chưa có biến thể nào. Nhấn nút + để tạo mới.
+                              </div>
                             )}
                           </SelectContent>
                         </Select>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setCreateVariantOpen(true)}
+                          title="Tạo variant mới"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
                         <Button
                           type="button"
                           onClick={generateVariantRows}
@@ -887,6 +1017,124 @@ export const ProductForm = ({
                 <>
                   <Plus className="mr-2 h-4 w-4" />
                   Tạo danh mục
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Variant Dialog */}
+      <Dialog open={createVariantOpen} onOpenChange={setCreateVariantOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tạo variant mới</DialogTitle>
+            <DialogDescription>
+              Tạo loại biến thể mới cho sản phẩm (VD: Size, Color, Material)
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Tên variant</label>
+              <Input
+                placeholder="VD: Size, Color, Material"
+                value={newVariantName}
+                onChange={(e) => setNewVariantName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && newVariantName.trim()) {
+                    handleCreateVariant();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCreateVariantOpen(false)}
+              disabled={createVariantMutation.isPending}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="button"
+              onClick={handleCreateVariant}
+              disabled={
+                !newVariantName.trim() || createVariantMutation.isPending
+              }
+            >
+              {createVariantMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang tạo...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Tạo variant
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Variant Value Dialog */}
+      <Dialog
+        open={createVariantValueOpen}
+        onOpenChange={setCreateVariantValueOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Thêm giá trị mới</DialogTitle>
+            <DialogDescription>
+              Thêm giá trị cho variant:{" "}
+              {selectedVariantOptions.find(
+                (o) => o.variantId === selectedVariantIdForValue
+              )?.name || ""}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Giá trị</label>
+              <Input
+                placeholder="VD: S, M, L"
+                value={newVariantValue}
+                onChange={(e) => setNewVariantValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && newVariantValue.trim()) {
+                    handleCreateVariantValue();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCreateVariantValueOpen(false)}
+              disabled={createVariantValueMutation.isPending}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="button"
+              onClick={handleCreateVariantValue}
+              disabled={
+                !newVariantValue.trim() || createVariantValueMutation.isPending
+              }
+            >
+              {createVariantValueMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang thêm...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Thêm giá trị
                 </>
               )}
             </Button>
