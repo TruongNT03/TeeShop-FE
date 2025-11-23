@@ -68,10 +68,8 @@ apiClient.instance.interceptors.response.use(
     let originalRequest = error.config as AxiosRequestConfig & {
       _retry: boolean;
     };
-    // Nếu token hết hạn
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        // Nếu đang refresh, chờ token mới
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -95,10 +93,9 @@ apiClient.instance.interceptors.response.use(
 
         // Gọi API refresh
         const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_BASE_URL}/auth/refresh-token`,
+          `${import.meta.env.VITE_BACKEND_BASE_URL}/api/v1/auth/refresh-token`,
           { headers: { Authorization: `Bearer ${refreshToken}` } }
         );
-
         const newAccessToken = res.data.accessToken;
         localStorage.setItem("accessToken", newAccessToken);
 
@@ -112,10 +109,10 @@ apiClient.instance.interceptors.response.use(
         }
         return apiClient.instance(originalRequest);
       } catch (err) {
+        console.log(err);
         processQueue(err, null);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        window.location.href = "/login";
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

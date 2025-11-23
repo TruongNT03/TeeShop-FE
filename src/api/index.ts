@@ -61,24 +61,16 @@ export interface SuccessResponseDto {
   success: boolean;
 }
 
-export interface RoleResponseDto {
-  id: number;
-  name: string;
-  /** @format date-time */
-  createdAt: string;
-  /** @format date-time */
-  updatedAt: string;
-}
-
 export interface UserResponseDto {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  name: string;
+  phoneNumber: string;
   avatar: string;
-  roles: RoleResponseDto[];
+  gender: "male" | "female" | "other";
+  roles: string[];
+  /** @format date-time */
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface RefreshTokenResponseDto {
@@ -99,7 +91,13 @@ export interface VerifyForgotPasswordDto {
 }
 
 export interface ChangePasswordDto {
+  password: string;
   newPassword: string;
+}
+
+export interface ChangePasswordResponseDto {
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface UploadDto {
@@ -113,9 +111,10 @@ export interface UploadResponseDto {
 }
 
 export interface UpdateProfileDto {
-  firstName: string;
-  lastName: string;
-  avatar: string;
+  name: string;
+  phoneNumber: string;
+  avatar?: string;
+  gender: "male" | "female" | "other";
 }
 
 export interface PaginateMetaDto {
@@ -237,7 +236,7 @@ export interface ProductResponseDto {
 }
 
 export interface ListProductResponseDto {
-  data: ProductResponseDto;
+  data: ProductResponseDto[];
   paginate: PaginateMetaDto;
 }
 
@@ -375,8 +374,7 @@ export interface ListVariantValueResponseDto {
 
 export interface AdminConversationUserResponseDto {
   id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   avatar: string;
 }
 
@@ -426,15 +424,25 @@ export interface AddItemToCartDto {
   quantity: number;
 }
 
+export interface UserProductResponseDto {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  productImages: ProductImageDetailResponseDto[];
+}
+
 export interface CartItemResponseDto {
   id: string;
+  product: UserProductResponseDto;
   productVariant: ProductVariantResponseDto;
   quantity: number;
 }
 
-export interface CartResponseDto {
+export interface CartSummaryResponseDto {
   id: string;
   cartItems: CartItemResponseDto[];
+  totalItems: number;
 }
 
 export interface ListCartItemResponseDto {
@@ -448,14 +456,6 @@ export interface UpdateQuantityCartItemDto {
 
 export interface UpdateProductVariantCartItemDto {
   productVariantId: string;
-}
-
-export interface UserProductResponseDto {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  productImages: ProductImageDetailResponseDto[];
 }
 
 export interface ListUserProductResponseDto {
@@ -485,12 +485,18 @@ export interface CreateOrderFromCartDto {
 }
 
 export interface CreateAddressDto {
-  address: string;
+  detail: string;
+  phoneNumber: string;
+  name: string;
+  isDefault: boolean;
 }
 
 export interface AddressResponseDto {
   id: string;
-  address: string;
+  detail: string;
+  name: string;
+  phoneNumber: string;
+  isDefault: boolean;
 }
 
 export interface ListAddressResponseDto {
@@ -499,7 +505,10 @@ export interface ListAddressResponseDto {
 }
 
 export interface UpdateAddressDto {
-  address: string;
+  detail: string;
+  phoneNumber: string;
+  name: string;
+  isDefault: boolean;
 }
 
 export interface CreatePaymentDto {
@@ -860,7 +869,7 @@ export class Api<
       data: ChangePasswordDto,
       params: RequestParams = {},
     ) =>
-      this.request<SuccessResponseDto, any>({
+      this.request<ChangePasswordResponseDto, any>({
         path: `/api/v1/auth/change-password`,
         method: "POST",
         body: data,
@@ -903,7 +912,7 @@ export class Api<
       data: UpdateProfileDto,
       params: RequestParams = {},
     ) =>
-      this.request<SaveEntityResponseDto, any>({
+      this.request<SuccessResponseDto, any>({
         path: `/api/v1/auth/update-profile`,
         method: "PUT",
         body: data,
@@ -1531,7 +1540,7 @@ export class Api<
      * @secure
      */
     cartControllerGetCartSummary: (params: RequestParams = {}) =>
-      this.request<CartResponseDto, any>({
+      this.request<CartSummaryResponseDto, any>({
         path: `/api/v1/carts`,
         method: "GET",
         secure: true,
@@ -1809,6 +1818,27 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] ADDRESS
+     * @name AddressControllerUpdateToDefault
+     * @summary [USER] UPDATE TO DEFAULT ADDRESS
+     * @request PUT:/api/v1/address/{id}/default
+     * @secure
+     */
+    addressControllerUpdateToDefault: (
+      id: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/address/${id}/default`,
+        method: "PUT",
+        secure: true,
         format: "json",
         ...params,
       }),

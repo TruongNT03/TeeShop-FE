@@ -1,3 +1,4 @@
+import { getProfileQuery, logoutMutation } from "@/queries/authQueries";
 import { useEffect, useState } from "react";
 
 export const useAuth = () => {
@@ -10,7 +11,6 @@ export const useAuth = () => {
       setAccessToken(localStorage.getItem("accessToken"));
     };
 
-    // Lắng nghe thay đổi giữa các tab
     window.addEventListener("storage", handleStorageChange);
 
     return () => {
@@ -27,5 +27,8 @@ export const useAuth = () => {
     localStorage.removeItem("accessToken");
     setAccessToken(null);
   };
-  return { accessToken, saveToken, clearToken };
+
+  const { mutate: logoutMutate } = logoutMutation();
+  const { data: profile } = getProfileQuery();
+  return { accessToken, saveToken, clearToken, logoutMutate, profile };
 };

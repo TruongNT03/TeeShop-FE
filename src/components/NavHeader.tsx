@@ -1,12 +1,41 @@
-import { Menu, ShoppingBag, User, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  Menu,
+  ShoppingBag,
+  User,
+  X,
+  UserCircle,
+  Package,
+  Lock,
+  MapPin,
+  LogOut,
+} from "lucide-react";
+import { use, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useAuth } from "@/hooks/useAuth";
+import { useCartTooltip } from "@/hooks/useCardTooltip";
+import { formatPriceVND } from "@/utils/formatPriceVND";
+import { Badge } from "./ui/badge";
 
 const NavHeader = () => {
+  const { cartSummaryData } = useCartTooltip();
   const [isHiddenHeaderNotification, setIsHiddenHeaderNotification] =
     useState(false);
   const [isHiddenNavHeader, setIsHiddenNavHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { logoutMutate, profile, accessToken } = useAuth();
+
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  const handleLogout = () => {
+    logoutMutate(void 0, {
+      onSuccess: () => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "";
+      },
+    });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,14 +63,14 @@ const NavHeader = () => {
       <div
         className={`w-full ${
           isHiddenHeaderNotification ? "h-0" : "h-[33px]"
-        } flex items-center justify-center bg-primary text-primary-foreground uppercase overflow-hidden transition-all duration-300`}
+        } flex items-center bg-primary text-primary-foreground uppercase overflow-hidden transition-all duration-300`}
       >
-        <div className="hover:underline cursor-pointer">
+        <div className="hover:underline cursor-pointer flex-1 text-center">
           Free Shipping & Returns On All US Orders
         </div>
         <X
           onClick={() => setIsHiddenHeaderNotification(true)}
-          className="absolute right-[4px] cursor-pointer scale-75 hover:text-red-500"
+          className="cursor-pointer scale-75 hover:text-red-500 mr-2"
         />
       </div>
 
@@ -51,22 +80,138 @@ const NavHeader = () => {
         }`}
       >
         <div className="flex w-full">
-          <div className="text-3xl uppercase cursor-pointer">Tee Shop</div>
+          <Link to="" className="text-3xl uppercase cursor-pointer">
+            Tee Shop
+          </Link>
 
           <ul className="flex items-center font-arimo gap-16 text-sm uppercase font-semibold ml-[156px]">
-            <li className="cursor-pointer hover:text-primary">Home</li>
+            <Link to="">
+              <li className="cursor-pointer hover:text-primary">Home</li>
+            </Link>
             <li className="cursor-pointer hover:text-primary">About</li>
             <li className="cursor-pointer hover:text-primary">Contact Us</li>
           </ul>
         </div>
 
         <div className="flex gap-[20px] ml-8">
-          <Link to={localStorage.getItem("accessToken") ? "/profile" : "login"}>
-            <User className="cursor-pointer hover:text-primary" />
-          </Link>
-          <Link to="/cart">
-            <ShoppingBag className="cursor-pointer hover:text-primary" /> 
-          </Link>
+          {profile?.name ? (
+            <div className="flex items-center font-medium w-fit text-nowrap">
+              {`Hello, ${profile?.name}`}
+            </div>
+          ) : null}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                to={localStorage.getItem("accessToken") ? "/profile" : "login"}
+              >
+                <User className="cursor-pointer hover:text-primary" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent className="bg-white border border-slate-200 shadow-lg rounded-lg p-2 text-sm">
+              <div className="flex flex-col min-w-[200px] gap-1">
+                <Link
+                  to="/profile/info"
+                  className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700 hover:text-slate-900"
+                >
+                  <User className="h-4 w-4" />
+                  <span>Thông tin cá nhân</span>
+                </Link>
+                <Link
+                  to="/profile/orders"
+                  className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700 hover:text-slate-900"
+                >
+                  <Package className="h-4 w-4" />
+                  <span>Đơn hàng của tôi</span>
+                </Link>
+                <Link
+                  to="/profile/change-password"
+                  className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700 hover:text-slate-900"
+                >
+                  <Lock className="h-4 w-4" />
+                  <span>Đổi mật khẩu</span>
+                </Link>
+                <Link
+                  to="/profile/addresses"
+                  className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700 hover:text-slate-900"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span>Địa chỉ nhận hàng</span>
+                </Link>
+                <div className="h-px bg-slate-200 my-1"></div>
+                <Link
+                  to="/"
+                  onClick={handleLogout}
+                  className="px-3 py-2 rounded-md hover:bg-red-50 transition-colors flex items-center gap-2 text-red-600 hover:text-red-700 font-medium"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Đăng xuất</span>
+                </Link>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link to="/cart">
+                <ShoppingBag className="cursor-pointer hover:text-primary" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent className="w-[400px] h-[500px] bg-white border-[1px] border-border shadow flex p-0 overflow-hidden">
+              <div className="w-full text-black flex flex-col gap-5">
+                {accessToken ? (
+                  cartSummaryData?.cartItems?.map((cartItem) => (
+                    <div className="w-full flex hover:bg-primary/80 p-4 gap-2 cursor-pointer hover:text-white group">
+                      <div>
+                        <img
+                          src={cartItem.product.productImages[0].url}
+                          alt=""
+                          onError={(e) => {
+                            e.currentTarget.setAttribute(
+                              "src",
+                              "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM="
+                            );
+                          }}
+                          className="w-12 rounded-md"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2 justify-center">
+                        <div className="font-semibold uppercase">
+                          {cartItem.product.name}
+                        </div>
+                        <div className="flex gap-4 items-center">
+                          <div>
+                            Price:{" "}
+                            {formatPriceVND(cartItem.productVariant.price)}
+                          </div>
+                          <div>Quantity: {cartItem.quantity}</div>
+                          <div className="flex gap-2">
+                            {cartItem.productVariant.variantValues.map(
+                              (variantValue) => (
+                                <Badge
+                                  variant="outline"
+                                  className="group-hover:text-white"
+                                >
+                                  {variantValue.value}
+                                </Badge>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full text-base flex flex-col gap-4 justify-center items-center text-center">
+                    <div>You’re not signed in yet!</div>
+                    <div>
+                      Log in to see your cart and pick up where you left off.
+                    </div>
+                  </div>
+                )}
+              </div>
+            </TooltipContent>
+          </Tooltip>
+
           <Menu className="cursor-pointer hover:text-primary" />
         </div>
       </div>

@@ -3,8 +3,9 @@ import type {
   RegisterDto,
   VerifyRegisterDto,
 } from "@/api";
+import { apiClient } from "@/services/apiClient";
 import { authApi } from "@/services/authApi";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const loginMutation = () => {
@@ -67,5 +68,19 @@ export const verifyRegisterMutation = () => {
     onError: (error) => {
       toast.error(error.message || "Mã OTP không hợp lệ hoặc đã hết hạn.");
     },
+  });
+};
+
+export const logoutMutation = () => {
+  return useMutation({
+    mutationKey: ["logout"],
+    mutationFn: () => apiClient.api.authControllerLogout(),
+  });
+};
+
+export const getProfileQuery = () => {
+  return useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => (await apiClient.api.authControllerGetProfile()).data,
   });
 };

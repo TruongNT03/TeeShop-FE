@@ -88,9 +88,7 @@ const AdminChatWidget = () => {
                       />
                       <div className="flex flex-col">
                         <div className="text-[14px] font-semibold truncate">
-                          {conversation?.user?.firstName +
-                            " " +
-                            conversation?.user?.lastName}
+                          {conversation?.user?.name}
                         </div>
                         <div className="truncate max-w-[200px] text-[12px]">
                           {conversation?.latestMessage}

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { jwtDecode } from "jwt-decode";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type { LoginDto } from "@/api";
 import { loginMutation } from "@/queries/authQueries";
+import { RoleType, type UserRequestPayload } from "@/types/userRequestPayload";
 
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -36,10 +37,16 @@ export const useLogin = () => {
       onSuccess: (response) => {
         localStorage.setItem("accessToken", response.data.accessToken);
         localStorage.setItem("refreshToken", response.data.refreshToken);
+        const user: UserRequestPayload = jwtDecode<UserRequestPayload>(
+          response.data.accessToken
+        );
+        if (user.roles && user.roles.includes(RoleType.ADMIN)) {
+          return navigate("/admin");
+        }
         navigate("/");
       },
       onError: (error) => {
-        toast(error.message);
+        toast("Tài khoản hoặc mật khẩu không đúng. Vui lòng thử lại.");
       },
     });
   });
