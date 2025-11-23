@@ -27,6 +27,9 @@ const apiClient = new Api({
   headers: {
     "Content-Type": "application/json",
   },
+  paramsSerializer: {
+    indexes: null,
+  },
   // withCredentials: true,
 });
 
