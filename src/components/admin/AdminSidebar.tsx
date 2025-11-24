@@ -1,5 +1,6 @@
 import {
   Bell,
+  Bot,
   ChevronDown,
   CreditCard,
   Layers,
@@ -105,7 +106,9 @@ const AdminSideBar = () => {
                       <SidebarMenuSubItem>
                         <SidebarMenuSubItem>
                           <div onClick={() => navigate("/admin/category")}>
-                            <SidebarMenuSubButton>Category</SidebarMenuSubButton>
+                            <SidebarMenuSubButton>
+                              Category
+                            </SidebarMenuSubButton>
                           </div>
                         </SidebarMenuSubItem>
                       </SidebarMenuSubItem>
@@ -138,6 +141,13 @@ const AdminSideBar = () => {
                 <SidebarMenuButton className="group">
                   <Wrench />
                   <span>Configuration</span>
+                </SidebarMenuButton>
+              </Link>
+
+              <Link to="/admin/chatbot">
+                <SidebarMenuButton className="group">
+                  <Bot />
+                  <span>Chatbot</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenu>

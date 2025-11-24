@@ -429,7 +429,7 @@ export const ProductForm = ({
                       <FormLabel>Mô tả</FormLabel>
                       <FormControl>
                         <Editor
-                          apiKey="6zx8a1n07j925x66iyy3gp0r8lgoywv2p8uq1fi6a7k9awsd"
+                          apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
                           onInit={(_evt, editor) =>
                             (editorRef.current = editor as any)
                           }

@@ -16,6 +16,7 @@ import ProductDetail from "@/pages/ProductDetail";
 import AdminProductEdit from "@/pages/AdminProductEdit";
 import CartPage from "@/pages/CartPage";
 import AdminConfig from "@/pages/AdminConfig";
+import AdminChatbotConfig from "@/pages/AdminChatbotConfig";
 import Checkout from "@/pages/Checkout";
 import { ProfileLayout } from "@/layouts/ProfileLayout";
 import { ProfileInfo } from "@/pages/profile/ProfileInfo";
@@ -73,7 +74,8 @@ const AppRouter = () => {
               path="/admin/category/create"
               element={<AdminCategoryCreate />}
             />
-            <Route path="admin/configuration" element={<AdminConfig />} />
+            <Route path="/admin/configuration" element={<AdminConfig />} />
+            <Route path="/admin/chatbot" element={<AdminChatbotConfig />} />
           </Route>
         </Route>
 
