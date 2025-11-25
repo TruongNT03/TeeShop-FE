@@ -203,8 +203,7 @@ export interface VariantValuesResponseDto {
   value: string;
 }
 
-export interface ProductVariantResponseDto {
-  /** @example "377a5d99-ee6d-4e6f-9197-713e0699ac93" */
+export interface AdminProductVariantResponseDto {
   id: string;
   /** @example 1000 */
   price: number;
@@ -215,8 +214,7 @@ export interface ProductVariantResponseDto {
   variantValues: VariantValuesResponseDto[];
 }
 
-export interface ProductResponseDto {
-  /** @example "377a5d99-ee6d-4e6f-9197-713e0699ac93" */
+export interface AdminProductResponseDto {
   id: string;
   /** @example "Áo thun nam" */
   name: string;
@@ -224,7 +222,7 @@ export interface ProductResponseDto {
   description: string;
   status: "unpublished" | "published";
   hasVariant: boolean;
-  productVariants: ProductVariantResponseDto[];
+  productVariants: AdminProductVariantResponseDto[];
   /** @example ["https://example.com"] */
   productImages: string[];
   /** @example ["Áo thu đông"] */
@@ -236,7 +234,7 @@ export interface ProductResponseDto {
 }
 
 export interface ListProductResponseDto {
-  data: ProductResponseDto[];
+  data: AdminProductResponseDto[];
   paginate: PaginateMetaDto;
 }
 
@@ -278,7 +276,7 @@ export interface ProductDetailVariantResponseDto {
   variantValues: ProductDetailVariantValueResponseDto[];
 }
 
-export interface ProductDetailResponseDto {
+export interface AdminProductDetailResponseDto {
   /** @example "377a5d99-ee6d-4e6f-9197-713e0699ac93" */
   id: string;
   /** @example "Áo thun nam" */
@@ -424,17 +422,28 @@ export interface AddItemToCartDto {
   quantity: number;
 }
 
-export interface UserProductResponseDto {
+export interface ProductResponseDto {
   id: string;
   name: string;
   description: string;
-  price: number;
   productImages: ProductImageDetailResponseDto[];
+}
+
+export interface ProductVariantResponseDto {
+  id: string;
+  product: ProductResponseDto;
+  /** @example 1000 */
+  price: number;
+  /** @example "AO-THUN-001" */
+  sku: string;
+  /** @example 50 */
+  stock: number;
+  variantValues: VariantValuesResponseDto[];
 }
 
 export interface CartItemResponseDto {
   id: string;
-  product: UserProductResponseDto;
+  product: ProductResponseDto;
   productVariant: ProductVariantResponseDto;
   quantity: number;
 }
@@ -459,11 +468,11 @@ export interface UpdateProductVariantCartItemDto {
 }
 
 export interface ListUserProductResponseDto {
-  data: UserProductResponseDto[];
+  data: ProductResponseDto[];
   paginate: PaginateMetaDto;
 }
 
-export interface UserProductDetailResponseDto {
+export interface ProductDetailResponseDto {
   id: string;
   name: string;
   description: string;
@@ -484,18 +493,58 @@ export interface CreateOrderFromCartDto {
   paymentType: "qr" | "cod";
 }
 
-export interface CreateAddressDto {
-  detail: string;
-  phoneNumber: string;
-  name: string;
-  isDefault: boolean;
-}
-
 export interface AddressResponseDto {
   id: string;
   detail: string;
   name: string;
   phoneNumber: string;
+  isDefault: boolean;
+}
+
+export interface OrderItemProductResponseDto {
+  id: string;
+  name: string;
+  description: string;
+  productImages: ProductImageDetailResponseDto[];
+}
+
+export interface OrderItemProductVariantResponseDto {
+  id: string;
+  /** @example 1000 */
+  price: number;
+  /** @example "AO-THUN-001" */
+  sku: string;
+  /** @example 50 */
+  stock: number;
+  variantValues: VariantValuesResponseDto[];
+}
+
+export interface OrderItemResponseDto {
+  id: string;
+  product: OrderItemProductResponseDto;
+  productVariant: OrderItemProductVariantResponseDto;
+  quantity: number;
+}
+
+export interface OrderResponseDto {
+  id: string;
+  address: AddressResponseDto;
+  status: "pending" | "shipping";
+  orderItems: OrderItemResponseDto[];
+  amount: number;
+  /** @format date-time */
+  createdAt: string;
+}
+
+export interface ListOrderResponseDto {
+  data: OrderResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface CreateAddressDto {
+  detail: string;
+  phoneNumber: string;
+  name: string;
   isDefault: boolean;
 }
 
@@ -513,6 +562,19 @@ export interface UpdateAddressDto {
 
 export interface CreatePaymentDto {
   orderId: string;
+}
+
+export interface CreatePaymentResponseDto {
+  id: string;
+  amount: number;
+  currency: string;
+  qrImageUrl: string;
+  /** @format date-time */
+  createdAr: string;
+}
+
+export interface CheckPaymentStatusResponseDto {
+  status: "failed" | "success" | "pending";
 }
 
 import type {
@@ -1110,7 +1172,7 @@ export class Api<
      * @secure
      */
     adminProductControllerFindOne: (id: string, params: RequestParams = {}) =>
-      this.request<ProductDetailResponseDto, any>({
+      this.request<AdminProductDetailResponseDto, any>({
         path: `/api/v1/admin/product/${id}`,
         method: "GET",
         secure: true,
@@ -1693,7 +1755,7 @@ export class Api<
      * @request GET:/api/v1/product/{id}
      */
     productControllerFindOne: (id: string, params: RequestParams = {}) =>
-      this.request<UserProductDetailResponseDto, any>({
+      this.request<ProductDetailResponseDto, any>({
         path: `/api/v1/product/${id}`,
         method: "GET",
         format: "json",
@@ -1738,6 +1800,39 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] ORDER
+     * @name OrderControllerGetAllOrder
+     * @summary [USER] GET ALL ORDER
+     * @request GET:/api/v1/order
+     * @secure
+     */
+    orderControllerGetAllOrder: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ListOrderResponseDto, any>({
+        path: `/api/v1/order`,
+        method: "GET",
+        query: query,
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -1856,12 +1951,34 @@ export class Api<
       data: CreatePaymentDto,
       params: RequestParams = {},
     ) =>
-      this.request<void, any>({
+      this.request<CreatePaymentResponseDto, any>({
         path: `/api/v1/payment`,
         method: "POST",
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] PAYMENT
+     * @name PaymentControllerCheckPaymentStatus
+     * @summary [USER] CHECK PAYMENT STATUS
+     * @request GET:/api/v1/payment/{id}/status
+     * @secure
+     */
+    paymentControllerCheckPaymentStatus: (
+      id: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<CheckPaymentStatusResponseDto, any>({
+        path: `/api/v1/payment/${id}/status`,
+        method: "GET",
+        secure: true,
+        format: "json",
         ...params,
       }),
 

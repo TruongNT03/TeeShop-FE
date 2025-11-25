@@ -43,6 +43,7 @@ import { apiClient } from "@/services/apiClient";
 import type { AddressResponseDto } from "@/api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import QRCode from "qrcode";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -56,6 +57,10 @@ const Checkout = () => {
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
+  const [qrCodeString, setQrCodeString] = useState<string>("");
+  const [qrImageUrl, setQrImageUrl] = useState<string>("");
+  const [paymentId, setPaymentId] = useState<string>("");
+  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
 
   // Form state for new address
   const [newAddressData, setNewAddressData] = useState({
@@ -106,6 +111,27 @@ const Checkout = () => {
   const shipping = 30000;
   const total = subtotal + shipping;
 
+  // Generate QR code image from string
+  useEffect(() => {
+    if (qrCodeString) {
+      QRCode.toDataURL(qrCodeString, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      })
+        .then((url) => {
+          setQrImageUrl(url);
+        })
+        .catch((err) => {
+          console.error("Error generating QR code:", err);
+          toast.error("Không thể tạo mã QR");
+        });
+    }
+  }, [qrCodeString]);
+
   // Handle new address form input changes
   const handleNewAddressChange = (field: string, value: string) => {
     setNewAddressData((prev) => ({ ...prev, [field]: value }));
@@ -146,13 +172,9 @@ const Checkout = () => {
       return;
     }
 
-    // For QR payment, process immediately without modal
-    if (selectedPayment === "qr") {
-      handleConfirmOrder();
-    } else {
-      // For COD, show confirmation modal
-      setShowPaymentModal(true);
-    }
+    // Show modal and create order for both payment types
+    setShowPaymentModal(true);
+    handleConfirmOrder();
   };
 
   // Handle confirm order (after modal confirmation for COD, or direct for QR)
@@ -172,62 +194,75 @@ const Checkout = () => {
         onSuccess: async (response) => {
           const createdOrderId = response.data.id;
 
-          // Call payment API for both COD and QR
-          try {
-            const paymentResponse = await apiClient.api.paymentControllerCreate(
-              {
-                orderId: createdOrderId,
-              }
-            );
+          if (selectedPayment === "qr") {
+            // QR payment - create payment and get QR image
+            try {
+              const paymentResponse =
+                await apiClient.api.paymentControllerCreate({
+                  orderId: createdOrderId,
+                });
 
-            console.log("Payment Response:", paymentResponse);
-            console.log("Payment Data:", paymentResponse.data);
+              console.log("Payment Response:", paymentResponse);
 
-            if (selectedPayment === "cod") {
-              // COD doesn't need payment redirect
-              setShowPaymentModal(false);
-              toast.success("Order placed successfully!");
-              setTimeout(() => {
-                navigate("/");
-              }, 1500);
-            } else {
-              // QR payment - get redirect URL to third-party payment page
-              const paymentUrl =
-                (paymentResponse.data as any)?.checkoutUrl ||
-                (paymentResponse.data as any)?.paymentUrl ||
-                (paymentResponse.data as any)?.url ||
-                (paymentResponse.data as any)?.redirectUrl ||
-                "";
-
-              console.log("Payment URL:", paymentUrl);
-
-              if (paymentUrl) {
-                toast.success("Redirecting to payment page...");
-                // Redirect to third-party payment gateway
-                window.location.href = paymentUrl;
+              if (paymentResponse.data) {
+                // Set QR code string to generate image
+                setQrCodeString(paymentResponse.data.qrImageUrl);
+                setPaymentId(paymentResponse.data.id);
+                setPaymentStatus("pending");
               } else {
-                toast.error("Failed to get payment URL");
-                console.error(
-                  "No payment URL in response:",
-                  paymentResponse.data
-                );
+                toast.error("Failed to get QR code");
+                setShowPaymentModal(false);
               }
-            }
-          } catch (error) {
-            console.error("Payment API error:", error);
-            toast.error("Failed to create payment");
-
-            if (selectedPayment === "cod") {
-              // Still close modal for COD even if payment API fails
+            } catch (error) {
+              console.error("Payment API error:", error);
+              toast.error("Failed to create payment");
               setShowPaymentModal(false);
-              setTimeout(() => {
-                navigate("/");
-              }, 1500);
             }
+          } else {
+            // COD - just show success
+            setPaymentStatus("success");
+            setTimeout(() => {
+              setShowPaymentModal(false);
+              navigate("/");
+            }, 1500);
           }
         },
       }
     );
+  };
+
+  // Handle check payment status
+  const handleCheckPaymentStatus = async () => {
+    if (!paymentId) {
+      toast.error("Payment ID not found");
+      return;
+    }
+
+    setIsCheckingPayment(true);
+    try {
+      const statusResponse =
+        await apiClient.api.paymentControllerCheckPaymentStatus(paymentId);
+
+      console.log("Payment Status:", statusResponse.data);
+
+      if (statusResponse.data.status === "success") {
+        setPaymentStatus("success");
+        toast.success("Thanh toán thành công!");
+        setTimeout(() => {
+          setShowPaymentModal(false);
+          navigate("/");
+        }, 1500);
+      } else if (statusResponse.data.status === "failed") {
+        toast.error("Thanh toán thất bại");
+      } else {
+        toast.info("Thanh toán đang chờ xử lý");
+      }
+    } catch (error) {
+      console.error("Check payment status error:", error);
+      toast.error("Không thể kiểm tra trạng thái thanh toán");
+    } finally {
+      setIsCheckingPayment(false);
+    }
   };
 
   return (
@@ -559,24 +594,104 @@ const Checkout = () => {
               </div>
             </div>
           ) : (
-            // QR Payment - will redirect to payment gateway
+            // QR Payment - show QR code
             <div className="space-y-4">
-              <Card className="p-4 bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
-                <div className="text-center space-y-4 py-6">
-                  <div className="flex justify-center">
-                    <Loader className="w-16 h-16 animate-spin text-primary" />
+              {paymentStatus === "success" ? (
+                <Card className="p-6 bg-green-50 border-green-200">
+                  <div className="text-center space-y-4">
+                    <div className="flex justify-center">
+                      <CheckCircle2 className="w-16 h-16 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-xl text-green-900 mb-2">
+                        Thanh toán thành công!
+                      </h3>
+                      <p className="text-sm text-green-700">
+                        Đơn hàng của bạn đã được xác nhận
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-xl mb-2">
-                      Processing Payment
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      Please wait while we redirect you to the payment
-                      gateway...
-                    </p>
+                </Card>
+              ) : qrImageUrl ? (
+                <>
+                  <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
+                    <div className="text-center space-y-4">
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        <QrCode className="w-5 h-5 text-primary" />
+                        <h3 className="font-semibold text-lg">
+                          Quét mã QR để thanh toán
+                        </h3>
+                      </div>
+
+                      {/* QR Image */}
+                      <div className="bg-white p-4 rounded-lg inline-block mx-auto">
+                        <img
+                          src={qrImageUrl}
+                          alt="QR Code"
+                          className="w-64 h-64 mx-auto"
+                        />
+                      </div>
+
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <p>
+                          Tổng thanh toán:{" "}
+                          <span className="font-semibold text-primary text-base">
+                            {formatPriceVND(total)}
+                          </span>
+                        </p>
+                        <p>Mở ứng dụng ngân hàng và quét mã QR</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Check Payment Status Button */}
+                  <Button
+                    className="w-full"
+                    onClick={handleCheckPaymentStatus}
+                    disabled={isCheckingPayment}
+                  >
+                    {isCheckingPayment ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin mr-2" />
+                        Đang kiểm tra...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Tôi đã thanh toán thành công
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      setQrImageUrl("");
+                      setPaymentId("");
+                    }}
+                  >
+                    Hủy
+                  </Button>
+                </>
+              ) : (
+                <Card className="p-4 bg-blue-50 border-blue-200">
+                  <div className="text-center space-y-4 py-6">
+                    <div className="flex justify-center">
+                      <Loader className="w-16 h-16 animate-spin text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-xl mb-2">
+                        Đang tạo mã QR
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Vui lòng đợi trong giây lát...
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
+              )}
             </div>
           )}
         </DialogContent>

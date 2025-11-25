@@ -21,6 +21,7 @@ import Checkout from "@/pages/Checkout";
 import { ProfileLayout } from "@/layouts/ProfileLayout";
 import { ProfileInfo } from "@/pages/profile/ProfileInfo";
 import { ProfileOrders } from "@/pages/profile/ProfileOrders";
+import { ProfileOrderDetail } from "@/pages/profile/ProfileOrderDetail";
 import { ProfileChangePassword } from "@/pages/profile/ProfileChangePassword";
 import { ProfileAddresses } from "@/pages/profile/ProfileAddresses";
 
@@ -50,6 +51,7 @@ const AppRouter = () => {
             <Route path="/profile" element={<ProfileLayout />}>
               <Route path="info" element={<ProfileInfo />} />
               <Route path="orders" element={<ProfileOrders />} />
+              <Route path="orders/:id" element={<ProfileOrderDetail />} />
               <Route
                 path="change-password"
                 element={<ProfileChangePassword />}

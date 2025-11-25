@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { motion } from "motion/react";
 import {
   findProductByIdQuery,
   findProductVariantOptionsQuery,
@@ -8,24 +9,28 @@ import { addItemToCartMutation } from "@/queries/cartQueries";
 import { capitalizeWords } from "@/utils/capitalizeWords";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Minus, Plus, ShoppingCart, Truck } from "lucide-react";
+import {
+  Minus,
+  Plus,
+  ShoppingCart,
+  Truck,
+  Shield,
+  Package,
+  Star,
+} from "lucide-react";
 import type {
   ProductVariantResponseDto,
-  UserProductDetailResponseDto,
+  ProductDetailResponseDto,
 } from "@/api";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const LoadingSkeleton = () => (
   <div className="container mx-auto max-w-6xl py-12 px-4 md:px-0">
@@ -58,9 +63,9 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { accessToken } = useAuth();
   const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(
-    {}
-  );
+  const [selectedOptions, setSelectedOptions] = useState<
+    Record<string, string>
+  >({});
   const [selectedVariant, setSelectedVariant] =
     useState<ProductVariantResponseDto | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -69,9 +74,13 @@ const ProductDetail = () => {
   const variantOptionsQuery = findProductVariantOptionsQuery(id!, !!id);
   const addToCartMutation = addItemToCartMutation();
 
-  const product: UserProductDetailResponseDto | undefined =
-    productQuery.data?.data;
+  const product: ProductDetailResponseDto | undefined = productQuery.data?.data;
   const variantOptions = variantOptionsQuery.data?.data || [];
+
+  // Scroll to top when component mounts or ID changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [id]);
 
   useEffect(() => {
     if (product?.productImages && product.productImages.length > 0) {
@@ -155,183 +164,207 @@ const ProductDetail = () => {
     );
   }
 
-  const currentPrice = selectedVariant
-    ? selectedVariant.price
-    : product.price;
+  const currentPrice = selectedVariant ? selectedVariant.price : product.price;
   const currentStock = selectedVariant
     ? selectedVariant.stock
     : product.totalStock;
 
   return (
-    <div className="container mx-auto max-w-6xl py-12 px-4 md:px-0">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
-        {/* Cột hình ảnh */}
-        <div className="flex flex-col gap-4">
-          <Card className="overflow-hidden border-2">
-            <img
-              src={selectedImageUrl}
-              alt={product.name}
-              className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-300 hover:scale-105"
-            />
-          </Card>
-          <div className="flex gap-4 overflow-x-auto pb-2">
-            {product.productImages.map((image) => (
-              <Card
-                key={image.id}
-                className={`w-24 h-24 rounded-md overflow-hidden shrink-0 cursor-pointer border-2 ${
-                  selectedImageUrl === image.url
-                    ? "border-primary"
-                    : "border-border"
-                }`}
-                onClick={() => setSelectedImageUrl(image.url)}
-              >
-                <img
-                  src={image.url}
-                  alt="thumbnail"
-                  className="w-full h-full object-cover"
-                />
-              </Card>
-            ))}
-          </div>
+    <div className="min-h-screen bg-white pt-6">
+      <div className="container mx-auto max-w-7xl px-4 py-8">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">
+          <Link to="/" className="hover:text-slate-900">
+            Trang chủ
+          </Link>
+          <span>/</span>
+          <span className="text-slate-900">
+            {capitalizeWords(product.name)}
+          </span>
         </div>
 
-        {/* Cột thông tin */}
-        <div className="flex flex-col gap-5">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-            {capitalizeWords(product.name)}
-          </h1>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Image Gallery */}
+          <div className="space-y-4">
+            {/* Main Image */}
+            <div className="aspect-square bg-slate-50 rounded-xl overflow-hidden">
+              <img
+                src={selectedImageUrl}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-          <div className="text-3xl font-semibold text-primary">
-            {formatPriceVND(currentPrice)}
-          </div>
-
-
-          <Separator />
-
-          {/* Lựa chọn biến thể */}
-          {variantOptions.map((option) => (
-            <div key={option.variant} className="flex flex-col gap-3">
-              <label className="text-sm font-medium">
-                Chọn {option.variant}:
-                <span className="text-muted-foreground ml-2">
-                  {selectedOptions[option.variant]}
-                </span>
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {option.value.map((value) => (
-                  <Button
-                    key={value}
-                    variant={
-                      selectedOptions[option.variant] === value
-                        ? "default"
-                        : "outline"
-                    }
-                    onClick={() => handleOptionSelect(option.variant, value)}
-                    className="rounded-full"
+            {/* Thumbnails */}
+            {product.productImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-3">
+                {product.productImages.map((image) => (
+                  <button
+                    key={image.id}
+                    className={cn(
+                      "aspect-square rounded-lg overflow-hidden border-2 transition-all",
+                      selectedImageUrl === image.url
+                        ? "border-slate-900"
+                        : "border-slate-200 hover:border-slate-300"
+                    )}
+                    onClick={() => setSelectedImageUrl(image.url)}
                   >
-                    {value}
-                  </Button>
+                    <img
+                      src={image.url}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
                 ))}
               </div>
-            </div>
-          ))}
-
-          {/* Lựa chọn số lượng */}
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-medium">Số lượng:</label>
-            <div className="flex items-center">
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-r-none"
-                onClick={() => handleQuantityChange(-1)}
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-              <Input
-                type="number"
-                value={quantity}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value, 10);
-                  setQuantity(isNaN(val) ? 1 : val);
-                }}
-                className="w-20 text-center rounded-none z-10 focus-visible:ring-primary"
-                min={1}
-                max={currentStock}
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-l-none"
-                onClick={() => handleQuantityChange(1)}
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-              <span className="text-sm text-muted-foreground ml-4">
-                {currentStock > 0
-                  ? `${currentStock} sản phẩm có sẵn`
-                  : "Hết hàng"}
-              </span>
-            </div>
+            )}
           </div>
 
-          <Separator />
+          {/* Product Info */}
+          <div className="space-y-8">
+            {/* Title */}
+            <div>
+              <h1 className="text-3xl font-semibold text-slate-900 mb-4">
+                {capitalizeWords(product.name)}
+              </h1>
+              <div className="flex items-center gap-3 text-sm">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="h-4 w-4 fill-slate-900 text-slate-900"
+                    />
+                  ))}
+                </div>
+                <span className="text-slate-600">4.8 (124 đánh giá)</span>
+              </div>
+            </div>
 
-          {/* Nút thêm vào giỏ hàng */}
-          <Button
-            size="lg"
-            className="w-full text-lg py-6"
-            disabled={
-              currentStock === 0 ||
-              !selectedVariant ||
-              addToCartMutation.isPending
-            }
-            onClick={handleAddToCart}
-          >
-            {addToCartMutation.isPending ? (
-              <Spinner className="mr-2" />
-            ) : (
-              <ShoppingCart className="mr-2 h-5 w-5" />
-            )}
-            {currentStock === 0
-              ? "Hết hàng"
-              : !selectedVariant
-              ? "Vui lòng chọn tùy chọn"
-              : "Thêm vào giỏ hàng"}
-          </Button>
+            {/* Price */}
+            <div className="py-6 border-y border-slate-200">
+              <div className="text-3xl font-semibold text-slate-900 mb-2">
+                {formatPriceVND(currentPrice)}
+              </div>
+              {currentStock > 0 ? (
+                <p className="text-sm text-slate-600">
+                  Còn {currentStock} sản phẩm
+                </p>
+              ) : (
+                <p className="text-sm text-red-600">Hết hàng</p>
+              )}
+            </div>
 
-          {/* Chính sách */}
-          <Card className="bg-transparent border-border border-dashed">
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-center gap-3">
-                <Truck className="w-5 h-5 text-primary" />
-                <span className="text-sm">
-                  Giao hàng miễn phí cho đơn hàng trên 500.000đ
+            {/* Variants */}
+            {variantOptions.map((option) => (
+              <div key={option.variant}>
+                <div className="text-sm font-medium text-slate-900 mb-3">
+                  {option.variant}: {selectedOptions[option.variant]}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {option.value.map((value) => {
+                    const isSelected =
+                      selectedOptions[option.variant] === value;
+                    return (
+                      <button
+                        key={value}
+                        onClick={() =>
+                          handleOptionSelect(option.variant, value)
+                        }
+                        className={cn(
+                          "px-6 py-2 text-sm border rounded-lg transition-colors",
+                          isSelected
+                            ? "border-slate-900 bg-slate-900 text-white"
+                            : "border-slate-300 hover:border-slate-900"
+                        )}
+                      >
+                        {value}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* Quantity */}
+            <div>
+              <div className="text-sm font-medium text-slate-900 mb-3">
+                Số lượng
+              </div>
+              <div className="inline-flex border border-slate-300 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={quantity <= 1}
+                  className="px-4 py-2 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <div className="px-6 py-2 border-x border-slate-300 min-w-[60px] text-center">
+                  {quantity}
+                </div>
+                <button
+                  onClick={() => handleQuantityChange(1)}
+                  disabled={quantity >= currentStock}
+                  className="px-4 py-2 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Add to Cart */}
+            <button
+              disabled={
+                currentStock === 0 ||
+                !selectedVariant ||
+                addToCartMutation.isPending
+              }
+              onClick={handleAddToCart}
+              className="w-full bg-slate-900 text-white py-4 rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {addToCartMutation.isPending ? (
+                <Spinner className="w-5 h-5" />
+              ) : (
+                <>
+                  <ShoppingCart className="w-5 h-5" />
+                  {currentStock === 0
+                    ? "Hết hàng"
+                    : !selectedVariant
+                    ? "Chọn tùy chọn"
+                    : "Thêm vào giỏ"}
+                </>
+              )}
+            </button>
+
+            {/* Benefits */}
+            <div className="space-y-3 pt-6 border-t border-slate-200">
+              <div className="flex items-center gap-3 text-sm">
+                <Truck className="w-5 h-5 text-slate-600" />
+                <span className="text-slate-600">
+                  Miễn phí vận chuyển cho đơn từ 500.000đ
                 </span>
               </div>
-              <div className="flex items-center gap-3">
-                <Badge variant="outline" className="border-green-500 text-green-500">
-                  Chính hãng
-                </Badge>
-                <span className="text-sm">Cam kết 100% chính hãng</span>
+              <div className="flex items-center gap-3 text-sm">
+                <Shield className="w-5 h-5 text-slate-600" />
+                <span className="text-slate-600">Bảo hành chính hãng</span>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex items-center gap-3 text-sm">
+                <Package className="w-5 h-5 text-slate-600" />
+                <span className="text-slate-600">Đổi trả trong 7 ngày</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="mt-16">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Mô tả sản phẩm</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div
-              className="prose prose-sm max-w-none text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: product.description }}
-            />
-          </CardContent>
-        </Card>
+        {/* Description */}
+        <div className="mt-16 border-t border-slate-200 pt-16">
+          <h2 className="text-2xl font-semibold text-slate-900 mb-6">
+            Mô tả sản phẩm
+          </h2>
+          <div
+            className="prose prose-slate max-w-none"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
+        </div>
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-  PaginationControl, 
+  PaginationControl,
 } from "@/components/ui/pagination";
 import {
   Table,
@@ -39,7 +39,7 @@ import { convertDateTime } from "@/utils/convertDateTime";
 import { Link } from "react-router-dom";
 import type { apiClient } from "@/services/apiClient";
 import { ProductStatus } from "@/types/productStatus";
-import type { ProductResponseDto, CategoryResponseDto } from "@/api";
+import type { AdminProductResponseDto, CategoryResponseDto } from "@/api";
 import { Spinner } from "@/components/ui/spinner";
 import {
   updateProductStatusMutation,
@@ -103,7 +103,7 @@ const AdminProduct = () => {
     pagination,
     isLoading,
   } = useAdminProduct(query as any);
- 
+
   const statusMutation = updateProductStatusMutation();
 
   const [categorySearch, setCategorySearch] = useState("");
@@ -232,7 +232,7 @@ const AdminProduct = () => {
       key: "action",
       title: "Action",
       sortable: false,
-      render: (product: ProductResponseDto): React.ReactNode => (
+      render: (product: AdminProductResponseDto): React.ReactNode => (
         <TableCell>
           <div className="flex gap-2">
             <Link to={`/admin/product/edit/${product.id}`}>
@@ -379,7 +379,7 @@ const AdminProduct = () => {
                   onCheckedChange={(checked) => {
                     if (checked && products) {
                       setSelectedProducts(
-                        (products as ProductResponseDto[]).map((p) => p.id)
+                        (products as AdminProductResponseDto[]).map((p) => p.id)
                       );
                     } else {
                       setSelectedProducts([]);
@@ -424,7 +424,7 @@ const AdminProduct = () => {
                   <Spinner className="w-10 h-10" />
                 </TableCell>
               </TableRow>
-            ) : (products as ProductResponseDto[]).length === 0 ? (
+            ) : (products as AdminProductResponseDto[]).length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={tableHeaderTitles.length + 2}
@@ -434,7 +434,7 @@ const AdminProduct = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              (products as ProductResponseDto[]).map((product, index) => (
+              (products as AdminProductResponseDto[]).map((product, index) => (
                 <TableRow
                   key={product.id}
                   className={`${index % 2 ? "bg-muted" : ""}`}
@@ -449,7 +449,7 @@ const AdminProduct = () => {
                           setSelectedProducts(updated);
                           if (
                             updated.length ===
-                            (products as ProductResponseDto[]).length
+                            (products as AdminProductResponseDto[]).length
                           ) {
                             setIsSelectedAllProduct(true);
                           }
@@ -471,7 +471,7 @@ const AdminProduct = () => {
                     if (tableHeaderTitle.key === "action") {
                       return (
                         tableHeaderTitle.render as (
-                          product: ProductResponseDto
+                          product: AdminProductResponseDto
                         ) => React.ReactNode
                       )(product);
                     }

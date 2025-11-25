@@ -2,7 +2,7 @@ import { Image } from "antd";
 import { Card, CardDescription, CardTitle } from "./ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useId } from "react";
-import type { UserProductResponseDto } from "@/api";
+import type { ProductResponseDto } from "@/api";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { capitalizeWords } from "@/utils/capitalizeWords";
 import { Link } from "react-router-dom";
@@ -11,7 +11,7 @@ interface ProductSectionProps {
   title?: string;
   descriptions?: string;
   itemPerRow: 4 | 6 | 8;
-  items: UserProductResponseDto[];
+  items: ProductResponseDto[];
   isLoading?: boolean;
 }
 
@@ -80,9 +80,6 @@ const ProductSection = (props: ProductSectionProps) => {
                     alt={`Product ${index}`}
                     className="!w-full !h-full object-cover rounded-3xl p-3"
                   />
-                  <CardDescription className="text-center">
-                    {formatPriceVND(item.price)}
-                  </CardDescription>
                 </Card>
               </div>
             ))}

@@ -1,7 +1,15 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiClient } from "@/services/apiClient";
 import type { CreateOrderFromCartDto } from "@/api";
+import { orderApi } from "@/services/orderApi";
+
+export const getOrdersQuery = (pageSize: number, page?: number) => {
+  return useQuery({
+    queryKey: ["orders", pageSize, page],
+    queryFn: () => orderApi.getAllOrders(pageSize, page),
+  });
+};
 
 export const createOrderFromCartMutation = () => {
   const queryClient = useQueryClient();
@@ -14,6 +22,8 @@ export const createOrderFromCartMutation = () => {
       // Invalidate cart queries to refresh cart data
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
       queryClient.invalidateQueries({ queryKey: ["cartSummary"] });
+      // Invalidate orders to show new order
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
       // Clear selected cart items from localStorage
       localStorage.removeItem("selectedCartItemIds");
       return response;

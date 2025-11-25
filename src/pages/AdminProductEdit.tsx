@@ -1,5 +1,12 @@
-import type { ProductDetailResponseDto, VariantValueResponseDto } from "@/api";
-import { ProductForm, type VariantOption } from "@/components/admin/ProductForm";
+import type {
+  AdminProductDetailResponseDto,
+  VariantValueResponseDto,
+  ProductDetailVariantValueResponseDto,
+} from "@/api";
+import {
+  ProductForm,
+  type VariantOption,
+} from "@/components/admin/ProductForm";
 import { Spinner } from "@/components/ui/spinner";
 import { useProductForm, type ProductFormData } from "@/hooks/useProductForm";
 import {
@@ -11,7 +18,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const transformDtoToFormData = (
-  data: ProductDetailResponseDto
+  data: AdminProductDetailResponseDto
 ): Partial<ProductFormData> => {
   if (!data.hasVariant) {
     const simpleVariant = data.productVariants?.[0];
@@ -20,7 +27,7 @@ const transformDtoToFormData = (
       description: data.description,
       status: data.status,
       hasVariant: false,
-      categoryIds: data.categories.map((c) => c.id),
+      categoryIds: data.categories.map((c: { id: number }) => c.id),
       imageUrls: data.productImages.map((img) => img.url),
       price: simpleVariant?.price ?? 0,
       stock: simpleVariant?.stock ?? 0,
@@ -33,15 +40,19 @@ const transformDtoToFormData = (
       description: data.description,
       status: data.status,
       hasVariant: true,
-      categoryIds: data.categories.map((c) => c.id),
+      categoryIds: data.categories.map((c: { id: number }) => c.id),
       imageUrls: data.productImages.map((img) => img.url),
       price: undefined,
       stock: undefined,
       sku: undefined,
       productVariants: data.productVariants.map((v) => ({
         ...v,
-        variantValueIds: v.variantValues.map((vv) => vv.id),
-        name: v.variantValues.map((vv) => vv.value).join(" / "),
+        variantValueIds: v.variantValues.map(
+          (vv: ProductDetailVariantValueResponseDto) => vv.id
+        ),
+        name: v.variantValues
+          .map((vv: ProductDetailVariantValueResponseDto) => vv.value)
+          .join(" / "),
       })),
     };
   }
@@ -92,13 +103,17 @@ const AdminProductEdit = () => {
       if (productData.data.hasVariant) {
         const variantValueIdsInProduct = new Set(
           productData.data.productVariants.flatMap((pv) =>
-            pv.variantValues.map((vv) => vv.id)
+            pv.variantValues.map(
+              (vv: ProductDetailVariantValueResponseDto) => vv.id
+            )
           )
         );
 
         const allVariantIdsInProduct = new Set(
           productData.data.productVariants.flatMap((pv) =>
-            pv.variantValues.map((vv) => vv.variant.id)
+            pv.variantValues.map(
+              (vv: ProductDetailVariantValueResponseDto) => vv.variant.id
+            )
           )
         );
 
@@ -110,13 +125,19 @@ const AdminProductEdit = () => {
             values:
               productData.data.productVariants
                 .flatMap((pv) => pv.variantValues)
-                .filter((vv) => vv.variant.id === v.id)
-                .reduce((acc, current) => {
-                  if (!acc.find((item) => item.id === current.id)) {
-                    acc.push(current);
-                  }
-                  return acc;
-                }, [] as (VariantValueResponseDto & { selected?: boolean })[])
+                .filter(
+                  (vv: ProductDetailVariantValueResponseDto) =>
+                    vv.variant.id === v.id
+                )
+                .reduce(
+                  (acc, current: ProductDetailVariantValueResponseDto) => {
+                    if (!acc.find((item) => item.id === current.id)) {
+                      acc.push({ id: current.id, value: current.value });
+                    }
+                    return acc;
+                  },
+                  [] as (VariantValueResponseDto & { selected?: boolean })[]
+                )
                 .map((val) => ({
                   ...val,
                   selected: variantValueIdsInProduct.has(val.id),
@@ -134,29 +155,29 @@ const AdminProductEdit = () => {
 
     const originalImages = productData?.data.productImages || [];
 
-    const transformedImageUrls = data.imageUrls?.map((url) => {
-      const originalImage = originalImages.find((img) => img.url === url);
-      return {
-        id: originalImage ? originalImage.id : undefined, 
-        url: url,
-      };
-    }) || [];
-    
+    const transformedImageUrls =
+      data.imageUrls?.map((url) => {
+        const originalImage = originalImages.find((img) => img.url === url);
+        return {
+          id: originalImage ? originalImage.id : undefined,
+          url: url,
+        };
+      }) || [];
+
     const finalData = {
       ...data,
       description,
-      imageUrls: transformedImageUrls, 
+      imageUrls: transformedImageUrls,
     };
-    
+
     mutation.mutate(
-      { id: id!, data: finalData as any},
+      { id: id!, data: finalData as any },
       {
         onSuccess: () => {
           navigate("/admin/product");
         },
       }
     );
-  
   };
 
   if (isLoadingProduct || (productData && variantsLoading)) {
