@@ -275,7 +275,7 @@ const Checkout = () => {
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <ShoppingBag className="w-10 h-10" />
-        <h1 className="text-4xl font-normal uppercase">Checkout</h1>
+        <h1 className="text-4xl font-normal uppercase">Thanh toán</h1>
       </div>
 
       <div className="flex gap-8">
@@ -286,7 +286,7 @@ const Checkout = () => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5" />
-                <h2 className="text-2xl font-semibold">Shipping Address</h2>
+                <h2 className="text-2xl font-semibold">Địa chỉ nhận hàng</h2>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -294,7 +294,7 @@ const Checkout = () => {
                   size="sm"
                   onClick={() => setShowAddressModal(true)}
                 >
-                  {selectedAddressId ? "Change" : "Select"} Address
+                  {selectedAddressId ? "Thay đổi" : "Chọn"} địa chỉ
                 </Button>
                 <Button
                   variant="outline"
@@ -303,7 +303,7 @@ const Checkout = () => {
                   className="gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  Add New
+                  Thêm mới
                 </Button>
               </div>
             </div>
@@ -352,10 +352,10 @@ const Checkout = () => {
 
               {/* Order Notes */}
               <div className="space-y-2">
-                <Label htmlFor="notes">Order Notes (Optional)</Label>
+                <Label htmlFor="notes">Ghi chú đơn hàng (Tùy chọn)</Label>
                 <Textarea
                   id="notes"
-                  placeholder="Notes about your order, e.g. special delivery instructions"
+                  placeholder="Ghi chú về đơn hàng của bạn, ví dụ hướng dẫn giao hàng đặc biệt"
                   rows={3}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -368,7 +368,7 @@ const Checkout = () => {
           <Card className="p-6">
             <div className="flex items-center gap-2 mb-6">
               <CreditCard className="w-5 h-5" />
-              <h2 className="text-2xl font-semibold">Payment Method</h2>
+              <h2 className="text-2xl font-semibold">Phương thức thanh toán</h2>
             </div>
 
             <div className="space-y-4">
@@ -384,9 +384,11 @@ const Checkout = () => {
                   <div className="flex items-center gap-3">
                     <Truck className="w-5 h-5" />
                     <div>
-                      <div className="font-medium">Cash on Delivery</div>
+                      <div className="font-medium">
+                        Thanh toán khi nhận hàng
+                      </div>
                       <div className="text-sm text-gray-500">
-                        Pay when you receive your order
+                        Thanh toán khi bạn nhận được đơn hàng
                       </div>
                     </div>
                   </div>
@@ -408,9 +410,9 @@ const Checkout = () => {
                   <div className="flex items-center gap-3">
                     <CreditCard className="w-5 h-5" />
                     <div>
-                      <div className="font-medium">QR Code Payment</div>
+                      <div className="font-medium">Thanh toán qua QR Code</div>
                       <div className="text-sm text-gray-500">
-                        Pay via QR code (VNPay, Momo, ZaloPay)
+                        Thanh toán qua mã QR (VNPay, Momo, ZaloPay)
                       </div>
                     </div>
                   </div>
@@ -426,7 +428,7 @@ const Checkout = () => {
         {/* Order Summary Sidebar */}
         <div className="flex-[1]">
           <Card className="p-6 sticky top-6">
-            <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+            <h2 className="text-xl font-semibold mb-4">Tóm tắt đơn hàng</h2>
 
             <div className="space-y-4 mb-4">
               {isCheckoutItemsLoading ? (
@@ -481,11 +483,11 @@ const Checkout = () => {
 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
+                <span className="text-gray-600">Tạm tính</span>
                 <span>{formatPriceVND(subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
+                <span className="text-gray-600">Vận chuyển</span>
                 <span>{formatPriceVND(shipping)}</span>
               </div>
             </div>
@@ -493,7 +495,7 @@ const Checkout = () => {
             <Separator className="my-4" />
 
             <div className="flex justify-between text-lg font-semibold mb-6">
-              <span>Total</span>
+              <span>Tổng cộng</span>
               <span className="text-red-600">{formatPriceVND(total)}</span>
             </div>
 
@@ -506,17 +508,17 @@ const Checkout = () => {
               {isCheckoutItemsLoading ? (
                 <>
                   <Loader className="w-4 h-4 animate-spin mr-2" />
-                  Loading...
+                  Đang tải...
                 </>
               ) : (
-                "Place Order"
+                "Đặt hàng"
               )}
             </Button>
 
             <div className="mt-4 text-xs text-gray-500 text-center">
-              By placing your order, you agree to our{" "}
+              Bằng việc đặt hàng, bạn đồng ý với{" "}
               <a href="#" className="underline">
-                Terms & Conditions
+                Điều khoản & Điều kiện
               </a>
             </div>
           </Card>
@@ -528,12 +530,14 @@ const Checkout = () => {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              {selectedPayment === "cod" ? "Confirm Order" : "Complete Payment"}
+              {selectedPayment === "cod"
+                ? "Xác nhận đơn hàng"
+                : "Hoàn tất thanh toán"}
             </DialogTitle>
             <DialogDescription>
               {selectedPayment === "cod"
-                ? "Please confirm your order details"
-                : "Scan QR code to complete your payment"}
+                ? "Vui lòng xác nhận thông tin đơn hàng"
+                : "Quét mã QR để hoàn tất thanh toán"}
             </DialogDescription>
           </DialogHeader>
 
@@ -702,10 +706,10 @@ const Checkout = () => {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              Select Delivery Address
+              Chọn địa chỉ giao hàng
             </DialogTitle>
             <DialogDescription>
-              Choose an address from your saved addresses
+              Chọn một địa chỉ từ danh sách đã lưu
             </DialogDescription>
           </DialogHeader>
 
@@ -749,8 +753,8 @@ const Checkout = () => {
             ) : (
               <div className="text-center py-12 text-gray-500">
                 <MapPin className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p className="font-medium">No saved addresses</p>
-                <p className="text-sm mt-1">Add a new address to get started</p>
+                <p className="font-medium">Chưa có địa chỉ nào</p>
+                <p className="text-sm mt-1">Thêm địa chỉ mới để bắt đầu</p>
               </div>
             )}
           </div>
@@ -760,7 +764,7 @@ const Checkout = () => {
               variant="outline"
               onClick={() => setShowAddressModal(false)}
             >
-              Close
+              Đóng
             </Button>
           </div>
         </DialogContent>
@@ -772,10 +776,10 @@ const Checkout = () => {
           <DialogHeader>
             <DialogTitle className="text-2xl flex items-center gap-2">
               <Plus className="w-6 h-6" />
-              Add New Address
+              Thêm địa chỉ mới
             </DialogTitle>
             <DialogDescription>
-              Enter your delivery address details
+              Nhập thông tin địa chỉ giao hàng
             </DialogDescription>
           </DialogHeader>
 
@@ -829,7 +833,7 @@ const Checkout = () => {
               onClick={() => setShowAddAddressModal(false)}
               disabled={isCreatingAddress}
             >
-              Cancel
+              Hủy
             </Button>
             <Button
               className="flex-1"
@@ -839,10 +843,10 @@ const Checkout = () => {
               {isCreatingAddress ? (
                 <>
                   <Loader className="w-4 h-4 animate-spin mr-2" />
-                  Saving...
+                  Đang lưu...
                 </>
               ) : (
-                "Save Address"
+                "Lưu địa chỉ"
               )}
             </Button>
           </div>

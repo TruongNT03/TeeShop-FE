@@ -43,8 +43,8 @@
 
 @theme {
   --color-custom-primary: #024e82;
-  --font-arimo: "Arimo", sans-serif;
-  --font-lato: "Lato", sans-serif;
+  /* --font-arimo: "Arimo", sans-serif;
+  --font-lato: "Lato", sans-serif; */
 }
 
 @theme inline {
@@ -125,5 +125,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+
+  html {
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
 }

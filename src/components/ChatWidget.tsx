@@ -103,7 +103,9 @@ const ChatWidget = () => {
             <div className="w-full flex justify-between items-center px-2 py-1 bg-primary">
               <div className="flex items-end text-white gap-2">
                 <img src="admin-avatar.png" alt="" className="h-[28px]" />
-                <div className="text-white font-medium">Chat with us</div>
+                <div className="text-white font-medium">
+                  Trò chuyện với chúng tôi
+                </div>
               </div>
               <X
                 className="text-white cursor-pointer hover:opacity-80"
@@ -130,7 +132,7 @@ const ChatWidget = () => {
                     {isCreateConversationPending ? (
                       <LoaderCircle className="animate-spin" />
                     ) : (
-                      "Start chat"
+                      "Bắt đầu trò chuyện"
                     )}
                   </Button>
                 </div>
@@ -160,7 +162,7 @@ const ChatWidget = () => {
               <Input
                 type="text"
                 className="outline-0 border-[1px] p-1 flex-1"
-                placeholder="Type a message..."
+                placeholder="Nhập tin nhắn..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 disabled={!conversation?.id || isSendMessagePending}

@@ -3,9 +3,7 @@ import { IoIosArrowForward } from "react-icons/io";
 const FooterEmail = () => {
   return (
     <div className="flex flex-col gap-[32px]">
-      <div className="font-arimo text-[12px] font-semibold uppercase">
-        get in the know
-      </div>
+      <div className="text-[12px] font-semibold uppercase">get in the know</div>
       <div className="flex items-center">
         <input
           type="text"

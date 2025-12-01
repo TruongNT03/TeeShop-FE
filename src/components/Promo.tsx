@@ -1,7 +1,11 @@
 import type { ReactNode } from "react";
 
 const Promo = ({ children }: { children: ReactNode }) => {
-  return <div className="flex gap-8 px-[65px] py-[24px]">{children}</div>;
+  return (
+    <div className="flex flex-col md:flex-row gap-4 md:gap-8 px-4 md:px-8 lg:px-[65px] py-4 md:py-6 lg:py-[24px]">
+      {children}
+    </div>
+  );
 };
 
 export default Promo;

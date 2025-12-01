@@ -117,8 +117,8 @@ const Register = () => {
   const renderRegisterStep = () => (
     <>
       <CardHeader>
-        <CardTitle className="text-center text-3xl">REGISTER</CardTitle>
-        <div className="text-center pt-2">Create your account</div>
+        <CardTitle className="text-center text-3xl">ĐĂNG KÝ</CardTitle>
+        <div className="text-center pt-2">Tạo tài khoản mới</div>
       </CardHeader>
       <CardContent>
         <Form {...registerForm}>
@@ -146,11 +146,11 @@ const Register = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Mật khẩu</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="Password"
+                        placeholder="Mật khẩu"
                         type={isShowPassword ? "text" : "password"}
                         {...field}
                       />
@@ -176,11 +176,11 @@ const Register = () => {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>Xác nhận mật khẩu</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="Password"
+                        placeholder="Mật khẩu"
                         type={isShowConfirmPassword ? "text" : "password"}
                         {...field}
                       />
@@ -207,7 +207,7 @@ const Register = () => {
               type="submit"
               disabled={regMutation.isPending}
             >
-              {regMutation.isPending ? <Spinner /> : "Submit"}
+              {regMutation.isPending ? <Spinner /> : "Đăng ký"}
             </Button>
           </form>
         </Form>
@@ -286,11 +286,11 @@ const Register = () => {
           <CardFooter className="justify-center">
             <Link to="/login">
               <div className="text-center">
-                Don't have an account? Click{" "}
+                Đã có tài khoản? Nhấn{" "}
                 <span className="underline cursor-pointer text-primary">
-                  here
+                  vào đây
                 </span>{" "}
-                to login.
+                để đăng nhập.
               </div>
             </Link>
           </CardFooter>

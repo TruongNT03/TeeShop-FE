@@ -27,6 +27,8 @@ import { ProfileAddresses } from "@/pages/profile/ProfileAddresses";
 
 import AdminCategory from "@/pages/AdminCategory";
 import AdminCategoryCreate from "@/pages/AdminCategoryCreate";
+import ProductList from "@/pages/ProductList";
+import AdminOrder from "@/pages/AdminOrder";
 
 const AppRouter = () => {
   return (
@@ -35,6 +37,7 @@ const AppRouter = () => {
         <Route element={<PublicRoute />}>
           <Route element={<UserLayout />}>
             <Route index path="/" element={<Home />} />
+            <Route path="/product" element={<ProductList />} />
             <Route path="/product/:id" element={<ProductDetail />} />
           </Route>
           <Route path="/register" element={<Register />} />
@@ -76,6 +79,7 @@ const AppRouter = () => {
               path="/admin/category/create"
               element={<AdminCategoryCreate />}
             />
+            <Route path="/admin/order" element={<AdminOrder />} />
             <Route path="/admin/configuration" element={<AdminConfig />} />
             <Route path="/admin/chatbot" element={<AdminChatbotConfig />} />
           </Route>

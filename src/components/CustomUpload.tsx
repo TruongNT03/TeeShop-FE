@@ -1,6 +1,5 @@
 import { Upload } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
-import ImgCrop from "antd-img-crop";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { uploadProductImageMutation } from "@/queries/adminProductQueries";
@@ -103,17 +102,15 @@ const CustomUpload = ({ value = [], onChange }: CustomUploadProps) => {
   return (
     <div className="w-full border-dotted border-2 hover:border-blue-500 p-8 rounded-lg flex items-center justify-center">
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <ImgCrop rotationSlider>
-          <Upload
-            customRequest={customUploadRequest}
-            listType="picture-card"
-            fileList={fileList}
-            onChange={onAntdChange}
-            onPreview={onPreview}
-          >
-            {fileList.length < 5 && "+ Upload"}
-          </Upload>
-        </ImgCrop>
+        <Upload
+          customRequest={customUploadRequest}
+          listType="picture-card"
+          fileList={fileList}
+          onChange={onAntdChange}
+          onPreview={onPreview}
+        >
+          {fileList.length < 5 && "+ Upload"}
+        </Upload>
         {isPreviewOpen && (
           <DialogContent className="w-150 p-10">
             <img

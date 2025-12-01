@@ -38,3 +38,21 @@ export const findProductVariantOptionsQuery = (
     enabled: enabled,
   });
 };
+
+export const findProductListQuery = (
+  query: Parameters<typeof apiClient.api.productControllerFindAll>[0]
+) => {
+  return useQuery({
+    queryKey: ["userProductList", query],
+    queryFn: () => apiClient.api.productControllerFindAll(query),
+  });
+};
+
+export const getAllCategoriesQuery = (
+  query: Parameters<typeof apiClient.api.categoryControllerFindAll>[0]
+) => {
+  return useQuery({
+    queryKey: ["categories", query],
+    queryFn: () => apiClient.api.categoryControllerFindAll(query),
+  });
+};

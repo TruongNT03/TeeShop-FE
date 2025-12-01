@@ -44,7 +44,7 @@ const CartPage = () => {
       className="px-[65px] mx-auto py-12 bg-stone-100"
     >
       <div className="flex text-4xl items-center gap-4 my-12">
-        <div className="uppercase">My Cart:</div>
+        <div className="uppercase">Giỏ hàng của tôi:</div>
       </div>
       <div className="flex gap-12">
         <div className="flex-[3] gap-12">
@@ -57,12 +57,12 @@ const CartPage = () => {
                     onCheckedChange={handleCheckAll}
                   />
                 </th>
-                <th className="py-5 font-normal text-left">Products</th>
-                <th className="py-5 font-normal text-center">Unit Price</th>
-                <th className="py-5 font-normal text-center">Quantity</th>
-                <th className="py-5 font-normal text-center">Amount</th>
+                <th className="py-5 font-normal text-left">Sản phẩm</th>
+                <th className="py-5 font-normal text-center">Đơn giá</th>
+                <th className="py-5 font-normal text-center">Số lượng</th>
+                <th className="py-5 font-normal text-center">Thành tiền</th>
                 <th className="py-5 pr-5 font-normal text-center rounded-r-sm">
-                  Actions
+                  Thao tác
                 </th>
               </tr>
             </thead>
@@ -105,7 +105,7 @@ const CartPage = () => {
                                   )
                                 }
                               >
-                                Product Classification:
+                                Phân loại sản phẩm:
                                 <IoMdArrowDropup className="rotate-180" />
                               </div>
                             )}
@@ -145,9 +145,11 @@ const CartPage = () => {
                                   </div>
                                 ))}
                                 <div className="flex justify-between items-center">
-                                  <div className="text-sm">Stock: {"12"}</div>
+                                  <div className="text-sm">
+                                    Còn hàng: {"12"}
+                                  </div>
                                   <Button variant="outline" size="sm">
-                                    Change
+                                    Thay đổi
                                   </Button>
                                 </div>
                               </div>
@@ -183,18 +185,18 @@ const CartPage = () => {
         </div>
         <div className="flex-[1] relative mt-4">
           <Card className="rounded-sm top-34 sticky shadow-none border-none">
-            <CardHeader className="font-medium">Checkout summary:</CardHeader>
+            <CardHeader className="font-medium">Tóm tắt đơn hàng:</CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4 mb-4">
-                <div>Total Amount: {formatPriceVND(totalAmount)}</div>
-                <div>Total Quantity: {totalQuantity}</div>
+                <div>Tổng tiền: {formatPriceVND(totalAmount)}</div>
+                <div>Tổng số lượng: {totalQuantity}</div>
               </div>
               <div className="w-full">
                 <Button
                   className="ml-auto"
                   onClick={() => navigate("/checkout")}
                 >
-                  Checkout
+                  Thanh toán
                 </Button>
               </div>
             </CardContent>

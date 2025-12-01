@@ -17,14 +17,12 @@ interface ProductSectionProps {
 
 const ProductSection = (props: ProductSectionProps) => {
   const sectionId = useId();
-  const imageHeight = { 4: 300, 6: 200, 8: 150 };
-
   const skeletonCount = props.itemPerRow * 2;
   return (
-    <section id={sectionId} className="w-full pb-[24px]">
-      <div className="flex flex-col gap-4 justify-center items-center py-8">
+    <section id={sectionId} className="w-full pb-[24px] overflow-x-hidden">
+      <div className="flex flex-col gap-4 justify-center items-center py-6 md:py-8 px-4">
         <div
-          className="text-5xl font-semibold text-shadow-lg cursor-pointer"
+          className="text-3xl md:text-4xl lg:text-5xl font-semibold text-shadow-lg cursor-pointer text-center"
           onClick={() => {
             document.getElementById(sectionId)?.scrollIntoView({
               behavior: "smooth",
@@ -33,26 +31,29 @@ const ProductSection = (props: ProductSectionProps) => {
         >
           {props.title}
         </div>
-        <div>{props.descriptions}</div>
+        <div className="text-sm md:text-base text-center">
+          {props.descriptions}
+        </div>
       </div>
 
-      <div className="flex flex-wrap px-[65px]">
+      <div className="flex flex-wrap px-4 md:px-8 lg:px-[65px]">
         {props.isLoading
           ? Array.from({ length: skeletonCount }).map((_, i) => (
               <div
                 key={i}
                 className={`
-                  px-5 mb-8 
-                  ${props.itemPerRow === 4 ? "basis-1/4" : ""} 
-                  ${props.itemPerRow === 6 ? "basis-1/6" : ""} 
-                  ${props.itemPerRow === 8 ? "basis-1/8" : ""} 
+                  px-3 md:px-5 mb-6 md:mb-8
+                  basis-1/2 sm:basis-1/3
+                  ${props.itemPerRow === 4 ? "md:basis-1/3 lg:basis-1/4" : ""} 
+                  ${props.itemPerRow === 6 ? "md:basis-1/4 lg:basis-1/6" : ""} 
+                  ${props.itemPerRow === 8 ? "md:basis-1/6 lg:basis-1/8" : ""} 
                 `}
               >
                 <Card className="flex flex-col items-center p-4">
                   <Skeleton className="h-6 w-3/4 mb-3 rounded-md" />
                   <Skeleton
                     className="w-full rounded-3xl mb-3"
-                    style={{ height: imageHeight[props.itemPerRow] }}
+                    style={{ maxHeight: "400px" }}
                   />
                   <Skeleton className="h-5 w-1/2 rounded-md" />
                 </Card>
@@ -62,24 +63,49 @@ const ProductSection = (props: ProductSectionProps) => {
               <div
                 key={index}
                 className={`
-                  px-5 mb-8 
-                  ${props.itemPerRow === 4 ? "basis-1/4" : ""} 
-                  ${props.itemPerRow === 6 ? "basis-1/6" : ""} 
-                  ${props.itemPerRow === 8 ? "basis-1/8" : ""} 
+                  px-3 md:px-5 mb-6 md:mb-8
+                  basis-1/2 sm:basis-1/3
+                  ${props.itemPerRow === 4 ? "md:basis-1/3 lg:basis-1/4" : ""} 
+                  ${props.itemPerRow === 6 ? "md:basis-1/4 lg:basis-1/6" : ""} 
+                  ${props.itemPerRow === 8 ? "md:basis-1/6 lg:basis-1/8" : ""} 
                 `}
               >
-                <Card>
+                <Card className="">
                   <Link to={`/product/${item.id}`}>
-                    <CardTitle className="text-center px-2 h-[32px] text-wrap truncate">
+                    <CardTitle className="text-center px-2 h-[32px] text-wrap truncate font-medium uppercase">
                       {capitalizeWords(item.name)}
                     </CardTitle>
                   </Link>
-                  <Image
-                    height={imageHeight[props.itemPerRow]}
-                    src={item.productImages[0].url}
-                    alt={`Product ${index}`}
-                    className="!w-full !h-full object-cover rounded-3xl p-3"
-                  />
+                  {item.productImages[0]?.url ? (
+                    <Image
+                      height={300}
+                      src={item.productImages[0]?.url}
+                      alt={`Product ${index}`}
+                      className="object-cover rounded-3xl p-3"
+                      onError={(e) =>
+                        e.currentTarget.setAttribute(
+                          "src",
+                          "https://pbs.twimg.com/media/F4jjWyzacAAX25-.jpg"
+                        )
+                      }
+                    />
+                  ) : (
+                    <div className="p-3">
+                      <Skeleton
+                        className="w-full rounded-3xl"
+                        style={{ maxHeight: "400px" }}
+                      />
+                    </div>
+                  )}
+                  <div className="text-center pb-3 px-2">
+                    {item.price ? (
+                      <span className="text-base font-medium">
+                        {formatPriceVND(item.price)}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-slate-500">Liên hệ</span>
+                    )}
+                  </div>
                 </Card>
               </div>
             ))}

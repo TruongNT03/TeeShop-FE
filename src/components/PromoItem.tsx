@@ -11,17 +11,17 @@ export interface PromoItemProps {
 const PromoItem = (props: PromoItemProps) => {
   return (
     <div
-      className={`${props.className} bg-secondary text-secondary-foreground flex flex-col gap-[24px] items-center h-[429px] justify-center`}
+      className={`${props.className} bg-secondary text-secondary-foreground flex flex-col gap-4 md:gap-6 lg:gap-[24px] items-center min-h-[300px] md:h-[350px] lg:h-[429px] justify-center px-4 py-6 md:py-8`}
     >
-      <div className="font-lato text-[32px] uppercase">
+      <div className="text-xl md:text-2xl lg:text-[32px] uppercase text-center">
         {props.title}
       </div>
-      <div className="font-lato text-[18px] max-w-[500px] text-wrap text-center">
+      <div className="text-sm md:text-base lg:text-[18px] max-w-[350px] md:max-w-[450px] lg:max-w-[500px] text-wrap text-center">
         {props.description}
       </div>
       <Link to={props.redirectUrl}>
         <Button
-          className="relative overflow-hidden text-lato uppercase bg-primary-foreground text-primary text-[14px] rounded-none p-6 
+          className="relative overflow-hidden text-lato uppercase bg-primary-foreground text-primary text-xs md:text-sm lg:text-[14px] rounded-none p-4 md:p-5 lg:p-6 
         transition-all duration-500 ease-out group hover:text-primary-foreground"
         >
           <span className="relative z-10">Buy now</span>

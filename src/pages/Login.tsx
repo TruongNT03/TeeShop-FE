@@ -52,10 +52,10 @@ const Login = () => {
       >
         <Card className="w-96 border-0 shadow-none">
           <CardHeader>
-            <CardTitle className="text-center text-3xl">LOGIN</CardTitle>
+            <CardTitle className="text-center text-3xl">ĐĂNG NHẬP</CardTitle>
             <div className="text-center mt-5">
-              Welcome back!
-              <br /> Input your account to login.
+              Chào mừng bạn trở lại!
+              <br /> Nhập thông tin tài khoản để đăng nhập.
             </div>
           </CardHeader>
           <CardContent>
@@ -80,11 +80,11 @@ const Login = () => {
                   name="password"
                   render={({ field }) => (
                     <FormItem className="mt-5">
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>Mật khẩu</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
-                            placeholder="Password"
+                            placeholder="Mật khẩu"
                             type={isShowPassword ? "text" : "password"}
                             {...field}
                           />
@@ -110,10 +110,10 @@ const Login = () => {
                     <Checkbox
                       onChange={() => setIsRememberMe((prev) => !prev)}
                     />
-                    <div>Remember me</div>
+                    <div>Ghi nhớ đăng nhập</div>
                   </div>
                   <Link to="/forgot-password">
-                    <div className="underline">Forgot password?</div>
+                    <div className="underline">Quên mật khẩu?</div>
                   </Link>
                 </div>
                 <Button
@@ -121,7 +121,7 @@ const Login = () => {
                   type="submit"
                   disabled={isLoading}
                 >
-                  {isLoading ? <Spinner /> : "Submit"}
+                  {isLoading ? <Spinner /> : "Đăng nhập"}
                 </Button>
                 <Button className="w-full mt-4 bg-red-400 hover:bg-red-500">
                   <FaGoogle />
@@ -131,11 +131,11 @@ const Login = () => {
           </CardContent>
           <CardFooter>
             <div className="text-center mt-4">
-              Don't have an account? Click{" "}
+              Chưa có tài khoản? Nhấn{" "}
               <Link to="/register" className="underline text-primary">
-                here
+                vào đây
               </Link>{" "}
-              to register.
+              để đăng ký.
             </div>
           </CardFooter>
         </Card>

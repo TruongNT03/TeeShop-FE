@@ -129,7 +129,7 @@ const AdminSideBar = () => {
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
-                      <div>
+                      <div onClick={() => navigate("/admin/order")}>
                         <SidebarMenuSubButton>Management</SidebarMenuSubButton>
                       </div>
                     </SidebarMenuSubItem>

@@ -20,7 +20,15 @@ import { useNavigate, useParams } from "react-router-dom";
 const transformDtoToFormData = (
   data: AdminProductDetailResponseDto
 ): Partial<ProductFormData> => {
-  if (!data.hasVariant) {
+  // Check if product has variants by checking if any productVariant has variantValues
+  const hasVariants = data.productVariants?.some(
+    (pv) => pv.variantValues && pv.variantValues.length > 0
+  ) ?? false;
+
+  console.log('Transform DTO - hasVariants determined:', hasVariants);
+  console.log('Transform DTO - productVariants:', data.productVariants);
+
+  if (!hasVariants) {
     const simpleVariant = data.productVariants?.[0];
     return {
       name: data.name,
@@ -92,61 +100,75 @@ const AdminProductEdit = () => {
   });
 
   useEffect(() => {
-    if (productData?.data && variants.length > 0) {
+    if (productData?.data) {
       const formData = transformDtoToFormData(productData.data);
+      console.log("Form data being set:", formData);
+      console.log("Product has variant:", productData.data.hasVariant);
+      console.log("Product variants:", formData.productVariants);
       form.reset(formData);
 
       if (editorRef.current) {
         (editorRef.current as any).setContent(formData.description || "");
       }
-
-      if (productData.data.hasVariant) {
-        const variantValueIdsInProduct = new Set(
-          productData.data.productVariants.flatMap((pv) =>
-            pv.variantValues.map(
-              (vv: ProductDetailVariantValueResponseDto) => vv.id
-            )
-          )
-        );
-
-        const allVariantIdsInProduct = new Set(
-          productData.data.productVariants.flatMap((pv) =>
-            pv.variantValues.map(
-              (vv: ProductDetailVariantValueResponseDto) => vv.variant.id
-            )
-          )
-        );
-
-        const options: VariantOption[] = variants
-          .filter((v) => allVariantIdsInProduct.has(v.id))
-          .map((v) => ({
-            variantId: v.id,
-            name: v.name,
-            values:
-              productData.data.productVariants
-                .flatMap((pv) => pv.variantValues)
-                .filter(
-                  (vv: ProductDetailVariantValueResponseDto) =>
-                    vv.variant.id === v.id
-                )
-                .reduce(
-                  (acc, current: ProductDetailVariantValueResponseDto) => {
-                    if (!acc.find((item) => item.id === current.id)) {
-                      acc.push({ id: current.id, value: current.value });
-                    }
-                    return acc;
-                  },
-                  [] as (VariantValueResponseDto & { selected?: boolean })[]
-                )
-                .map((val) => ({
-                  ...val,
-                  selected: variantValueIdsInProduct.has(val.id),
-                })) || [],
-          }));
-        setSelectedVariantOptions(options);
-      }
     }
-  }, [productData, variants, form.reset]);
+  }, [productData, form]);
+
+  useEffect(() => {
+    if (
+      productData?.data &&
+      productData.data.hasVariant &&
+      variants.length > 0
+    ) {
+      console.log("Setting variant options...");
+      console.log("Available variants:", variants);
+      console.log(
+        "Product variants from API:",
+        productData.data.productVariants
+      );
+
+      const variantValueIdsInProduct = new Set(
+        productData.data.productVariants.flatMap((pv) =>
+          pv.variantValues.map(
+            (vv: ProductDetailVariantValueResponseDto) => vv.id
+          )
+        )
+      );
+
+      const allVariantIdsInProduct = new Set(
+        productData.data.productVariants.flatMap((pv) =>
+          pv.variantValues.map(
+            (vv: ProductDetailVariantValueResponseDto) => vv.variant.id
+          )
+        )
+      );
+
+      const options: VariantOption[] = variants
+        .filter((v) => allVariantIdsInProduct.has(v.id))
+        .map((v) => ({
+          variantId: v.id,
+          name: v.name,
+          values:
+            productData.data.productVariants
+              .flatMap((pv) => pv.variantValues)
+              .filter(
+                (vv: ProductDetailVariantValueResponseDto) =>
+                  vv.variant.id === v.id
+              )
+              .reduce((acc, current: ProductDetailVariantValueResponseDto) => {
+                if (!acc.find((item) => item.id === current.id)) {
+                  acc.push({ id: current.id, value: current.value });
+                }
+                return acc;
+              }, [] as (VariantValueResponseDto & { selected?: boolean })[])
+              .map((val) => ({
+                ...val,
+                selected: variantValueIdsInProduct.has(val.id),
+              })) || [],
+        }));
+      console.log("Variant options to set:", options);
+      setSelectedVariantOptions(options);
+    }
+  }, [productData, variants]);
 
   const onSubmit = (data: ProductFormData) => {
     const description = editorRef.current

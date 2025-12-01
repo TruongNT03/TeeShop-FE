@@ -417,6 +417,22 @@ export interface ConversationResponseDto {
   users: ConversationUserResponseDto[];
 }
 
+export interface AdminOrderResponseDto {
+  id: string;
+  userEmail: string;
+  status: "pending" | "shipping";
+  amount: number;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+}
+
+export interface AdminListOrderResponseDto {
+  data: AdminOrderResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
 export interface AddItemToCartDto {
   productVariantId: string;
   quantity: number;
@@ -426,6 +442,7 @@ export interface ProductResponseDto {
   id: string;
   name: string;
   description: string;
+  price: number;
   productImages: ProductImageDetailResponseDto[];
 }
 
@@ -1105,6 +1122,42 @@ export class Api<
     /**
      * No description
      *
+     * @tags [USER] CATEGORY
+     * @name CategoriesControllerFindAll
+     * @summary [USER] GET LIST CATEGORIES
+     * @request GET:/api/v1/category
+     */
+    categoriesControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+        /** Keyword for search */
+        search?: string;
+        /** Available field for sort */
+        sortBy?: "title" | "createdAt";
+        /** Availabel order direaction for sort */
+        orderBy?: "DESC" | "ASC";
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<any, ListCategoryResponseDto>({
+        path: `/api/v1/category`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags [ADMIN] PRODUCT MANAGEMENT
      * @name AdminProductControllerCreate
      * @summary [ADMIN] CREATE PRODUCT
@@ -1566,6 +1619,39 @@ export class Api<
         path: `/api/v1/chat/${id}`,
         method: "GET",
         secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] ORDER
+     * @name AdminOrderControllerFindAll
+     * @summary [ADMIN] FIND ALL ORDER
+     * @request GET:/api/v1/admin-order
+     * @secure
+     */
+    adminOrderControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminListOrderResponseDto, any>({
+        path: `/api/v1/admin-order`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
         ...params,
       }),
 
