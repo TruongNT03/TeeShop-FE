@@ -1,4 +1,4 @@
-import type { apiClient } from "@/services/apiClient";
+import { apiClient } from "@/services/apiClient";
 import { productApi } from "@/services/getListProduct";
 import { useQuery } from "@tanstack/react-query";
 
@@ -49,10 +49,10 @@ export const findProductListQuery = (
 };
 
 export const getAllCategoriesQuery = (
-  query: Parameters<typeof apiClient.api.categoryControllerFindAll>[0]
+  query: Parameters<typeof apiClient.api.categoriesControllerFindAll>[0]
 ) => {
   return useQuery({
     queryKey: ["categories", query],
-    queryFn: () => apiClient.api.categoryControllerFindAll(query),
+    queryFn: () => apiClient.api.categoriesControllerFindAll(query),
   });
 };

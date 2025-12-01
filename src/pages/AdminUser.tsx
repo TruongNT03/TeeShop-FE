@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useNavigate } from "react-router-dom";
 import { PaginationControl } from "@/components/ui/pagination";
 import {
     Table,
@@ -13,33 +12,23 @@ import {
 import {
     ArrowUpDown,
     Search,
-    Package,
-    Clock,
-    Truck,
+    Users,
+    UserCheck,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { convertDateTime } from "@/utils/convertDateTime";
-import type { AdminOrderResponseDto } from "@/api";
+import type { UserResponseDto } from "@/api";
 import { Spinner } from "@/components/ui/spinner";
-import { useAdminOrders } from "@/queries/adminOrderQueries";
+import { useAdminUsers } from "@/queries/adminUserQueries";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import React from "react";
 
-export enum AdminOrderSortField {
-    STATUS = "status",
-    AMOUNT = "amount",
+export enum AdminUserSortField {
+    EMAIL = "email",
     CREATED_AT = "createdAt",
-    UPDATED_AT = "updatedAt",
 }
 
 export enum SortOrder {
@@ -47,48 +36,52 @@ export enum SortOrder {
     ASC = "ASC",
 }
 
-type AdminOrderQuery = {
+type AdminUserQuery = {
     page: number;
     pageSize: number;
     search?: string;
-    sortBy?: string;
+    sortBy?: "email" | "createdAt";
     sortOrder?: "ASC" | "DESC";
-    status?: string;
 };
 
-const AdminOrder = () => {
-    const navigate = useNavigate();
-    const [query, setQuery] = useState<AdminOrderQuery>({
+const AdminUser = () => {
+    const [query, setQuery] = useState<AdminUserQuery>({
         page: 1,
         pageSize: 10,
         search: "",
         sortBy: "createdAt",
         sortOrder: "DESC",
-        status: "",
     });
 
     const [searchTerm, setSearchTerm] = useState("");
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-    const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [isSelectedAll, setIsSelectedAll] = useState(false);
 
-    const { data, isLoading } = useAdminOrders(
+    const { data, isLoading } = useAdminUsers(
         query.pageSize,
         query.page,
         query.search,
         query.sortBy,
-        query.sortOrder,
-        query.status
+        query.sortOrder
     );
 
-    const orders = data?.data.data || [];
+    const users = data?.data.data || [];
     const pagination = data?.data.paginate || {
         page: 1,
         pageSize: 10,
         totalItem: 0,
         totalPage: 1,
     };
+
+    // Debug: Log user data to check structure
+    useEffect(() => {
+        if (users.length > 0) {
+            console.log("First user data:", users[0]);
+            console.log("User keys:", Object.keys(users[0]));
+        }
+    }, [users]);
 
     useEffect(() => {
         setQuery((prevQuery) => ({
@@ -98,7 +91,7 @@ const AdminOrder = () => {
         }));
     }, [debouncedSearchTerm]);
 
-    const handleSort = (field: AdminOrderSortField) => {
+    const handleSort = (field: AdminUserSortField) => {
         const isCurrentSort = query.sortBy === field;
         setQuery((prevQuery) => ({
             ...prevQuery,
@@ -108,87 +101,80 @@ const AdminOrder = () => {
         }));
     };
 
-    const handleStatusFilter = (status: string) => {
-        setQuery((prevQuery) => ({
-            ...prevQuery,
-            status: status === "all" ? "" : status,
-            page: 1,
-        }));
+    const getGenderBadge = (gender: string) => {
+        const colors = {
+            male: "border-blue-500 text-blue-500",
+            female: "border-pink-500 text-pink-500",
+            other: "border-gray-500 text-gray-500",
+        };
+
+        return (
+            <Badge variant="outline" className={colors[gender as keyof typeof colors] || colors.other}>
+                {gender === "male" ? "Nam" : gender === "female" ? "Nữ" : "Khác"}
+            </Badge>
+        );
     };
 
-    const getStatusBadge = (status: string) => {
-        switch (status) {
-            case "pending":
-                return (
+    const getRoleBadges = (roles: string[]) => {
+        return (
+            <div className="flex flex-wrap gap-1">
+                {roles.map((role, index) => (
                     <Badge
+                        key={index}
                         variant="outline"
-                        className="border-yellow-500 text-yellow-500"
+                        className={role === "admin" ? "border-purple-500 text-purple-500" : "border-green-500 text-green-500"}
                     >
-                        <Clock className="w-3 h-3 mr-1" />
-                        Pending
+                        {role}
                     </Badge>
-                );
-            case "shipping":
-                return (
-                    <Badge variant="outline" className="border-blue-500 text-blue-500">
-                        <Truck className="w-3 h-3 mr-1" />
-                        Shipping
-                    </Badge>
-                );
-            default:
-                return (
-                    <Badge variant="outline" className="border-gray-500 text-gray-500">
-                        {status}
-                    </Badge>
-                );
-        }
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-        }).format(amount);
+                ))}
+            </div>
+        );
     };
 
     const tableHeaderTitles = [
         {
-            key: "userEmail",
-            title: "User Email",
+            key: "name",
+            title: "Name",
             sortable: false,
+            render: (value: string): React.ReactNode => (
+                <TableCell className="font-medium">{value || "N/A"}</TableCell>
+            ),
+        },
+        {
+            key: "email",
+            title: "Email",
+            sortable: true,
             render: (value: string): React.ReactNode => (
                 <TableCell>{value}</TableCell>
             ),
         },
         {
-            key: "status",
-            title: "Status",
-            sortable: true,
+            key: "phoneNumber",
+            title: "Phone Number",
+            sortable: false,
             render: (value: string): React.ReactNode => (
-                <TableCell>{getStatusBadge(value)}</TableCell>
+                <TableCell>{value || "N/A"}</TableCell>
             ),
         },
         {
-            key: "amount",
-            title: "Amount",
-            sortable: true,
-            render: (value: number): React.ReactNode => (
-                <TableCell className="font-semibold">
-                    {formatCurrency(value)}
-                </TableCell>
+            key: "gender",
+            title: "Gender",
+            sortable: false,
+            render: (value: string): React.ReactNode => (
+                <TableCell>{getGenderBadge(value)}</TableCell>
+            ),
+        },
+        {
+            key: "roles",
+            title: "Roles",
+            sortable: false,
+            render: (value: string[]): React.ReactNode => (
+                <TableCell>{getRoleBadges(value)}</TableCell>
             ),
         },
         {
             key: "createdAt",
             title: "Created At",
-            sortable: true,
-            render: (value: string): React.ReactNode => (
-                <TableCell>{convertDateTime(value)}</TableCell>
-            ),
-        },
-        {
-            key: "updatedAt",
-            title: "Updated At",
             sortable: true,
             render: (value: string): React.ReactNode => (
                 <TableCell>{convertDateTime(value)}</TableCell>
@@ -205,14 +191,13 @@ const AdminOrder = () => {
     };
 
     // Calculate statistics
-    const totalOrders = pagination.totalItem;
-    const pendingOrders = orders.filter((o) => o.status === "pending").length;
-    const shippingOrders = orders.filter((o) => o.status === "shipping").length;
+    const totalUsers = pagination.totalItem;
+    const adminUsers = users.filter((u) => u.roles.includes("admin")).length;
 
     return (
         <div className="w-full overflow-auto py-5">
             <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
-                Order Management
+                User Management
             </div>
 
             {/* Statistics Cards */}
@@ -220,63 +205,49 @@ const AdminOrder = () => {
                 <Card className="flex-1 p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-muted-foreground">Total Orders</p>
-                            <p className="text-3xl font-bold mt-2">{totalOrders}</p>
+                            <p className="text-sm text-muted-foreground">Total Users</p>
+                            <p className="text-3xl font-bold mt-2">{totalUsers}</p>
                         </div>
-                        <Package className="w-12 h-12 text-primary opacity-20" />
+                        <Users className="w-12 h-12 text-primary opacity-20" />
                     </div>
                 </Card>
                 <Card className="flex-1 p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-muted-foreground">Pending</p>
-                            <p className="text-3xl font-bold mt-2 text-yellow-500">
-                                {pendingOrders}
+                            <p className="text-sm text-muted-foreground">Admin Users</p>
+                            <p className="text-3xl font-bold mt-2 text-purple-500">
+                                {adminUsers}
                             </p>
                         </div>
-                        <Clock className="w-12 h-12 text-yellow-500 opacity-20" />
+                        <UserCheck className="w-12 h-12 text-purple-500 opacity-20" />
                     </div>
                 </Card>
                 <Card className="flex-1 p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-muted-foreground">Shipping</p>
-                            <p className="text-3xl font-bold mt-2 text-blue-500">
-                                {shippingOrders}
+                            <p className="text-sm text-muted-foreground">Regular Users</p>
+                            <p className="text-3xl font-bold mt-2 text-green-500">
+                                {totalUsers - adminUsers}
                             </p>
                         </div>
-                        <Truck className="w-12 h-12 text-blue-500 opacity-20" />
+                        <Users className="w-12 h-12 text-green-500 opacity-20" />
                     </div>
                 </Card>
             </div>
 
-            {/* Search and Filter */}
+            {/* Search */}
             <div className="w-[95%] mx-auto mb-5 flex justify-between">
                 <div className="flex gap-5">
                     <div className="relative">
                         <Input
                             className="w-[400px] py-0 pl-10"
                             type="search"
-                            placeholder="Tìm theo email hoặc Order ID..."
+                            placeholder="Tìm theo email hoặc tên..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
                     </div>
-
-                    <Select
-                        value={query.status || "all"}
-                        onValueChange={handleStatusFilter}
-                    >
-                        <SelectTrigger className="w-[200px]">
-                            <SelectValue placeholder="Lọc theo trạng thái" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Tất cả</SelectItem>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="shipping">Shipping</SelectItem>
-                        </SelectContent>
-                    </Select>
                 </div>
             </div>
 
@@ -290,10 +261,10 @@ const AdminOrder = () => {
                                     className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
                                     checked={isSelectedAll}
                                     onCheckedChange={(checked) => {
-                                        if (checked && orders) {
-                                            setSelectedOrders(orders.map((o) => o.id));
+                                        if (checked && users) {
+                                            setSelectedUsers(users.map((u) => u.id));
                                         } else {
-                                            setSelectedOrders([]);
+                                            setSelectedUsers([]);
                                         }
                                         setIsSelectedAll(!!checked);
                                     }}
@@ -311,7 +282,7 @@ const AdminOrder = () => {
                                         )}
                                         onClick={() =>
                                             value.sortable &&
-                                            handleSort(value.key as AdminOrderSortField)
+                                            handleSort(value.key as AdminUserSortField)
                                         }
                                     >
                                         {value.title}{" "}
@@ -335,38 +306,38 @@ const AdminOrder = () => {
                                     <Spinner className="w-10 h-10" />
                                 </TableCell>
                             </TableRow>
-                        ) : orders.length === 0 ? (
+                        ) : users.length === 0 ? (
                             <TableRow>
                                 <TableCell
                                     colSpan={tableHeaderTitles.length + 2}
                                     className="h-48 text-center text-lg"
                                 >
-                                    Không tìm thấy đơn hàng nào.
+                                    Không tìm thấy người dùng nào.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            orders.map((order, index) => (
+
+                            users.map((user, index) => (
                                 <TableRow
-                                    key={order.id}
-                                    className={`${index % 2 ? "bg-muted" : ""} cursor-pointer hover:bg-slate-100`}
-                                    onClick={() => navigate(`/admin/order/${order.id}`)}
+                                    key={user.id}
+                                    className={`${index % 2 ? "bg-muted" : ""}`}
                                 >
                                     <TableCell className="py-5">
                                         <Checkbox
                                             className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
-                                            checked={selectedOrders.includes(order.id)}
+                                            checked={selectedUsers.includes(user.id)}
                                             onCheckedChange={(checked) => {
                                                 if (checked) {
-                                                    const updated = [...selectedOrders, order.id];
-                                                    setSelectedOrders(updated);
-                                                    if (updated.length === orders.length) {
+                                                    const updated = [...selectedUsers, user.id];
+                                                    setSelectedUsers(updated);
+                                                    if (updated.length === users.length) {
                                                         setIsSelectedAll(true);
                                                     }
                                                 } else {
-                                                    const updated = selectedOrders.filter(
-                                                        (value) => value !== order.id
+                                                    const updated = selectedUsers.filter(
+                                                        (value) => value !== user.id
                                                     );
-                                                    setSelectedOrders(updated);
+                                                    setSelectedUsers(updated);
                                                     setIsSelectedAll(false);
                                                 }
                                             }}
@@ -376,13 +347,15 @@ const AdminOrder = () => {
                                         {index + 1 + (query.page - 1) * query.pageSize}
                                     </TableCell>
 
-                                    {tableHeaderTitles.map((tableHeaderTitle, idx) => (
-                                        <React.Fragment key={idx}>
-                                            {tableHeaderTitle.render(
-                                                order[tableHeaderTitle.key as keyof typeof order] as never
-                                            )}
-                                        </React.Fragment>
-                                    ))}
+                                    {tableHeaderTitles.map((tableHeaderTitle, idx) => {
+                                        const value = user[tableHeaderTitle.key as keyof UserResponseDto] as string & string[];
+
+                                        return (
+                                            <React.Fragment key={idx}>
+                                                {tableHeaderTitle.render(value)}
+                                            </React.Fragment>
+                                        );
+                                    })}
                                 </TableRow>
                             ))
                         )}
@@ -391,7 +364,7 @@ const AdminOrder = () => {
 
                 <div className="w-full py-3 flex justify-between items-center px-5">
                     <div className="text-sm text-muted-foreground">
-                        Tổng: <b>{pagination.totalItem}</b> đơn hàng
+                        Tổng: <b>{pagination.totalItem}</b> người dùng
                     </div>
 
                     <PaginationControl
@@ -405,4 +378,4 @@ const AdminOrder = () => {
     );
 };
 
-export default AdminOrder;
+export default AdminUser;

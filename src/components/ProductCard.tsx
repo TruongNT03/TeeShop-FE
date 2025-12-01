@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { capitalizeWords } from "@/utils/capitalizeWords";
-import { ShoppingCart, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +14,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { ProductResponseDto } from "@/api";
-import { motion } from "motion/react";
-import { apiClient } from "@/services/apiClient";
-import { toast } from "sonner";
 
 interface ProductCardProps {
   product: any; // API returns simple ProductResponseDto without full details
@@ -28,7 +25,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const isOutOfStock = false; // Simple list doesn't have stock info
   const [showQuickView, setShowQuickView] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const images = product.productImages || [];
   const hasVariants = product.hasVariants || false;
@@ -39,33 +35,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const handleNextImage = () => {
     setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
-
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // If product has variants, navigate to detail page
-    if (hasVariants) {
-      navigate(`/product/${product.id}`);
-      toast.info("Vui lòng chọn biến thể sản phẩm");
-      return;
-    }
-
-    // Add to cart directly if no variants
-    try {
-      setIsAddingToCart(true);
-      await apiClient.api.cartControllerAddItem({
-        productId: product.id,
-        quantity: 1,
-      });
-      toast.success("Đã thêm sản phẩm vào giỏ hàng!");
-    } catch (error: any) {
-      console.error("Add to cart error:", error);
-      toast.error(error?.error?.message || "Không thể thêm vào giỏ hàng");
-    } finally {
-      setIsAddingToCart(false);
-    }
   };
 
   return (

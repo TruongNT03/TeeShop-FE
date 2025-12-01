@@ -17,8 +17,26 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const getStatusConfig = (status: "pending" | "shipping") => {
+const getStatusConfig = (
+  status: "pending" | "shipping" | "confirmed" | "completed"
+) => {
   switch (status) {
+    case "completed":
+      return {
+        icon: CheckCircle,
+        color: "text-green-600",
+        bg: "bg-green-100",
+        border: "border-green-200",
+        text: "Đã hoàn thành",
+      };
+    case "confirmed":
+      return {
+        icon: CheckCircle,
+        color: "text-emerald-600",
+        bg: "bg-emerald-100",
+        border: "border-emerald-200",
+        text: "Đã xác nhận",
+      };
     case "shipping":
       return {
         icon: Truck,

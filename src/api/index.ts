@@ -117,11 +117,34 @@ export interface UpdateProfileDto {
   gender: "male" | "female" | "other";
 }
 
+export interface NotificationResponseDto {
+  id: string;
+  title: string;
+  content: string;
+  triggerBy: string;
+  navigateTo: string;
+  isRead: boolean;
+  meta: object;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+}
+
 export interface PaginateMetaDto {
   page: number;
   pageSize: number;
   totalItem: number;
   totalPage: number;
+}
+
+export interface ListNotificationResponseDto {
+  data: NotificationResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface TotalUnreadNotificationResponseDto {
+  totalUnread: number;
 }
 
 export interface UserListResponseDto {
@@ -420,7 +443,7 @@ export interface ConversationResponseDto {
 export interface AdminOrderResponseDto {
   id: string;
   userEmail: string;
-  status: "pending" | "shipping";
+  status: "pending" | "confirmed" | "shipping" | "completed";
   amount: number;
   /** @format date-time */
   createdAt: string;
@@ -431,6 +454,60 @@ export interface AdminOrderResponseDto {
 export interface AdminListOrderResponseDto {
   data: AdminOrderResponseDto[];
   paginate: PaginateMetaDto;
+}
+
+export interface AdminOrderDetailUserResponseDto {
+  id: string;
+  email: string;
+  avatar: string;
+  gender: string;
+}
+
+export interface AdminOrderDetailAddressResponseDto {
+  id: string;
+  name: string;
+  phoneNumber: string;
+  detail: string;
+}
+
+export interface OrderItemProductResponseDto {
+  id: string;
+  name: string;
+  description: string;
+  productImages: ProductImageDetailResponseDto[];
+}
+
+export interface OrderItemProductVariantResponseDto {
+  id: string;
+  /** @example 1000 */
+  price: number;
+  /** @example "AO-THUN-001" */
+  sku: string;
+  /** @example 50 */
+  stock: number;
+  variantValues: VariantValuesResponseDto[];
+}
+
+export interface OrderItemResponseDto {
+  id: string;
+  product: OrderItemProductResponseDto;
+  productVariant: OrderItemProductVariantResponseDto;
+  quantity: number;
+}
+
+export interface AdminOrderDetailResponseDto {
+  id: string;
+  status: "pending" | "confirmed" | "shipping" | "completed";
+  amount: number;
+  user: AdminOrderDetailUserResponseDto;
+  address: AdminOrderDetailAddressResponseDto;
+  orderItems: OrderItemResponseDto[];
+  /** @format date-time */
+  createdAt: string;
+}
+
+export interface AdminUpdateOrderStatusDto {
+  status: "pending" | "confirmed" | "shipping" | "completed";
 }
 
 export interface AddItemToCartDto {
@@ -518,35 +595,10 @@ export interface AddressResponseDto {
   isDefault: boolean;
 }
 
-export interface OrderItemProductResponseDto {
-  id: string;
-  name: string;
-  description: string;
-  productImages: ProductImageDetailResponseDto[];
-}
-
-export interface OrderItemProductVariantResponseDto {
-  id: string;
-  /** @example 1000 */
-  price: number;
-  /** @example "AO-THUN-001" */
-  sku: string;
-  /** @example 50 */
-  stock: number;
-  variantValues: VariantValuesResponseDto[];
-}
-
-export interface OrderItemResponseDto {
-  id: string;
-  product: OrderItemProductResponseDto;
-  productVariant: OrderItemProductVariantResponseDto;
-  quantity: number;
-}
-
 export interface OrderResponseDto {
   id: string;
   address: AddressResponseDto;
-  status: "pending" | "shipping";
+  status: "pending" | "confirmed" | "shipping" | "completed";
   orderItems: OrderItemResponseDto[];
   amount: number;
   /** @format date-time */
@@ -1004,6 +1056,90 @@ export class Api<
     /**
      * No description
      *
+     * @tags [USER/ADMIN] NOTIFICATION
+     * @name NotificationControllerFindAll
+     * @summary [USER/ADMIN] FIND ALL NOTIFICATION
+     * @request GET:/api/v1/notification
+     */
+    notificationControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ListNotificationResponseDto, any>({
+        path: `/api/v1/notification`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER/ADMIN] NOTIFICATION
+     * @name NotificationControllerGetTotalUnreadNotification
+     * @summary [USER/ADMIN] GET TOTAL UNREAD NOTIFICATION
+     * @request GET:/api/v1/notification/unread-count
+     */
+    notificationControllerGetTotalUnreadNotification: (
+      params: RequestParams = {},
+    ) =>
+      this.request<TotalUnreadNotificationResponseDto, any>({
+        path: `/api/v1/notification/unread-count`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER/ADMIN] NOTIFICATION
+     * @name NotificationControllerMarkAllRead
+     * @summary [USER/ADMIN] MARK ALL READ
+     * @request GET:/api/v1/notification/read
+     */
+    notificationControllerMarkAllRead: (params: RequestParams = {}) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/notification/read`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER/ADMIN] NOTIFICATION
+     * @name NotificationControllerMarkRead
+     * @summary [USER/ADMIN] MARK READ
+     * @request GET:/api/v1/notification/{notificationId}/read
+     */
+    notificationControllerMarkRead: (
+      notificationId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/notification/${notificationId}/read`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags [ADMIN] USER MANAGEMENT
      * @name AdminUserControllerFindAll
      * @summary [ADMIN] GET LIST USER
@@ -1023,7 +1159,7 @@ export class Api<
          */
         pageSize: number;
         search?: string;
-        sortBy?: "email" | "createdAt";
+        sortBy?: "name" | "email" | "phoneNumber" | "gender" | "createdAt";
         sortOrder?: "DESC" | "ASC";
       },
       params: RequestParams = {},
@@ -1643,6 +1779,7 @@ export class Api<
          * @example 10
          */
         pageSize: number;
+        search?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -1652,6 +1789,47 @@ export class Api<
         query: query,
         secure: true,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] ORDER
+     * @name AdminOrderControllerFindOne
+     * @summary [ADMIN] FIND ONE ORDER BY ID
+     * @request GET:/api/v1/admin-order/{id}
+     * @secure
+     */
+    adminOrderControllerFindOne: (id: string, params: RequestParams = {}) =>
+      this.request<AdminOrderDetailResponseDto, any>({
+        path: `/api/v1/admin-order/${id}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] ORDER
+     * @name AdminOrderControllerUpdateOrderStatus
+     * @summary [ADMIN] UPDATE ORDER STATUS
+     * @request PUT:/api/v1/admin-order/{id}
+     * @secure
+     */
+    adminOrderControllerUpdateOrderStatus: (
+      id: string,
+      data: AdminUpdateOrderStatusDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/admin-order/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         ...params,
       }),
 

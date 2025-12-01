@@ -29,6 +29,9 @@ import AdminCategory from "@/pages/AdminCategory";
 import AdminCategoryCreate from "@/pages/AdminCategoryCreate";
 import ProductList from "@/pages/ProductList";
 import AdminOrder from "@/pages/AdminOrder";
+import AdminOrderDetail from "@/pages/AdminOrderDetail";
+import AdminUser from "@/pages/AdminUser";
+import NotificationList from "@/pages/NotificationList";
 
 const AppRouter = () => {
   return (
@@ -60,6 +63,7 @@ const AppRouter = () => {
                 element={<ProfileChangePassword />}
               />
               <Route path="addresses" element={<ProfileAddresses />} />
+              <Route path="notifications" element={<NotificationList />} />
             </Route>
           </Route>
           <Route element={<AdminLayout />}>
@@ -80,8 +84,11 @@ const AppRouter = () => {
               element={<AdminCategoryCreate />}
             />
             <Route path="/admin/order" element={<AdminOrder />} />
+            <Route path="/admin/order/:id" element={<AdminOrderDetail />} />
+            <Route path="/admin/user" element={<AdminUser />} />
             <Route path="/admin/configuration" element={<AdminConfig />} />
             <Route path="/admin/chatbot" element={<AdminChatbotConfig />} />
+            <Route path="/admin/notifications" element={<NotificationList />} />
           </Route>
         </Route>
 

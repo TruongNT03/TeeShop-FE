@@ -28,6 +28,9 @@ const apiClient = new Api({
     "Content-Type": "application/json",
   },
   // withCredentials: true,
+  paramsSerializer: {
+    indexes: null,
+  },
 });
 
 let isRefreshing = false;

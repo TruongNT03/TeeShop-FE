@@ -20,6 +20,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCartTooltip } from "@/hooks/useCardTooltip";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { Badge } from "./ui/badge";
+import Notification from "./Notification";
 import {
   Sheet,
   SheetContent,
@@ -170,6 +171,13 @@ const NavHeader = () => {
               </TooltipContent>
             </Tooltip>
           </div>
+
+          {/* Notification Icon - Desktop */}
+          {accessToken && (
+            <div className="hidden lg:block">
+              <Notification />
+            </div>
+          )}
 
           {/* Cart Icon - Desktop with Tooltip, Mobile direct link */}
           <div className="hidden lg:block">
