@@ -3,16 +3,22 @@ import {
   SendHorizontal,
   X,
   Loader2,
-  LoaderCircle,
+  User,
+  Bot,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useChatWidget } from "@/hooks/useChatWidget";
 import { motion, AnimatePresence } from "motion/react";
+import { cn } from "@/lib/utils";
+import { useChatContext } from "@/contexts/ChatContext";
+import { formatDistanceToNow } from "date-fns";
+import { vi } from "date-fns/locale";
 
 const ChatWidget = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { activeChat, openChat, closeChat } = useChatContext();
+  const isOpen = activeChat === "admin";
 
   const {
     chatMessages,
@@ -52,6 +58,16 @@ const ChatWidget = () => {
     }
   }, [chatMessages]);
 
+  const handleSendMessage = () => {
+    if (!message.trim() || !conversationId || isSendMessagePending) return;
+
+    sendMessageMute({
+      content: message.trim(),
+      conversationId,
+    });
+    setMessage("");
+  };
+
   const handleScrollTop = async (e: React.UIEvent<HTMLDivElement>) => {
     const div = e.currentTarget;
 
@@ -70,143 +86,173 @@ const ChatWidget = () => {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[11] bg-transparent">
-      {!isOpen ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          onClick={() => setIsOpen(true)}
-          className="w-14 h-14 rounded-full bg-primary flex justify-center items-center text-white drop-shadow-2xl hover:bg-primary/80 cursor-pointer transition-transform active:scale-95 hover:scale-110"
+    <div className="fixed bottom-6 right-6 z-50">
+      {/* Chat Button */}
+      {!isOpen && activeChat !== "ai" && (
+        <motion.button
+          key="chat-button"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => openChat("admin")}
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/80 flex justify-center items-center text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
         >
-          <MessageSquareText />
-        </motion.div>
-      ) : null}
+          <MessageSquareText className="w-7 h-7" />
+        </motion.button>
+      )}
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{
-              y: 0,
-              opacity: 1,
-              transition: { duration: 0.2 },
-            }}
-            exit={{
-              y: 20,
-              opacity: 0,
-              transition: { duration: 0.2 },
-            }}
-            className="w-[300px] h-[400px] bg-white rounded-md shadow-2xl shadow-black/70 overflow-hidden flex flex-col"
-          >
-            {/* Header */}
-            <div className="w-full flex justify-between items-center px-2 py-1 bg-primary">
-              <div className="flex items-end text-white gap-2">
-                <img src="admin-avatar.png" alt="" className="h-[28px]" />
-                <div className="text-white font-medium">
-                  Trò chuyện với chúng tôi
-                </div>
+      {/* Chat Window */}
+      {isOpen && (
+        <motion.div
+          key="chat-window"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="w-[380px] h-[600px] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col"
+        >
+          {/* Header */}
+          <div className="bg-gradient-to-r from-primary to-primary/90 px-5 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div>
+                <h3 className="text-white font-semibold text-sm">
+                  Hỗ trợ khách hàng
+                </h3>
+                <p className="text-white/80 text-[11px]">
+                  Luôn sẵn sàng hỗ trợ bạn
+                </p>
               </div>
-              <X
-                className="text-white cursor-pointer hover:opacity-80"
-                onClick={() => setIsOpen(false)}
-              />
             </div>
-
-            {/* Body */}
-            <div
-              className="flex-1 px-3 py-2 overflow-y-auto flex flex-col gap-2 relative"
-              ref={messagesContainerRef}
-              onScroll={handleScrollTop}
+            <button
+              onClick={() => closeChat()}
+              className="w-7 h-7 rounded-lg hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer"
             >
-              {/* Loading khi fetch page mới */}
-              {isFetchingNextPage && (
-                <div className="absolute top-2 left-1/2 -translate-x-1/2">
-                  <Loader2 className="animate-spin text-primary" />
-                </div>
-              )}
+              <X className="w-4 h-4 text-white" />
+            </button>
+          </div>
 
-              {!conversation?.id && (
-                <div className="flex justify-center mt-10">
-                  <Button onClick={() => createConversationMutate()}>
-                    {isCreateConversationPending ? (
-                      <LoaderCircle className="animate-spin" />
-                    ) : (
-                      "Bắt đầu trò chuyện"
+          {/* Messages Container */}
+          <div
+            className="flex-1 px-4 py-4 overflow-y-auto bg-slate-50 relative"
+            ref={messagesContainerRef}
+            onScroll={handleScrollTop}
+          >
+            {/* Loading indicator at top */}
+            {isFetchingNextPage && (
+              <div className="flex justify-center py-2">
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              </div>
+            )}
+
+            {/* Empty state - Start conversation */}
+            {!conversation?.id && (
+              <div className="flex flex-col items-center justify-center h-full gap-4">
+                <div className="w-20 h-20 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <MessageSquareText className="w-10 h-10 text-primary" />
+                </div>
+                <div className="text-center">
+                  <h4 className="font-semibold text-slate-900 mb-1">
+                    Chào mừng bạn!
+                  </h4>
+                  <p className="text-sm text-slate-500 mb-4">
+                    Bắt đầu trò chuyện để được hỗ trợ
+                  </p>
+                  <Button
+                    onClick={() => createConversationMutate()}
+                    disabled={isCreateConversationPending}
+                    className="gap-2"
+                  >
+                    {isCreateConversationPending && (
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     )}
+                    Bắt đầu trò chuyện
                   </Button>
                 </div>
-              )}
+              </div>
+            )}
 
-              {[...chatMessages].reverse().map((msg) =>
-                msg.senderId === conversation?.users?.[0]?.id ? (
-                  <div
+            {/* Messages */}
+            <div className="space-y-4">
+              {[...chatMessages].reverse().map((msg, index) => {
+                const isUser = msg.senderId === conversation?.users?.[0]?.id;
+                return (
+                  <motion.div
                     key={msg.id}
-                    className="text-sm bg-primary rounded-md p-2 text-white ml-auto max-w-[80%]"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className={cn(
+                      "flex gap-2",
+                      isUser ? "justify-end" : "justify-start"
+                    )}
                   >
-                    {msg.content}
-                  </div>
-                ) : (
-                  <div
-                    key={msg.id}
-                    className="text-sm border-primary border-[1px] rounded-md p-2 mr-auto max-w-[80%]"
-                  >
-                    {msg.content}
-                  </div>
-                )
-              )}
+                    <div
+                      className={cn(
+                        "max-w-[75%] rounded-xl px-4 py-2.5 break-words",
+                        isUser
+                          ? "bg-primary text-white rounded-br-md"
+                          : "bg-white border border-slate-200 text-slate-900 rounded-bl-md shadow-sm"
+                      )}
+                    >
+                      <p className="text-sm leading-relaxed">{msg.content}</p>
+                      {msg.createdAt && (
+                        <p
+                          className={cn(
+                            "text-xs mt-1",
+                            isUser ? "text-white/70" : "text-slate-400"
+                          )}
+                        >
+                          {formatDistanceToNow(new Date(msg.createdAt), {
+                            addSuffix: true,
+                            locale: vi,
+                          })}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
+          </div>
 
-            {/* Footer */}
-            <div className="px-3 py-2 border-t flex gap-2">
+          {/* Input Footer */}
+          <div className="p-3 bg-white border-t border-slate-200">
+            <div className="flex gap-2">
               <Input
                 type="text"
-                className="outline-0 border-[1px] p-1 flex-1"
+                className="flex-1 rounded-lg border-slate-300 focus-visible:ring-primary px-3 h-9 text-sm"
                 placeholder="Nhập tin nhắn..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 disabled={!conversation?.id || isSendMessagePending}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    conversationId &&
-                      sendMessageMute(
-                        {
-                          content: message,
-                          conversationId,
-                        },
-                        {
-                          onSuccess: () =>
-                            chatMessages.push({ content: message }),
-                        }
-                      );
-                    setMessage("");
+                    handleSendMessage();
                   }
                 }}
               />
               <Button
-                className="transition-transform active:scale-95"
-                type="submit"
-                disabled={!message || !conversation?.id || isSendMessagePending}
-                onClick={() => {
-                  conversationId &&
-                    sendMessageMute({
-                      content: message,
-                      conversationId,
-                    });
-                  setMessage("");
-                }}
+                size="icon"
+                className="rounded-lg w-9 h-9 flex-shrink-0"
+                disabled={
+                  !message.trim() || !conversation?.id || isSendMessagePending
+                }
+                onClick={handleSendMessage}
               >
                 {isSendMessagePending ? (
-                  <LoaderCircle className="animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <SendHorizontal />
+                  <SendHorizontal className="w-4 h-4" />
                 )}
               </Button>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

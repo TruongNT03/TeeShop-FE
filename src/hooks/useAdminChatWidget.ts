@@ -39,11 +39,24 @@ export const useAdminChatWidget = () => {
       // When a new message arrives through socket, invalidate messages queries so react-query will refetch
       try {
         console.log("Invalidating chatMessages queries");
-        // Use simple key array to match queries that start with 'chatMessages'
-        queryClient.invalidateQueries(["chatMessages"] as any);
+        // Invalidate messages queries
+        queryClient.invalidateQueries({ queryKey: ["adminChatMessages"] });
+        // Also invalidate conversations list to update latest message
+        queryClient.invalidateQueries({ queryKey: ["adminChatConversations"] });
       } catch (e) {
         // ignore if query client not ready
         console.warn("Failed to invalidate chatMessages queries", e);
+      }
+    });
+
+    // Listen for new conversation created
+    socket.on("newConversation", (data: any) => {
+      console.log("New conversation created:", data);
+      try {
+        // Invalidate conversations list to show the new conversation
+        queryClient.invalidateQueries({ queryKey: ["adminChatConversations"] });
+      } catch (e) {
+        console.warn("Failed to invalidate conversations queries", e);
       }
     });
 
@@ -51,6 +64,7 @@ export const useAdminChatWidget = () => {
 
     return () => {
       socket.off(import.meta.env.VITE_CHAT_EVENT);
+      socket.off("newConversation");
       socket.disconnect();
       socketRef.current = null;
     };

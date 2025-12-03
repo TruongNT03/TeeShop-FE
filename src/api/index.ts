@@ -510,6 +510,65 @@ export interface AdminUpdateOrderStatusDto {
   status: "pending" | "confirmed" | "shipping" | "completed";
 }
 
+export interface CreateFaqDto {
+  question: string;
+  answer: string;
+  type:
+    | "Chính sách đổi trả"
+    | "Vận chuyển"
+    | "Thanh toán"
+    | "Sản phẩm"
+    | "Tài khoản"
+    | "Khuyến mãi"
+    | "Chăm sóc khách hàng"
+    | "Đặt hàng"
+    | "Bảo mật"
+    | "Thành viên"
+    | "Nước hoa";
+}
+
+export interface AdminFaqResponseDto {
+  id: number;
+  question: string;
+  answer: string;
+  type:
+    | "Chính sách đổi trả"
+    | "Vận chuyển"
+    | "Thanh toán"
+    | "Sản phẩm"
+    | "Tài khoản"
+    | "Khuyến mãi"
+    | "Chăm sóc khách hàng"
+    | "Đặt hàng"
+    | "Bảo mật"
+    | "Thành viên"
+    | "Nước hoa";
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+}
+
+export interface AdminListFaqResponseDto {
+  data: AdminFaqResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface AdminFaqSummaryLatestTrainingResponseDto {
+  id: number;
+  status: "success" | "fail";
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+}
+
+export interface AdminFaqSummaryResponseDto {
+  totalFaqs: number;
+  totalFaqCategories: number;
+  latestTraining: AdminFaqSummaryLatestTrainingResponseDto;
+}
+
 export interface AddItemToCartDto {
   productVariantId: string;
   quantity: number;
@@ -644,6 +703,14 @@ export interface CreatePaymentResponseDto {
 
 export interface CheckPaymentStatusResponseDto {
   status: "failed" | "success" | "pending";
+}
+
+export interface AskDto {
+  question: string;
+}
+
+export interface AskResponseDto {
+  answer: string;
 }
 
 import type {
@@ -1836,6 +1903,166 @@ export class Api<
     /**
      * No description
      *
+     * @tags [ADMIN] CHATBOT
+     * @name AdminChatbotControllerCreate
+     * @summary [ADMIN] CREATE FAQ
+     * @request POST:/api/v1/admin-chatbot
+     * @secure
+     */
+    adminChatbotControllerCreate: (
+      data: CreateFaqDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/admin-chatbot`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHATBOT
+     * @name AdminChatbotControllerFindAll
+     * @summary [ADMIN] FIND ALL FAQ
+     * @request GET:/api/v1/admin-chatbot
+     * @secure
+     */
+    adminChatbotControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+        search?: string;
+        typeFilter?:
+          | "Chính sách đổi trả"
+          | "Vận chuyển"
+          | "Thanh toán"
+          | "Sản phẩm"
+          | "Tài khoản"
+          | "Khuyến mãi"
+          | "Chăm sóc khách hàng"
+          | "Đặt hàng"
+          | "Bảo mật"
+          | "Thành viên"
+          | "Nước hoa";
+        sortBy?: "question" | "answer" | "type";
+        sortOrder?: "DESC" | "ASC";
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminListFaqResponseDto, any>({
+        path: `/api/v1/admin-chatbot`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHATBOT
+     * @name AdminChatbotControllerRetraining
+     * @summary [ADMIN] RETRAINING MODEL
+     * @request POST:/api/v1/admin-chatbot/retraining
+     * @secure
+     */
+    adminChatbotControllerRetraining: (params: RequestParams = {}) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/admin-chatbot/retraining`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHATBOT
+     * @name AdminChatbotControllerDelete
+     * @summary [ADMIN] DELETE FAQ
+     * @request DELETE:/api/v1/admin-chatbot/{id}
+     * @secure
+     */
+    adminChatbotControllerDelete: (
+      id: string,
+      query: {
+        id: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/admin-chatbot/${id}`,
+        method: "DELETE",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHATBOT
+     * @name AdminChatbotControllerUpdate
+     * @summary [ADMIN] UPDATE FAQ
+     * @request PUT:/api/v1/admin-chatbot/{id}
+     * @secure
+     */
+    adminChatbotControllerUpdate: (
+      id: string,
+      query: {
+        id: number;
+      },
+      data: CreateFaqDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/admin-chatbot/${id}`,
+        method: "PUT",
+        query: query,
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHATBOT
+     * @name AdminChatbotControllerGetSummary
+     * @summary [ADMIN] GET FAQ SUMMARY
+     * @request GET:/api/v1/admin-chatbot/summary
+     * @secure
+     */
+    adminChatbotControllerGetSummary: (params: RequestParams = {}) =>
+      this.request<AdminFaqSummaryResponseDto, any>({
+        path: `/api/v1/admin-chatbot/summary`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags [USER] CART
      * @name CartControllerAddItemToCart
      * @summary [USER] ADD PRODUCT TO CART
@@ -2258,6 +2485,24 @@ export class Api<
       this.request<SuccessResponseDto, any>({
         path: `/api/v1/webhook/payment`,
         method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] CHATBOT
+     * @name ChatbotControllerAsk
+     * @summary [USER] ASK QUESTION
+     * @request POST:/api/v1/chatbot/ask
+     */
+    chatbotControllerAsk: (data: AskDto, params: RequestParams = {}) =>
+      this.request<AskResponseDto, any>({
+        path: `/api/v1/chatbot/ask`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
