@@ -2063,6 +2063,49 @@ export class Api<
     /**
      * No description
      *
+     * @tags [ADMIN] CHATBOT
+     * @name AdminChatbotControllerDownloadTemplate
+     * @summary [ADMIN] DOWNLOAD EXCEL FILE TEMPLATE
+     * @request GET:/api/v1/admin-chatbot/download-template
+     * @secure
+     */
+    adminChatbotControllerDownloadTemplate: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/admin-chatbot/download-template`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] CHATBOT
+     * @name AdminChatbotControllerUploadFaqFile
+     * @summary [ADMIN] UPLOAD FAQ
+     * @request POST:/api/v1/admin-chatbot/upload-faq
+     * @secure
+     */
+    adminChatbotControllerUploadFaqFile: (
+      data: {
+        /** @format binary */
+        file?: File;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/admin-chatbot/upload-faq`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.FormData,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags [USER] CART
      * @name CartControllerAddItemToCart
      * @summary [USER] ADD PRODUCT TO CART

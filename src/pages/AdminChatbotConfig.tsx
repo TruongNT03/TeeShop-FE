@@ -41,6 +41,8 @@ import {
   Search,
   SquarePen,
   ArrowUpDown,
+  Download,
+  Upload,
 } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -53,6 +55,8 @@ import {
   useUpdateChatbot,
   useDeleteChatbot,
   useRetrainingModel,
+  useDownloadTemplate,
+  useUploadFaqFile,
 } from "../queries/chatbotQueries";
 import type { AdminFaqResponseDto } from "../api";
 import { PaginationControl } from "@/components/ui/pagination";
@@ -109,6 +113,8 @@ const AdminChatbotConfig = () => {
   const updateMutation = useUpdateChatbot();
   const deleteMutation = useDeleteChatbot();
   const retrainingMutation = useRetrainingModel();
+  const downloadTemplateMutation = useDownloadTemplate();
+  const uploadFaqFileMutation = useUploadFaqFile();
 
   const qaPairs = data?.data || [];
   const pagination = {
@@ -174,6 +180,31 @@ const AdminChatbotConfig = () => {
 
   const handleTrainModel = async () => {
     await retrainingMutation.mutateAsync();
+  };
+
+  const handleDownloadTemplate = async () => {
+    await downloadTemplateMutation.mutateAsync();
+  };
+
+  const handleUploadFile = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+    ];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Vui lòng chọn file Excel (.xlsx, .xls)");
+      return;
+    }
+
+    await uploadFaqFileMutation.mutateAsync(file);
+    // Reset input
+    event.target.value = "";
   };
 
   const openEditModal = (qa: AdminFaqResponseDto) => {
@@ -251,8 +282,8 @@ const AdminChatbotConfig = () => {
 
       {/* Search and Actions */}
       <div className="w-[95%] mx-auto mb-5 flex justify-between">
-        <div className="flex">
-          <div className="relative mr-5">
+        <div className="flex gap-3">
+          <div className="relative">
             <Input
               className="w-[400px] py-0 pl-10"
               type="search"
@@ -262,6 +293,47 @@ const AdminChatbotConfig = () => {
             />
             <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
           </div>
+          <Button
+            onClick={handleDownloadTemplate}
+            disabled={downloadTemplateMutation.isPending}
+            variant="outline"
+          >
+            {downloadTemplateMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang tải...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Tải Template
+              </>
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            disabled={uploadFaqFileMutation.isPending}
+            onClick={() => document.getElementById("faq-upload-input")?.click()}
+          >
+            {uploadFaqFileMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang tải lên...
+              </>
+            ) : (
+              <>
+                <Upload className="mr-2 h-4 w-4" />
+                Tải lên File
+              </>
+            )}
+          </Button>
+          <input
+            id="faq-upload-input"
+            type="file"
+            accept=".xlsx,.xls"
+            className="hidden"
+            onChange={handleUploadFile}
+          />
           <Button
             onClick={handleTrainModel}
             disabled={retrainingMutation.isPending}

@@ -134,6 +134,64 @@ export const useDeleteChatbot = () => {
   });
 };
 
+// Download template mutation
+export const useDownloadTemplate = () => {
+  return useMutation({
+    mutationFn: async () => {
+      // Gọi API với axios config để set responseType blob
+      const instance = apiClient.instance;
+      const response = await instance.get(
+        "/api/v1/admin-chatbot/download-template",
+        {
+          responseType: "blob",
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (blob: Blob) => {
+      // BE trả về buffer dưới dạng blob, tạo download link trực tiếp
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "template.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Tải xuống template thành công");
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message || "Có lỗi xảy ra khi tải template";
+      toast.error(message);
+    },
+  });
+};
+
+// Upload FAQ file mutation
+export const useUploadFaqFile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const response = await apiClient.api.adminChatbotControllerUploadFaqFile({
+        file,
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: chatbotKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: chatbotKeys.summary() });
+      toast.success("Tải lên file FAQ thành công");
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message || "Có lỗi xảy ra khi tải lên file";
+      toast.error(message);
+    },
+  });
+};
+
 // Retraining model mutation
 export const useRetrainingModel = () => {
   const queryClient = useQueryClient();
