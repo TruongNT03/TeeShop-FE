@@ -6,14 +6,13 @@ import {
   findProductVariantOptionsQuery,
 } from "@/queries/productQueries";
 import { addItemToCartMutation } from "@/queries/cartQueries";
+import { getProductReviewsQuery } from "@/queries/reviewQueries";
 import { capitalizeWords } from "@/utils/capitalizeWords";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Minus,
   Plus,
@@ -22,6 +21,8 @@ import {
   Shield,
   Package,
   Star,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import type {
   ProductVariantResponseDto,
@@ -69,10 +70,18 @@ const ProductDetail = () => {
   const [selectedVariant, setSelectedVariant] =
     useState<ProductVariantResponseDto | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [reviewPage, setReviewPage] = useState(1);
+  const reviewPageSize = 5;
 
   const productQuery = findProductByIdQuery(id!, !!id);
   const variantOptionsQuery = findProductVariantOptionsQuery(id!, !!id);
   const addToCartMutation = addItemToCartMutation();
+  const reviewsQuery = getProductReviewsQuery(
+    id!,
+    reviewPage,
+    reviewPageSize,
+    !!id
+  );
 
   const product: ProductDetailResponseDto | undefined = productQuery.data?.data;
   const variantOptions = variantOptionsQuery.data?.data || [];
@@ -232,11 +241,19 @@ const ProductDetail = () => {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className="h-4 w-4 fill-slate-900 text-slate-900"
+                      className={cn(
+                        "h-4 w-4",
+                        i < Math.round(product.averageRating)
+                          ? "fill-amber-400 text-amber-400"
+                          : "fill-slate-200 text-slate-200"
+                      )}
                     />
                   ))}
                 </div>
-                <span className="text-slate-600">4.8 (124 đánh giá)</span>
+                <span className="text-slate-600">
+                  {product.averageRating.toFixed(1)} ({product.totalRating} đánh
+                  giá)
+                </span>
               </div>
             </div>
 
@@ -364,6 +381,154 @@ const ProductDetail = () => {
             className="prose prose-slate max-w-none"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-16 border-t border-slate-200 pt-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-semibold text-slate-900">
+              Đánh giá sản phẩm
+            </h2>
+            <div className="flex items-center gap-2">
+              <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+              <span className="text-lg font-semibold">
+                {product.averageRating.toFixed(1)}
+              </span>
+              <span className="text-slate-600">
+                ({product.totalRating} đánh giá)
+              </span>
+            </div>
+          </div>
+
+          {reviewsQuery.isLoading ? (
+            <div className="space-y-6">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-slate-50 rounded-xl p-6 border border-slate-200"
+                >
+                  <div className="flex gap-4">
+                    <Skeleton className="w-12 h-12 rounded-full" />
+                    <div className="flex-1 space-y-3">
+                      <Skeleton className="h-5 w-1/3" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-4/5" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : reviewsQuery.data?.data && reviewsQuery.data.data.length > 0 ? (
+            <>
+              <div className="space-y-6">
+                {reviewsQuery.data.data.map((review, index) => (
+                  <motion.div
+                    key={review.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    className="bg-slate-50 rounded-xl p-6 border border-slate-200 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex gap-4">
+                      <Avatar className="w-12 h-12 ring-2 ring-slate-200">
+                        <AvatarImage src={review.user.avatar} />
+                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white font-semibold">
+                          {review.user.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <span className="font-semibold text-slate-900">
+                              {review.user.name}
+                            </span>
+                            <div className="flex gap-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={cn(
+                                    "h-4 w-4",
+                                    i < review.rating
+                                      ? "fill-amber-400 text-amber-400"
+                                      : "fill-slate-300 text-slate-300"
+                                  )}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-sm text-slate-500 flex-shrink-0">
+                            {new Date(review.createdAt).toLocaleDateString(
+                              "vi-VN",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </span>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed mb-4 whitespace-pre-line">
+                          {review.comment}
+                        </p>
+                        {review.images && review.images.length > 0 && (
+                          <div className="flex gap-3 flex-wrap">
+                            {review.images.map((img, idx) => (
+                              <div
+                                key={idx}
+                                className="relative group cursor-pointer"
+                              >
+                                <img
+                                  src={img}
+                                  alt={`Review ${idx + 1}`}
+                                  className="w-24 h-24 object-cover rounded-lg border-2 border-slate-200 group-hover:border-slate-400 transition-all group-hover:scale-105"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {reviewsQuery.data.paginate.totalPage > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setReviewPage((p) => Math.max(1, p - 1))}
+                    disabled={reviewPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm text-slate-600">
+                    Trang {reviewPage} / {reviewsQuery.data.paginate.totalPage}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() =>
+                      setReviewPage((p) =>
+                        Math.min(reviewsQuery.data.paginate.totalPage, p + 1)
+                      )
+                    }
+                    disabled={
+                      reviewPage === reviewsQuery.data.paginate.totalPage
+                    }
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <Star className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500">Chưa có đánh giá nào</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -34,6 +34,8 @@ const ChatWidget = () => {
     conversationId,
     createConversationMutate,
     isCreateConversationPending,
+    isSendingMessage,
+    setIsSendingMessage,
   } = useChatWidget();
 
   const isLoadingMoreRef = useRef(false);
@@ -65,7 +67,7 @@ const ChatWidget = () => {
       content: message.trim(),
       conversationId,
     });
-    setMessage("");
+    setIsSendingMessage(true);
   };
 
   const handleScrollTop = async (e: React.UIEvent<HTMLDivElement>) => {
@@ -216,6 +218,13 @@ const ChatWidget = () => {
                 );
               })}
             </div>
+            {isSendingMessage ? (
+              <div className="max-w-[75%] rounded-xl px-4 py-2.5 break-words bg-primary text-white rounded-br-md">
+                Sending...
+              </div>
+            ) : (
+              <div></div>
+            )}
           </div>
 
           {/* Input Footer */}

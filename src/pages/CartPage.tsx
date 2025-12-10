@@ -79,7 +79,7 @@ const CartPage = () => {
                   </td>
                   <td className="py-5 flex items-center">
                     <img
-                      src={cartItem.product.productImages[0].url}
+                      src={cartItem.product?.productImages[0]?.url}
                       alt={cartItem.product.name}
                       className="w-[80px] h-[80px] object-cover rounded-md"
                       onError={(e) =>

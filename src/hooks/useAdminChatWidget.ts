@@ -16,7 +16,6 @@ export const useAdminChatWidget = () => {
   const socketRef = useRef<Socket | null>(null);
   const queryClient = useQueryClient();
 
-  // Initialize socket once and set up listeners
   useEffect(() => {
     const socketUrl = `${import.meta.env.VITE_BACKEND_BASE_URL}/chat`;
     const socket = io(socketUrl, {
@@ -34,20 +33,10 @@ export const useAdminChatWidget = () => {
       console.log("Disconnected from chat server");
     });
 
-    socket.on(import.meta.env.VITE_CHAT_EVENT, (data: any) => {
-      console.log("New chat message received:", data);
-      // When a new message arrives through socket, invalidate messages queries so react-query will refetch
-      try {
-        console.log("Invalidating chatMessages queries");
-        // Invalidate messages queries
-        queryClient.invalidateQueries({ queryKey: ["adminChatMessages"] });
-        // Also invalidate conversations list to update latest message
-        queryClient.invalidateQueries({ queryKey: ["adminChatConversations"] });
-      } catch (e) {
-        // ignore if query client not ready
-        console.warn("Failed to invalidate chatMessages queries", e);
-      }
-    });
+    socket.on(
+      import.meta.env.VITE_CHAT_EVENT,
+      (data: MessageResponseDto) => {}
+    );
 
     // Listen for new conversation created
     socket.on("newConversation", (data: any) => {
@@ -68,7 +57,6 @@ export const useAdminChatWidget = () => {
       socket.disconnect();
       socketRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const {
     data: conversations,

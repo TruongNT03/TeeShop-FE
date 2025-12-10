@@ -194,7 +194,7 @@ const NavHeader = () => {
                       <div className="w-full flex hover:bg-primary/80 p-4 gap-2 cursor-pointer hover:text-white group">
                         <div>
                           <img
-                            src={cartItem.product.productImages[0].url}
+                            src={cartItem.product?.productImages[0]?.url}
                             alt=""
                             onError={(e) => {
                               e.currentTarget.setAttribute(

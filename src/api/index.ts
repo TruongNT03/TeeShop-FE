@@ -445,6 +445,8 @@ export interface AdminOrderResponseDto {
   userEmail: string;
   status: "pending" | "confirmed" | "shipping" | "completed";
   amount: number;
+  paymentMethod: "qr" | "cod";
+  paymentStatus: "not_yet" | "failed" | "success" | "pending";
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -493,12 +495,15 @@ export interface OrderItemResponseDto {
   product: OrderItemProductResponseDto;
   productVariant: OrderItemProductVariantResponseDto;
   quantity: number;
+  isReviewed: boolean;
 }
 
 export interface AdminOrderDetailResponseDto {
   id: string;
   status: "pending" | "confirmed" | "shipping" | "completed";
   amount: number;
+  paymentMethod: "qr" | "cod";
+  paymentStatus: "not_yet" | "failed" | "success" | "pending";
   user: AdminOrderDetailUserResponseDto;
   address: AdminOrderDetailAddressResponseDto;
   orderItems: OrderItemResponseDto[];
@@ -508,6 +513,10 @@ export interface AdminOrderDetailResponseDto {
 
 export interface AdminUpdateOrderStatusDto {
   status: "pending" | "confirmed" | "shipping" | "completed";
+}
+
+export interface AdminUpdateOrderPaymentStatusDto {
+  paymentStatus: "not_yet" | "failed" | "success" | "pending";
 }
 
 export interface CreateFaqDto {
@@ -630,6 +639,8 @@ export interface ProductDetailResponseDto {
   name: string;
   description: string;
   price: number;
+  totalRating: number;
+  averageRating: number;
   totalStock: number;
   productImages: ProductImageDetailResponseDto[];
   productVariants: ProductVariantResponseDto[];
@@ -702,7 +713,7 @@ export interface CreatePaymentResponseDto {
 }
 
 export interface CheckPaymentStatusResponseDto {
-  status: "failed" | "success" | "pending";
+  status: "not_yet" | "failed" | "success" | "pending";
 }
 
 export interface AskDto {
@@ -711,6 +722,33 @@ export interface AskDto {
 
 export interface AskResponseDto {
   answer: string;
+}
+
+export interface CreateReviewForOrderItemDto {
+  rating: number;
+  comment: string;
+  images?: string[];
+}
+
+export interface UserReviewResponseDto {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
+export interface ReviewResponseDto {
+  id: string;
+  comment: string;
+  rating: number;
+  images: string[];
+  user: UserReviewResponseDto;
+  /** @format date-time */
+  createdAt: string;
+}
+
+export interface ListReviewResponseDto {
+  data: ReviewResponseDto[];
+  paginate: PaginateMetaDto;
 }
 
 import type {
@@ -1883,7 +1921,7 @@ export class Api<
      * @tags [ADMIN] ORDER
      * @name AdminOrderControllerUpdateOrderStatus
      * @summary [ADMIN] UPDATE ORDER STATUS
-     * @request PUT:/api/v1/admin-order/{id}
+     * @request PUT:/api/v1/admin-order/{id}/status
      * @secure
      */
     adminOrderControllerUpdateOrderStatus: (
@@ -1892,7 +1930,30 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
-        path: `/api/v1/admin-order/${id}`,
+        path: `/api/v1/admin-order/${id}/status`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] ORDER
+     * @name AdminOrderControllerUpdatePaymentStatus
+     * @summary [ADMIN] UPDATE PAYMENT STATUS
+     * @request PUT:/api/v1/admin-order/{id}/payemnt-status
+     * @secure
+     */
+    adminOrderControllerUpdatePaymentStatus: (
+      id: string,
+      data: AdminUpdateOrderPaymentStatusDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/admin-order/${id}/payemnt-status`,
         method: "PUT",
         body: data,
         secure: true,
@@ -2546,6 +2607,65 @@ export class Api<
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] REVIEW
+     * @name ReviewControllerCreateReviewForOrderItem
+     * @summary [USER] CREATE REVIEW FOR ORDER ITEM
+     * @request POST:/api/v1/review/{orderId}/{orderItemId}
+     * @secure
+     */
+    reviewControllerCreateReviewForOrderItem: (
+      orderId: string,
+      orderItemId: string,
+      data: CreateReviewForOrderItemDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/review/${orderId}/${orderItemId}`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [USER] REVIEW
+     * @name ReviewControllerFindAllReviewOfProduct
+     * @summary [USER/ADMIN] GET ALL REVIEW OF PRODUCT
+     * @request GET:/api/v1/review/{productId}
+     * @secure
+     */
+    reviewControllerFindAllReviewOfProduct: (
+      productId: string,
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ListReviewResponseDto, any>({
+        path: `/api/v1/review/${productId}`,
+        method: "GET",
+        query: query,
+        secure: true,
         format: "json",
         ...params,
       }),

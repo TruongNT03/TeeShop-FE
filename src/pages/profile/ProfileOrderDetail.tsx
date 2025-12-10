@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import {
@@ -10,6 +10,7 @@ import {
   Phone,
   User,
   CheckCircle,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getOrdersQuery } from "@/queries/orderQueries";
@@ -19,6 +20,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useCreateReview } from "@/queries/reviewQueries";
+import { Spinner } from "@/components/ui/spinner";
 
 const getStatusConfig = (
   status: "pending" | "shipping" | "confirmed" | "completed"
@@ -63,6 +76,14 @@ const getStatusConfig = (
 export const ProfileOrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [reviewDialog, setReviewDialog] = useState<{
+    open: boolean;
+    orderItemId: string;
+    productName: string;
+  } | null>(null);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const createReviewMutation = useCreateReview();
 
   const { data, isLoading } = getOrdersQuery(100, 1);
   const order = data?.data?.data?.find((o) => o.id === id);
@@ -96,6 +117,33 @@ export const ProfileOrderDetail: React.FC = () => {
 
   const statusConfig = getStatusConfig(order.status);
   const StatusIcon = statusConfig.icon;
+
+  const handleOpenReviewDialog = (orderItemId: string, productName: string) => {
+    setReviewDialog({ open: true, orderItemId, productName });
+    setRating(5);
+    setComment("");
+  };
+
+  const handleCloseReviewDialog = () => {
+    setReviewDialog(null);
+    setRating(5);
+    setComment("");
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewDialog || !comment.trim()) return;
+
+    await createReviewMutation.mutateAsync({
+      orderId: order.id,
+      orderItemId: reviewDialog.orderItemId,
+      data: {
+        rating,
+        comment: comment.trim(),
+      },
+    });
+
+    handleCloseReviewDialog();
+  };
 
   return (
     <div className="space-y-6">
@@ -232,12 +280,31 @@ export const ProfileOrderDetail: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex flex-col items-end gap-2">
                       <p className="font-semibold text-slate-900">
                         {formatPriceVND(
                           item.productVariant.price * item.quantity
                         )}
                       </p>
+                      {order.status === "completed" && !item.isReviewed && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            handleOpenReviewDialog(item.id, item.product.name)
+                          }
+                          className="gap-1"
+                        >
+                          <Star className="h-3.5 w-3.5" />
+                          Đánh giá
+                        </Button>
+                      )}
+                      {order.status === "completed" && item.isReviewed && (
+                        <Badge variant="secondary" className="gap-1">
+                          <CheckCircle className="h-3.5 w-3.5" />
+                          Đã đánh giá
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -267,6 +334,81 @@ export const ProfileOrderDetail: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Review Dialog */}
+      <Dialog
+        open={reviewDialog?.open || false}
+        onOpenChange={(open) => !open && handleCloseReviewDialog()}
+      >
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Đánh giá sản phẩm</DialogTitle>
+            <DialogDescription>{reviewDialog?.productName}</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Rating Stars */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Đánh giá của bạn
+              </label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    className="transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={cn(
+                        "h-8 w-8 cursor-pointer",
+                        star <= rating
+                          ? "fill-amber-400 text-amber-400"
+                          : "fill-slate-200 text-slate-200"
+                      )}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Comment */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Nhận xét của bạn
+              </label>
+              <Textarea
+                placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows={4}
+                className="resize-none"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCloseReviewDialog}
+              disabled={createReviewMutation.isPending}
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleSubmitReview}
+              disabled={!comment.trim() || createReviewMutation.isPending}
+              className="gap-2"
+            >
+              {createReviewMutation.isPending && (
+                <Spinner className="w-4 h-4" />
+              )}
+              Gửi đánh giá
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

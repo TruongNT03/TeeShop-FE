@@ -1,6 +1,11 @@
-import type { CreateMessageDto } from "@/api";
+import type { CreateMessageDto, ListMessageResponseDto } from "@/api";
 import { apiClient } from "@/services/apiClient";
-import { useMutation, useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useInfiniteQuery,
+  type QueryFunctionContext,
+} from "@tanstack/react-query";
 
 export const getListMessagesQuery = (
   query: Parameters<typeof apiClient.api.chatControllerGetListMessages>[0]
@@ -13,19 +18,20 @@ export const getListMessagesQuery = (
 
 export const getListMessagesInfiniteQuery = (opts: { pageSize: number }) => {
   const { pageSize } = opts;
-  return useInfiniteQuery({
+  return useInfiniteQuery<ListMessageResponseDto>({
     queryKey: ["chatMessagesInfinite", pageSize],
-    // start from page 1 by default
     initialPageParam: 1,
-    queryFn: ({ pageParam = 1 }: any) =>
-      apiClient.api.chatControllerGetListMessages({
-        page: pageParam,
-        pageSize,
-      }),
-
-    getNextPageParam: (lastPage: any) => {
-      const page = lastPage.data.paginate.page;
-      const total = lastPage.data.paginate.totalPage;
+    queryFn: async ({ pageParam }: QueryFunctionContext) => {
+      return (
+        await apiClient.api.chatControllerGetListMessages({
+          page: pageParam as number,
+          pageSize,
+        })
+      ).data;
+    },
+    getNextPageParam: (lastPage) => {
+      const page = lastPage.paginate.page;
+      const total = lastPage.paginate.totalPage;
       return page < total ? page + 1 : undefined;
     },
   });

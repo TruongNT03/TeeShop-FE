@@ -1,4 +1,8 @@
-import type { ConversationResponseDto } from "@/api";
+import type {
+  ConversationResponseDto,
+  ListMessageResponseDto,
+  MessageResponseDto,
+} from "@/api";
 import {
   createConversationMutation,
   getConversationQuery,
@@ -6,16 +10,22 @@ import {
   sendMessageMutation,
 } from "@/queries/chatQueries";
 import { useState, useEffect, useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { io, type Socket } from "socket.io-client";
 
 export const useChatWidget = () => {
   const [message, setMessage] = useState<string>("");
+  const [newMessages, setNewMessages] = useState<MessageResponseDto[]>([]);
+  const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
-  const queryClient = useQueryClient();
 
-  // Initialize socket once and set up listeners
+  const {
+    data: chatMessages,
+    fetchNextPage: listMessageFetchNextPage,
+    hasNextPage: listMessageHasNextPage,
+    isFetchingNextPage: listMessageIsFetchingNextPage,
+  } = getListMessagesInfiniteQuery({ pageSize: 10 });
+
   useEffect(() => {
     const socketUrl = `${import.meta.env.VITE_BACKEND_BASE_URL}/chat`;
     const socket = io(socketUrl, {
@@ -33,17 +43,12 @@ export const useChatWidget = () => {
       console.log("Disconnected from chat server");
     });
 
-    socket.on(import.meta.env.VITE_CHAT_EVENT, (data: any) => {
-      console.log("New chat message received:", data);
-      // When a new message arrives through socket, invalidate messages queries so react-query will refetch
-      try {
-        console.log("Invalidating chatMessages queries");
-        // Use simple key array to match queries that start with 'chatMessages'
-        queryClient.invalidateQueries(["chatMessages"] as any);
-      } catch (e) {
-        // ignore if query client not ready
-        console.warn("Failed to invalidate chatMessages queries", e);
-      }
+    socket.on(import.meta.env.VITE_CHAT_EVENT, (data: MessageResponseDto) => {
+      setNewMessages((prev) => [data, ...prev]);
+      setTimeout(() => {
+        setIsSendingMessage(false);
+        setMessage("");
+      }, 5000);
     });
 
     socketRef.current = socket;
@@ -60,8 +65,6 @@ export const useChatWidget = () => {
 
   const conversationId = conversation?.data.id;
 
-  const chatMessagesInfinite = getListMessagesInfiniteQuery({ pageSize: 10 });
-
   const { isPending: isSendMessagePending, mutate: sendMessageMute } =
     sendMessageMutation();
 
@@ -70,13 +73,17 @@ export const useChatWidget = () => {
     mutate: createConversationMutate,
   } = createConversationMutation();
 
+  const allMessages = [
+    ...(newMessages || []),
+    ...(chatMessages?.pages.flatMap((p: ListMessageResponseDto) => p.data) ||
+      []),
+  ];
+
   return {
-    chatMessages: chatMessagesInfinite.isSuccess
-      ? chatMessagesInfinite.data.pages.flatMap((p: any) => p.data.data)
-      : [],
-    fetchNextPage: chatMessagesInfinite.fetchNextPage,
-    hasNextPage: chatMessagesInfinite.hasNextPage,
-    isFetchingNextPage: chatMessagesInfinite.isFetchingNextPage,
+    chatMessages: allMessages,
+    fetchNextPage: listMessageFetchNextPage,
+    hasNextPage: listMessageHasNextPage,
+    isFetchingNextPage: listMessageIsFetchingNextPage,
     isSendMessagePending,
     sendMessageMute,
     conversationId,
@@ -86,5 +93,7 @@ export const useChatWidget = () => {
     isCreateConversationPending,
     createConversationMutate,
     messagesContainerRef,
+    isSendingMessage,
+    setIsSendingMessage,
   };
 };
