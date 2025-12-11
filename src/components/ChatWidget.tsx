@@ -178,44 +178,46 @@ const ChatWidget = () => {
             )}
 
             {/* Messages */}
-            <div className="space-y-4">
-              {[...chatMessages].reverse().map((msg, index) => {
-                const isUser = msg.senderId === conversation?.users?.[0]?.id;
-                return (
-                  <div
-                    key={msg.id}
-                    className={cn(
-                      "flex gap-2",
-                      isUser ? "justify-end" : "justify-start"
-                    )}
-                  >
+            {conversation?.id && (
+              <div className="space-y-4">
+                {[...chatMessages].reverse().map((msg, index) => {
+                  const isUser = msg.senderId === conversation?.users?.[0]?.id;
+                  return (
                     <div
+                      key={msg.id}
                       className={cn(
-                        "max-w-[75%] rounded-xl px-4 py-2.5 break-words",
-                        isUser
-                          ? "bg-primary text-white rounded-br-md"
-                          : "bg-white border border-slate-200 text-slate-900 rounded-bl-md shadow-sm"
+                        "flex gap-2",
+                        isUser ? "justify-end" : "justify-start"
                       )}
                     >
-                      <p className="text-sm leading-relaxed">{msg.content}</p>
-                      {msg.createdAt && (
-                        <p
-                          className={cn(
-                            "text-xs mt-1",
-                            isUser ? "text-white/70" : "text-slate-400"
-                          )}
-                        >
-                          {formatDistanceToNow(new Date(msg.createdAt), {
-                            addSuffix: true,
-                            locale: vi,
-                          })}
-                        </p>
-                      )}
+                      <div
+                        className={cn(
+                          "max-w-[75%] rounded-xl px-4 py-2.5 break-words",
+                          isUser
+                            ? "bg-primary text-white rounded-br-md"
+                            : "bg-white border border-slate-200 text-slate-900 rounded-bl-md shadow-sm"
+                        )}
+                      >
+                        <p className="text-sm leading-relaxed">{msg.content}</p>
+                        {msg.createdAt && (
+                          <p
+                            className={cn(
+                              "text-xs mt-1",
+                              isUser ? "text-white/70" : "text-slate-400"
+                            )}
+                          >
+                            {formatDistanceToNow(new Date(msg.createdAt), {
+                              addSuffix: true,
+                              locale: vi,
+                            })}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Input Footer */}

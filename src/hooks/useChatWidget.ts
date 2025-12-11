@@ -44,7 +44,13 @@ export const useChatWidget = () => {
     });
 
     socket.on(import.meta.env.VITE_CHAT_EVENT, (data: MessageResponseDto) => {
-      setNewMessages((prev) => [data, ...prev]);
+      setNewMessages((prev) => {
+        // Check if message already exists to prevent duplicates
+        if (prev.some((msg) => msg.id === data.id)) {
+          return prev;
+        }
+        return [data, ...prev];
+      });
     });
 
     socketRef.current = socket;
@@ -56,8 +62,11 @@ export const useChatWidget = () => {
     };
   }, []);
 
-  const { data: conversation, isSuccess: isGetConversationSuccess } =
-    getConversationQuery();
+  const {
+    data: conversation,
+    isSuccess: isGetConversationSuccess,
+    refetch: refetchConversation,
+  } = getConversationQuery();
 
   const conversationId = conversation?.data.id;
 
@@ -69,14 +78,29 @@ export const useChatWidget = () => {
     mutate: createConversationMutate,
   } = createConversationMutation();
 
+  // Wrap createConversation to refetch after success
+  const handleCreateConversation = () => {
+    createConversationMutate(undefined, {
+      onSuccess: () => {
+        // Refetch conversation to get the new conversation data
+        refetchConversation();
+      },
+    });
+  };
+
   const allMessages = [
     ...(newMessages || []),
     ...(chatMessages?.pages.flatMap((p: ListMessageResponseDto) => p.data) ||
       []),
   ];
 
+  // Remove duplicates by message ID (prioritize socket messages)
+  const uniqueMessages = Array.from(
+    new Map(allMessages.map((msg) => [msg.id, msg])).values()
+  );
+
   return {
-    chatMessages: allMessages,
+    chatMessages: uniqueMessages,
     fetchNextPage: listMessageFetchNextPage,
     hasNextPage: listMessageHasNextPage,
     isFetchingNextPage: listMessageIsFetchingNextPage,
@@ -87,7 +111,7 @@ export const useChatWidget = () => {
     setMessage,
     conversation: conversation?.data,
     isCreateConversationPending,
-    createConversationMutate,
+    createConversationMutate: handleCreateConversation,
     messagesContainerRef,
     isSendingMessage,
     setIsSendingMessage,
