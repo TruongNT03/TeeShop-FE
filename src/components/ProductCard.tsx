@@ -39,7 +39,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <div>
-      <Card className="flex flex-col items-center hover:shadow-lg transition-all duration-300 h-full">
+      <Card className="flex flex-col items-center hover:shadow-lg transition-all duration-300 h-full shadow-none">
         <Link to={`/product/${product.id}`} className="w-full">
           <h3 className="text-center px-2 h-[32px] text-wrap truncate pt-3 uppercase font-medium">
             {capitalizeWords(product.name)}

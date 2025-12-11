@@ -58,7 +58,7 @@ const ProductSection = (props: ProductSectionProps) => {
                 key={index}
                 className="px-3 md:px-5 mb-6 md:mb-8 w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/4"
               >
-                <Card className="">
+                <Card className="shadow-none">
                   <Link to={`/product/${item.id}`}>
                     <CardTitle className="text-center px-2 h-[32px] text-wrap truncate font-medium uppercase">
                       {capitalizeWords(item.name)}

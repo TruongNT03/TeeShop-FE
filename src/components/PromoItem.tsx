@@ -11,12 +11,12 @@ export interface PromoItemProps {
 const PromoItem = (props: PromoItemProps) => {
   return (
     <div
-      className={`${props.className} bg-secondary text-secondary-foreground flex flex-col gap-4 md:gap-6 lg:gap-[24px] items-center min-h-[300px] md:h-[350px] lg:h-[429px] justify-center px-4 py-6 md:py-8`}
+      className={`${props.className} bg-black text-secondary-foreground flex flex-col gap-4 md:gap-6 lg:gap-[24px] items-center min-h-[300px] md:h-[350px] lg:h-[429px] justify-center px-4 py-6 md:py-8 rounded-md`}
     >
-      <div className="text-xl md:text-2xl lg:text-[32px] uppercase text-center">
+      <div className="text-white text-xl md:text-2xl lg:text-[32px] uppercase text-center">
         {props.title}
       </div>
-      <div className="text-sm md:text-base lg:text-[18px] max-w-[350px] md:max-w-[450px] lg:max-w-[500px] text-wrap text-center">
+      <div className="text-white text-sm md:text-base lg:text-[18px] max-w-[350px] md:max-w-[450px] lg:max-w-[500px] text-wrap text-center">
         {props.description}
       </div>
       <Link to={props.redirectUrl}>

@@ -282,7 +282,7 @@ const ProductDetail = () => {
             {/* Variants */}
             {variantOptions.map((option) => (
               <div key={option.variant}>
-                <div className="text-sm font-medium text-slate-900 mb-3">
+                <div className="text-sm font-medium text-black mb-3">
                   {option.variant}: {selectedOptions[option.variant]}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -296,10 +296,10 @@ const ProductDetail = () => {
                           handleOptionSelect(option.variant, value)
                         }
                         className={cn(
-                          "px-6 py-2 text-sm border rounded-lg transition-colors",
+                          "px-6 py-2 text-sm border rounded-sm transition-colors cursor-pointer",
                           isSelected
-                            ? "border-slate-900 bg-slate-900 text-white"
-                            : "border-slate-300 hover:border-slate-900"
+                            ? "border-primary bg-primary text-white"
+                            : "border-primary hover:bg-primary hover:text-white"
                         )}
                       >
                         {value}
@@ -312,14 +312,14 @@ const ProductDetail = () => {
 
             {/* Quantity */}
             <div>
-              <div className="text-sm font-medium text-slate-900 mb-3">
+              <div className="text-sm font-medium text-black mb-3">
                 Số lượng
               </div>
-              <div className="inline-flex border border-slate-300 rounded-lg overflow-hidden">
+              <div className="inline-flex border border-primary rounded-sm overflow-hidden">
                 <button
                   onClick={() => handleQuantityChange(-1)}
                   disabled={quantity <= 1}
-                  className="px-4 py-2 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
+                  className="px-4 py-2 hover:bg-primary hover:text-white disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <Minus className="w-4 h-4" />
                 </button>
@@ -329,7 +329,7 @@ const ProductDetail = () => {
                 <button
                   onClick={() => handleQuantityChange(1)}
                   disabled={quantity >= currentStock}
-                  className="px-4 py-2 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
+                  className="px-4 py-2 hover:bg-primary hover:text-white disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -344,7 +344,7 @@ const ProductDetail = () => {
                 addToCartMutation.isPending
               }
               onClick={handleAddToCart}
-              className="w-full bg-slate-900 text-white py-4 rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-primary text-white py-4 rounded-sm hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
             >
               {addToCartMutation.isPending ? (
                 <Spinner className="w-5 h-5" />
@@ -361,20 +361,20 @@ const ProductDetail = () => {
             </button>
 
             {/* Benefits */}
-            <div className="space-y-3 pt-6 border-t border-slate-200">
+            <div className="space-y-3 pt-6 border-t border-slate-200 text-black">
               <div className="flex items-center gap-3 text-sm">
-                <Truck className="w-5 h-5 text-slate-600" />
-                <span className="text-slate-600">
+                <Truck className="w-5 h-5" />
+                <span className="">
                   Miễn phí vận chuyển cho đơn từ 500.000đ
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Shield className="w-5 h-5 text-slate-600" />
-                <span className="text-slate-600">Bảo hành chính hãng</span>
+                <Shield className="w-5 h-5" />
+                <span className="">Bảo hành chính hãng</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Package className="w-5 h-5 text-slate-600" />
-                <span className="text-slate-600">Đổi trả trong 7 ngày</span>
+                <Package className="w-5 h-5" />
+                <span className="">Đổi trả trong 7 ngày</span>
               </div>
             </div>
           </div>

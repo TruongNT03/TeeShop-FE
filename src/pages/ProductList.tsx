@@ -8,13 +8,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "../components/ui/slider";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { Filter, X, ChevronDown, ChevronUp } from "lucide-react";
@@ -36,6 +29,7 @@ const ProductList = () => {
   const [showFilters, setShowFilters] = useState(true);
   const [showCategorySection, setShowCategorySection] = useState(true);
   const [showPriceSection, setShowPriceSection] = useState(true);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
@@ -156,19 +150,63 @@ const ProductList = () => {
             </div>
 
             {/* Sort & Filter Toggle */}
-            <div className="flex items-center gap-4">
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Sắp xếp theo" />
-                </SelectTrigger>
-                <SelectContent position="popper" sideOffset={5}>
-                  <SelectItem value="newest">Mới nhất</SelectItem>
-                  <SelectItem value="price-asc">Giá: Thấp đến Cao</SelectItem>
-                  <SelectItem value="price-desc">Giá: Cao đến Thấp</SelectItem>
-                  <SelectItem value="name-asc">Tên: A-Z</SelectItem>
-                  <SelectItem value="name-desc">Tên: Z-A</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex items-center gap-4 text-black">
+              {/* Custom Sort Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowSortDropdown(!showSortDropdown)}
+                  className="w-[200px] bg-white px-4 py-2 cursor-pointer font-medium border rounded-lg flex items-center justify-between hover:border-slate-400 hover:shadow-sm transition-all duration-200"
+                >
+                  <span className="text-sm">
+                    {sortBy === "newest" && "Mới nhất"}
+                    {sortBy === "price-asc" && "Giá: Thấp đến Cao"}
+                    {sortBy === "price-desc" && "Giá: Cao đến Thấp"}
+                    {sortBy === "name-asc" && "Tên: A-Z"}
+                    {sortBy === "name-desc" && "Tên: Z-A"}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showSortDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showSortDropdown && (
+                  <>
+                    {/* Dropdown Menu */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute top-full left-0 mt-2 w-full bg-white border rounded-lg shadow-xl z-20 overflow-hidden"
+                    >
+                      {[
+                        { value: "newest", label: "Mới nhất" },
+                        { value: "price-asc", label: "Giá: Thấp đến Cao" },
+                        { value: "price-desc", label: "Giá: Cao đến Thấp" },
+                        { value: "name-asc", label: "Tên: A-Z" },
+                        { value: "name-desc", label: "Tên: Z-A" },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            setSortBy(option.value);
+                            setShowSortDropdown(false);
+                          }}
+                          className={`w-full cursor-pointer font-medium text-left px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-all duration-150 ${
+                            sortBy === option.value
+                              ? "bg-primary/5 text-primary font-medium"
+                              : ""
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </motion.div>
+                  </>
+                )}
+              </div>
 
               <Button
                 variant="outline"
@@ -188,7 +226,7 @@ const ProductList = () => {
               placeholder="Tìm kiếm sản phẩm..."
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
-              className="w-full px-4 py-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full bg-white px-4 py-3 pl-10 border rounded-lg outline-none"
             />
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
@@ -213,7 +251,7 @@ const ProductList = () => {
               showFilters ? "block" : "hidden lg:block"
             }`}
           >
-            <Card className="p-6">
+            <Card className="p-6 shadow-none">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   <Filter className="w-5 h-5" />
@@ -315,7 +353,7 @@ const ProductList = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => setPriceRange([0, 500000])}
-                          className="text-xs"
+                          className="text-xs rounded-sm"
                         >
                           Dưới 500K
                         </Button>
@@ -323,7 +361,7 @@ const ProductList = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => setPriceRange([500000, 1000000])}
-                          className="text-xs"
+                          className="text-xs rounded-sm"
                         >
                           500K - 1M
                         </Button>
@@ -331,7 +369,7 @@ const ProductList = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => setPriceRange([1000000, 2000000])}
-                          className="text-xs"
+                          className="text-xs rounded-sm"
                         >
                           1M - 2M
                         </Button>
@@ -339,7 +377,7 @@ const ProductList = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => setPriceRange([2000000, 5000000])}
-                          className="text-xs"
+                          className="text-xs rounded-sm"
                         >
                           Trên 2M
                         </Button>
@@ -394,7 +432,7 @@ const ProductList = () => {
           {/* Products Grid */}
           <div className="flex-1">
             {isLoadingProducts ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {Array.from({ length: 10 }).map((_, i) => (
                   <Card key={i} className="p-4">
                     <Skeleton className="w-full h-64 mb-4" />
@@ -404,7 +442,7 @@ const ProductList = () => {
                 ))}
               </div>
             ) : sortedProducts.length === 0 ? (
-              <Card className="p-12 text-center">
+              <Card className="p-12 text-center shadow-none">
                 <div className="text-slate-400 mb-4">
                   <Filter className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <h3 className="text-xl font-semibold text-slate-600 mb-2">
@@ -420,7 +458,7 @@ const ProductList = () => {
               </Card>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {sortedProducts.map((product: any) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
