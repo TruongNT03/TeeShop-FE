@@ -29,9 +29,31 @@ import { Collapsible, CollapsibleTrigger } from "../ui/collapsible";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const AdminSideBar = () => {
   const navigate = useNavigate();
+  const { logoutMutate } = useAuth();
+
+  const handleLogout = () => {
+    logoutMutate(undefined, {
+      onSuccess: () => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        toast.success("Đăng xuất thành công!");
+        navigate("/login");
+      },
+      onError: () => {
+        // Clear tokens anyway on error
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        toast.info("Đã đăng xuất");
+        navigate("/login");
+      },
+    });
+  };
+
   return (
     <Sidebar collapsible="offcanvas" className="font-medium">
       {/* Header */}
@@ -202,7 +224,11 @@ const AdminSideBar = () => {
               <span>Notification</span>
             </Button>
 
-            <Button variant="ghost" className="w-full flex justify-start gap-3">
+            <Button
+              variant="ghost"
+              className="w-full flex justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50"
+              onClick={handleLogout}
+            >
               <LogOut />
               <span>Logout</span>
             </Button>

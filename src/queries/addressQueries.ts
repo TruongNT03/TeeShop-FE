@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiClient } from "@/services/apiClient";
 import type { CreateAddressDto, UpdateAddressDto } from "@/api";
+import { isAuthenticated } from "@/utils/auth";
 
 export const getAddressesQuery = (pageSize: number = 100) => {
   return useQuery({
@@ -10,6 +11,7 @@ export const getAddressesQuery = (pageSize: number = 100) => {
       apiClient.api
         .addressControllerFindAll({ pageSize })
         .then((res) => res.data),
+    enabled: isAuthenticated(),
   });
 };
 

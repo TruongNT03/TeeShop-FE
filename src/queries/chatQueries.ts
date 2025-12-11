@@ -6,6 +6,7 @@ import {
   useInfiniteQuery,
   type QueryFunctionContext,
 } from "@tanstack/react-query";
+import { isAuthenticated } from "@/utils/auth";
 
 export const getListMessagesQuery = (
   query: Parameters<typeof apiClient.api.chatControllerGetListMessages>[0]
@@ -21,6 +22,7 @@ export const getListMessagesInfiniteQuery = (opts: { pageSize: number }) => {
   return useInfiniteQuery<ListMessageResponseDto>({
     queryKey: ["chatMessagesInfinite", pageSize],
     initialPageParam: 1,
+    enabled: isAuthenticated(),
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
       return (
         await apiClient.api.chatControllerGetListMessages({
@@ -48,6 +50,7 @@ export const getConversationQuery = () => {
   return useQuery({
     queryKey: ["chatConversation"],
     queryFn: () => apiClient.api.chatControllerGetConversation(),
+    enabled: isAuthenticated(),
   });
 };
 

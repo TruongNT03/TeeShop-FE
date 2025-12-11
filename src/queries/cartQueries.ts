@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { cartApi } from "@/services/cartApi";
 import type { AddItemToCartDto, UpdateQuantityCartItemDto } from "@/api";
 import { apiClient } from "@/services/apiClient";
+import { isAuthenticated } from "@/utils/auth";
 
 export const addItemToCartMutation = () => {
   const queryClient = useQueryClient();
@@ -28,6 +29,7 @@ export const getCartSummaryQuery = () => {
   return useQuery({
     queryKey: ["cartSummary"],
     queryFn: () => apiClient.api.cartControllerGetCartSummary(),
+    enabled: isAuthenticated(),
   });
 };
 

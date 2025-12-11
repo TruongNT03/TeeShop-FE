@@ -5,6 +5,7 @@ import type {
 } from "@/api";
 import { apiClient } from "@/services/apiClient";
 import { authApi } from "@/services/authApi";
+import { isAuthenticated } from "@/utils/auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -82,5 +83,6 @@ export const getProfileQuery = () => {
   return useQuery({
     queryKey: ["profile"],
     queryFn: async () => (await apiClient.api.authControllerGetProfile()).data,
+    enabled: isAuthenticated(),
   });
 };

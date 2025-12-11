@@ -3,11 +3,13 @@ import { toast } from "sonner";
 import { apiClient } from "@/services/apiClient";
 import type { CreateOrderFromCartDto } from "@/api";
 import { orderApi } from "@/services/orderApi";
+import { isAuthenticated } from "@/utils/auth";
 
 export const getOrdersQuery = (pageSize: number, page?: number) => {
   return useQuery({
     queryKey: ["orders", pageSize, page],
     queryFn: () => orderApi.getAllOrders(pageSize, page),
+    enabled: isAuthenticated(),
   });
 };
 
