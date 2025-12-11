@@ -34,7 +34,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const LoadingSkeleton = () => (
-  <div className="container mx-auto max-w-6xl py-12 px-4 md:px-0">
+  <div className="max-w-[1280px] mx-auto py-12 px-4">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
       <div>
         <Skeleton className="w-full h-[400px] md:h-[550px] rounded-lg" />
@@ -72,6 +72,12 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [reviewPage, setReviewPage] = useState(1);
   const reviewPageSize = 5;
+  const [reviewRatingFilter, setReviewRatingFilter] = useState<
+    number | undefined
+  >(undefined);
+  const [reviewHasImagesFilter, setReviewHasImagesFilter] = useState<
+    boolean | undefined
+  >(undefined);
 
   const productQuery = findProductByIdQuery(id!, !!id);
   const variantOptionsQuery = findProductVariantOptionsQuery(id!, !!id);
@@ -80,6 +86,8 @@ const ProductDetail = () => {
     id!,
     reviewPage,
     reviewPageSize,
+    reviewRatingFilter,
+    reviewHasImagesFilter,
     !!id
   );
 
@@ -162,7 +170,7 @@ const ProductDetail = () => {
 
   if (productQuery.isError || !product) {
     return (
-      <div className="container mx-auto max-w-6xl py-20 text-center">
+      <div className="max-w-[1280px] mx-auto py-20 text-center">
         <h2 className="text-2xl font-semibold">Không tìm thấy sản phẩm</h2>
         <Link to="/">
           <Button variant="link" className="text-primary">
@@ -180,7 +188,7 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-white pt-6">
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="max-w-[1280px] mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">
           <Link to="/" className="hover:text-slate-900">
@@ -233,17 +241,17 @@ const ProductDetail = () => {
           <div className="space-y-8">
             {/* Title */}
             <div>
-              <h1 className="text-3xl font-semibold text-slate-900 mb-4">
-                {capitalizeWords(product.name)}
+              <h1 className="text-3xl font-medium text-slate-900 mb-4 uppercase">
+                {product.name}
               </h1>
-              <div className="flex items-center gap-3 text-sm">
+              <div className="flex items-center gap-3">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
                       className={cn(
                         "h-4 w-4",
-                        i < Math.round(product.averageRating)
+                        i < Math.round(product.averageRating || 0)
                           ? "fill-amber-400 text-amber-400"
                           : "fill-slate-200 text-slate-200"
                       )}
@@ -251,8 +259,8 @@ const ProductDetail = () => {
                   ))}
                 </div>
                 <span className="text-slate-600">
-                  {product.averageRating.toFixed(1)} ({product.totalRating} đánh
-                  giá)
+                  {(product.averageRating || 0).toFixed(1)} (
+                  {product.totalRating || 0} đánh giá)
                 </span>
               </div>
             </div>
@@ -392,12 +400,66 @@ const ProductDetail = () => {
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
               <span className="text-lg font-semibold">
-                {product.averageRating.toFixed(1)}
+                {(product.averageRating || 0).toFixed(1)}
               </span>
               <span className="text-slate-600">
-                ({product.totalRating} đánh giá)
+                ({product.totalRating || 0} đánh giá)
               </span>
             </div>
+          </div>
+
+          {/* Filter Controls */}
+          <div className="flex items-center gap-4 mb-6 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-slate-700">
+                Lọc theo:
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant={
+                    reviewRatingFilter === undefined ? "default" : "outline"
+                  }
+                  size="sm"
+                  onClick={() => {
+                    setReviewRatingFilter(undefined);
+                    setReviewPage(1);
+                  }}
+                  className="transition-none"
+                >
+                  Tất cả
+                </Button>
+                {[5, 4, 3, 2, 1].map((rating) => (
+                  <Button
+                    key={rating}
+                    variant={
+                      reviewRatingFilter === rating ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => {
+                      setReviewRatingFilter(rating);
+                      setReviewPage(1);
+                    }}
+                    className="gap-1 transition-none"
+                  >
+                    {rating} <Star className="h-3 w-3 fill-current" />
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <Separator orientation="vertical" className="h-8" />
+            <Button
+              variant={reviewHasImagesFilter === true ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setReviewHasImagesFilter(
+                  reviewHasImagesFilter === true ? undefined : true
+                );
+                setReviewPage(1);
+              }}
+              className="transition-none"
+            >
+              Có hình ảnh
+            </Button>
           </div>
 
           {reviewsQuery.isLoading ? (

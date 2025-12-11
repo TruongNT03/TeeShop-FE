@@ -23,6 +23,7 @@ import { IoEyeOffOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 import { Spinner } from "@/components/ui/spinner";
 import { motion } from "motion/react";
+import { Home } from "lucide-react";
 
 const Login = () => {
   const {
@@ -126,11 +127,16 @@ const Login = () => {
                 <Button className="w-full mt-4 bg-red-400 hover:bg-red-500">
                   <FaGoogle />
                 </Button>
+                <Link to="/">
+                  <Button variant="outline" className="w-full mt-4">
+                    Quay về trang chủ
+                  </Button>
+                </Link>
               </form>
             </Form>
           </CardContent>
           <CardFooter>
-            <div className="text-center mt-4">
+            <div className="text-center">
               Chưa có tài khoản? Nhấn{" "}
               <Link to="/register" className="underline text-primary">
                 vào đây

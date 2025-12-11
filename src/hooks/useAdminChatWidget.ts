@@ -1,21 +1,68 @@
-import type { AdminConversationResponseDto, MessageResponseDto } from "@/api";
+import type { MessageResponseDto } from "@/api";
 import {
   adminGetListConversationsQuery,
   adminGetListMessagesQuery,
   adminSendMessageMutation,
-  getListMessagesInfiniteQuery,
 } from "@/queries/adminChatQueries";
-import { useQueryClient } from "@tanstack/react-query";
-import type { Socket } from "node_modules/socket.io-client/build/esm/socket";
+import type { Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 
 export const useAdminChatWidget = () => {
-  const [conversationId, setConversationId] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
+  const [selectedConversationId, setSelectedConversationId] =
+    useState<string>("");
+  const [messageInput, setMessageInput] = useState<string>("");
+  const [unreadConversations, setUnreadConversations] = useState<Set<string>>(
+    new Set()
+  );
   const socketRef = useRef<Socket | null>(null);
-  const queryClient = useQueryClient();
 
+  // Fetch conversations list
+  const {
+    data: conversationsData,
+    isLoading: isLoadingConversations,
+    refetch: refetchConversations,
+  } = adminGetListConversationsQuery({
+    pageSize: 20,
+  });
+
+  // Fetch messages for selected conversation
+  const { data: messagesData, refetch: refetchMessages } =
+    adminGetListMessagesQuery(
+      {
+        page: 1,
+        pageSize: 50,
+      },
+      selectedConversationId
+    );
+
+  // Send message mutation
+  const { isPending: isSending, mutate: sendMessage } =
+    adminSendMessageMutation();
+
+  // Auto-select first conversation on load
+  useEffect(() => {
+    if (
+      conversationsData?.data &&
+      conversationsData.data.length > 0 &&
+      !selectedConversationId
+    ) {
+      setSelectedConversationId(conversationsData.data[0].id);
+    }
+  }, [conversationsData, selectedConversationId]);
+
+  // Mark conversation as read when selected
+  useEffect(() => {
+    if (selectedConversationId) {
+      setUnreadConversations((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(selectedConversationId);
+        return newSet;
+      });
+    }
+  }, [selectedConversationId]);
+
+  // Setup socket connection
   useEffect(() => {
     const socketUrl = `${import.meta.env.VITE_BACKEND_BASE_URL}/chat`;
     const socket = io(socketUrl, {
@@ -26,27 +73,35 @@ export const useAdminChatWidget = () => {
     });
 
     socket.on("connect", () => {
-      console.log("Connected to chat server");
+      console.log("✅ Admin chat connected to socket");
     });
 
     socket.on("disconnect", () => {
-      console.log("Disconnected from chat server");
+      console.log("❌ Admin chat disconnected from socket");
     });
 
-    socket.on(
-      import.meta.env.VITE_CHAT_EVENT,
-      (data: MessageResponseDto) => {}
-    );
+    // Listen for new messages
+    socket.on(import.meta.env.VITE_CHAT_EVENT, (data: MessageResponseDto) => {
+      console.log("📩 Received message:", data);
 
-    // Listen for new conversation created
-    socket.on("newConversation", (data: any) => {
-      console.log("New conversation created:", data);
-      try {
-        // Invalidate conversations list to show the new conversation
-        queryClient.invalidateQueries({ queryKey: ["adminChatConversations"] });
-      } catch (e) {
-        console.warn("Failed to invalidate conversations queries", e);
+      // If message belongs to current conversation, refetch messages
+      if (data.conversationId === selectedConversationId) {
+        refetchMessages();
+      } else {
+        // Mark conversation as unread if message is not for current conversation
+        setUnreadConversations((prev) => {
+          const newSet = new Set(prev);
+          newSet.add(data.conversationId);
+          return newSet;
+        });
       }
+
+      // Always refetch conversations to update latest message
+      refetchConversations();
+    }); // Listen for new conversation
+    socket.on("newConversation", () => {
+      console.log("🆕 New conversation created");
+      refetchConversations();
     });
 
     socketRef.current = socket;
@@ -57,45 +112,52 @@ export const useAdminChatWidget = () => {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, []);
-  const {
-    data: conversations,
-    isLoading,
-    isError,
-    isSuccess,
-  } = adminGetListConversationsQuery({
-    page: 1,
-    pageSize: 20,
-  });
+  }, [selectedConversationId, refetchMessages, refetchConversations]);
 
-  const { data: messagesData } = adminGetListMessagesQuery(
-    {
-      page: 1,
-      pageSize: 20,
-    },
-    conversationId
-  );
+  // Handle send message
+  const handleSendMessage = () => {
+    if (!messageInput.trim() || !selectedConversationId) return;
 
-  const { isPending: isSendMessagePending, mutate: sendMessageMutation } =
-    adminSendMessageMutation();
-
-  useEffect(() => {
-    if (isSuccess && conversations?.data?.data?.length > 0 && !conversationId) {
-      setConversationId(conversations.data.data[0].id);
-    }
-  }, [isSuccess, conversations, conversationId]);
+    sendMessage(
+      {
+        content: messageInput.trim(),
+        conversationId: selectedConversationId,
+      },
+      {
+        onSuccess: () => {
+          setMessageInput("");
+          // Refetch messages after sending
+          setTimeout(() => {
+            refetchMessages();
+          }, 200);
+        },
+      }
+    );
+  };
 
   return {
-    conversations:
-      conversations?.data.data || ([] as AdminConversationResponseDto[]),
-    isLoading,
-    isError,
-    conversationId,
-    setConversationId,
-    chatMessages: messagesData?.data.data || ([] as MessageResponseDto[]),
-    message,
-    setMessage,
-    isSendMessagePending,
-    sendMessageMutation,
+    // Conversations
+    conversations: conversationsData?.data || [],
+    isLoadingConversations,
+    unreadConversations,
+
+    // Selected conversation
+    selectedConversationId,
+    setSelectedConversationId,
+
+    // Messages
+    messages: messagesData?.data || [],
+
+    // Message input
+    messageInput,
+    setMessageInput,
+
+    // Send message
+    isSending,
+    handleSendMessage,
+
+    // Refetch
+    refetchConversations,
+    refetchMessages,
   };
 };

@@ -27,7 +27,7 @@ import {
   registerMutation,
   verifyRegisterMutation,
 } from "@/queries/authQueries";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Home } from "lucide-react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { motion } from "motion/react";
 
@@ -209,6 +209,11 @@ const Register = () => {
             >
               {regMutation.isPending ? <Spinner /> : "Đăng ký"}
             </Button>
+            <Link to="/">
+              <Button variant="outline" className="w-full">
+                Quay về trang chủ
+              </Button>
+            </Link>
           </form>
         </Form>
       </CardContent>

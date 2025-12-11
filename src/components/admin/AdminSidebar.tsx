@@ -54,7 +54,7 @@ const AdminSideBar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               {/* User */}
-              <Collapsible>
+              <Collapsible defaultOpen>
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton className="group">
@@ -68,7 +68,9 @@ const AdminSideBar = () => {
                     <SidebarMenuSub>
                       <SidebarMenuSubItem>
                         <div onClick={() => navigate("/admin/user")}>
-                          <SidebarMenuSubButton>Management</SidebarMenuSubButton>
+                          <SidebarMenuSubButton>
+                            Management
+                          </SidebarMenuSubButton>
                         </div>
                       </SidebarMenuSubItem>
                       <SidebarMenuSubItem>
@@ -83,7 +85,7 @@ const AdminSideBar = () => {
               </Collapsible>
 
               {/* Product */}
-              <Collapsible>
+              <Collapsible defaultOpen>
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton className="group">
@@ -119,7 +121,7 @@ const AdminSideBar = () => {
                 </SidebarMenuItem>
               </Collapsible>
 
-              <Collapsible>
+              <Collapsible defaultOpen>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton className="group">
                     <CreditCard />

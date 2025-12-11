@@ -412,6 +412,7 @@ export interface AdminListConversationResponseDto {
 
 export interface MessageResponseDto {
   id: string;
+  conversationId: string;
   content: string;
   senderId: string;
   /** @format date-time */
@@ -2658,6 +2659,8 @@ export class Api<
          * @example 10
          */
         pageSize: number;
+        rating?: number;
+        hasImages?: "true" | "false";
       },
       params: RequestParams = {},
     ) =>

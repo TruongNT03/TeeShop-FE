@@ -45,10 +45,6 @@ export const useChatWidget = () => {
 
     socket.on(import.meta.env.VITE_CHAT_EVENT, (data: MessageResponseDto) => {
       setNewMessages((prev) => [data, ...prev]);
-      setTimeout(() => {
-        setIsSendingMessage(false);
-        setMessage("");
-      }, 5000);
     });
 
     socketRef.current = socket;

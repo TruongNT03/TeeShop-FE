@@ -8,10 +8,10 @@ import {
   CheckCircle,
 } from "lucide-react";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -20,14 +20,13 @@ import {
 } from "@/queries/notificationQueries";
 import { useNotificationSocket } from "@/hooks/useNotificationSocket";
 import { formatDistanceToNow } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/services/apiClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const Notification = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
   const { profile } = useAuth();
   const queryClient = useQueryClient();
@@ -93,8 +92,6 @@ const Notification = () => {
       } else {
         navigate(`/profile/orders/${orderId}`);
       }
-
-      setIsOpen(false);
     }
   };
 
@@ -124,59 +121,41 @@ const Notification = () => {
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <div className="relative">
-          <Bell className="cursor-pointer" />
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="relative cursor-pointer">
+          <Bell className="hover:text-primary" />
           {unreadCount > 0 && (
-            <>
-              <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-semibold">
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </span>
-            </>
+            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-semibold">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
           )}
         </div>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-          <h4 className="font-semibold text-sm">Notifications</h4>
-          {unreadCount > 0 && (
-            <button
-              className="text-xs text-primary hover:underline flex items-center gap-1 disabled:opacity-50"
-              onClick={() => markAllReadMutation.mutate()}
-              disabled={markAllReadMutation.isPending}
-            >
-              <Check className="h-3 w-3" />
-              {markAllReadMutation.isPending
-                ? "Đang xử lý..."
-                : "Mark all as read"}
-            </button>
-          )}
-        </div>
-        <div className="max-h-[400px] overflow-y-auto">
+      </TooltipTrigger>
+      <TooltipContent className="bg-white border border-slate-200 shadow-lg rounded-lg p-2 text-sm max-h-[500px] overflow-y-auto">
+        <div className="flex flex-col min-w-[280px] gap-1">
           {isLoading ? (
-            <div className="p-8 text-center text-slate-500">
-              <p className="text-sm">Loading...</p>
+            <div className="px-3 py-4 text-center text-slate-500 text-xs">
+              Đang tải...
             </div>
           ) : notifications.length > 0 ? (
-            <div className="divide-y divide-slate-100">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    "p-4 hover:bg-slate-50 transition-colors cursor-pointer flex gap-3 items-start",
-                    !notification.isRead && "bg-slate-50/50"
-                  )}
-                  onClick={() => handleNotificationClick(notification)}
-                >
-                  <div className="mt-1 flex-shrink-0">
+            notifications.slice(0, 5).map((notification) => (
+              <div
+                key={notification.id}
+                className={cn(
+                  "px-3 py-2 rounded-md hover:bg-slate-100 transition-colors cursor-pointer",
+                  !notification.isRead && "bg-slate-50"
+                )}
+                onClick={() => handleNotificationClick(notification)}
+              >
+                <div className="flex items-start gap-2">
+                  <div className="flex-shrink-0 mt-0.5">
                     {getIcon(getNotificationType(notification))}
                   </div>
-                  <div className="flex-1 space-y-1">
+                  <div className="flex-1 min-w-0">
                     <p
                       className={cn(
-                        "text-sm font-medium leading-none",
+                        "text-xs font-medium truncate",
                         !notification.isRead
                           ? "text-slate-900"
                           : "text-slate-600"
@@ -184,7 +163,7 @@ const Notification = () => {
                     >
                       {notification.title}
                     </p>
-                    <p className="text-xs text-slate-500 line-clamp-2">
+                    <p className="text-xs text-slate-500 line-clamp-2 mt-0.5">
                       {notification.content}
                     </p>
                     <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-1">
@@ -193,36 +172,35 @@ const Notification = () => {
                     </div>
                   </div>
                   {!notification.isRead && (
-                    <div className="h-2 w-2 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                    <div className="h-2 w-2 rounded-full bg-blue-500 mt-1 flex-shrink-0" />
                   )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))
           ) : (
-            <div className="p-8 text-center text-slate-500">
-              <Bell className="h-8 w-8 mx-auto mb-2 opacity-20" />
-              <p className="text-sm">No notifications</p>
+            <div className="px-3 py-4 text-center text-slate-500">
+              <Bell className="h-6 w-6 mx-auto mb-1 opacity-20" />
+              <p className="text-xs">Không có thông báo</p>
             </div>
           )}
+          {notifications.length > 0 && (
+            <>
+              <div className="h-px bg-slate-200 my-1"></div>
+              <Link
+                to={
+                  profile?.roles?.includes("admin")
+                    ? "/admin/notifications"
+                    : "/profile/notifications"
+                }
+                className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 text-slate-700 hover:text-slate-900 text-xs"
+              >
+                Xem tất cả
+              </Link>
+            </>
+          )}
         </div>
-        <div className="p-2 border-t border-slate-100 bg-slate-50">
-          <Button
-            variant="ghost"
-            className="w-full h-8 text-xs text-slate-500"
-            onClick={() => {
-              if (profile?.roles?.includes("admin")) {
-                navigate("/admin/notifications");
-              } else {
-                navigate("/profile/notifications");
-              }
-              setIsOpen(false);
-            }}
-          >
-            View all notifications
-          </Button>
-        </div>
-      </PopoverContent>
-    </Popover>
+      </TooltipContent>
+    </Tooltip>
   );
 };
 

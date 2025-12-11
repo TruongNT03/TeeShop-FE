@@ -54,41 +54,43 @@ const Home = () => {
       className="w-full bg-stone-100 overflow-x-hidden"
     >
       <Banner />
-      <ProductSection
-        title="Khám Phá Sản Phẩm Mới"
-        descriptions="Sản phẩm mới được thêm gần đây!"
-        itemPerRow={6}
-        items={newArrivalProducts}
-        isLoading={newArrivalProductsIsLoading}
-      />
-      <Policy items={policies} />
-      <Promo>
-        <PromoItem
-          className="flex-3"
-          title="Yên tâm mua sắm"
-          description="Nền tảng mua sắm thời trang tiện lợi, an toàn. Mua sắm với sự yên tâm tuyệt đối."
-          redirectUrl="#"
+      <div className="max-w-[1280px] mx-auto px-4">
+        <ProductSection
+          title="Khám Phá Sản Phẩm Mới"
+          descriptions="Sản phẩm mới được thêm gần đây!"
+          itemPerRow={6}
+          items={newArrivalProducts}
+          isLoading={newArrivalProductsIsLoading}
         />
-        <PromoItem
-          className="flex-2"
-          title="Yên tâm mua sắm"
-          description="Nền tảng mua sắm thời trang tiện lợi, an toàn. Mua sắm với sự yên tâm tuyệt đối."
-          redirectUrl="#"
+        <Policy items={policies} />
+        <Promo>
+          <PromoItem
+            className="flex-3"
+            title="Yên tâm mua sắm"
+            description="Nền tảng mua sắm thời trang tiện lợi, an toàn. Mua sắm với sự yên tâm tuyệt đối."
+            redirectUrl="#"
+          />
+          <PromoItem
+            className="flex-2"
+            title="Yên tâm mua sắm"
+            description="Nền tảng mua sắm thời trang tiện lợi, an toàn. Mua sắm với sự yên tâm tuyệt đối."
+            redirectUrl="#"
+          />
+        </Promo>
+        <ProductSection
+          title="Bán Chạy Nhất"
+          descriptions="Duyệt xem các sản phẩm bán chạy"
+          itemPerRow={4}
+          items={topSellerProducts}
+          isLoading={topSellerProductsIsLoading}
         />
-      </Promo>
-      <ProductSection
-        title="Bán Chạy Nhất"
-        descriptions="Duyệt xem các sản phẩm bán chạy"
-        itemPerRow={4}
-        items={topSellerProducts}
-        isLoading={topSellerProductsIsLoading}
-      />
-      <div className="w-full flex justify-center items-center">
-        <Link to={"/product"} className="py-8 md:py-14">
-          <Button className="uppercase py-4 px-6 text-base md:py-7 md:px-8 md:text-[20px] border-2 border-primary bg-primary rounded-sm hover:text-primary hover:bg-transparent hover:border-2 hover:border-primary">
-            Mua ngay
-          </Button>
-        </Link>
+        <div className="w-full flex justify-center items-center">
+          <Link to={"/product"} className="py-8 md:py-14">
+            <Button className="uppercase py-4 px-6 text-base md:py-7 md:px-8 md:text-[20px] border-2 border-primary bg-primary rounded-sm hover:text-primary hover:bg-transparent hover:border-2 hover:border-primary">
+              Mua ngay
+            </Button>
+          </Link>
+        </div>
       </div>
     </motion.div>
   );

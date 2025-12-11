@@ -142,7 +142,7 @@ const ProductList = () => {
       transition={{ duration: 0.3 }}
       className="min-h-screen bg-stone-100 pt-6"
     >
-      <div className="px-[65px] py-8">
+      <div className="max-w-[1280px] mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">

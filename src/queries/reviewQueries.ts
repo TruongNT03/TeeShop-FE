@@ -7,15 +7,24 @@ export const getProductReviewsQuery = (
   productId: string,
   page: number,
   pageSize: number,
+  rating?: number,
+  hasImages?: boolean,
   enabled: boolean = true
 ) => {
   return useQuery({
-    queryKey: ["productReviews", productId, page, pageSize],
+    queryKey: ["productReviews", productId, page, pageSize, rating, hasImages],
     queryFn: async () => {
       const response =
         await apiClient.api.reviewControllerFindAllReviewOfProduct(productId, {
           page,
           pageSize,
+          rating,
+          hasImages:
+            hasImages !== undefined
+              ? hasImages
+                ? "true"
+                : "false"
+              : undefined,
         });
       return response.data;
     },

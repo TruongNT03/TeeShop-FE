@@ -67,7 +67,8 @@ const ChatWidget = () => {
       content: message.trim(),
       conversationId,
     });
-    setIsSendingMessage(true);
+
+    setMessage("");
   };
 
   const handleScrollTop = async (e: React.UIEvent<HTMLDivElement>) => {
@@ -181,11 +182,8 @@ const ChatWidget = () => {
               {[...chatMessages].reverse().map((msg, index) => {
                 const isUser = msg.senderId === conversation?.users?.[0]?.id;
                 return (
-                  <motion.div
+                  <div
                     key={msg.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
                     className={cn(
                       "flex gap-2",
                       isUser ? "justify-end" : "justify-start"
@@ -214,17 +212,10 @@ const ChatWidget = () => {
                         </p>
                       )}
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
-            {isSendingMessage ? (
-              <div className="max-w-[75%] rounded-xl px-4 py-2.5 break-words bg-primary text-white rounded-br-md">
-                Sending...
-              </div>
-            ) : (
-              <div></div>
-            )}
           </div>
 
           {/* Input Footer */}

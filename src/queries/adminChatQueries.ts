@@ -1,4 +1,8 @@
-import type { CreateMessageDto } from "@/api";
+import {
+  type AdminListConversationResponseDto,
+  type CreateMessageDto,
+  type ListMessageResponseDto,
+} from "@/api";
 import { apiClient } from "@/services/apiClient";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 
@@ -7,9 +11,10 @@ export const adminGetListConversationsQuery = (
     typeof apiClient.api.adminChatControllerGetListConversation
   >[0]
 ) => {
-  return useQuery({
+  return useQuery<AdminListConversationResponseDto>({
     queryKey: ["adminChatConversations", query],
-    queryFn: () => apiClient.api.adminChatControllerGetListConversation(query),
+    queryFn: async () =>
+      (await apiClient.api.adminChatControllerGetListConversation(query)).data,
   });
 };
 
@@ -17,10 +22,15 @@ export const adminGetListMessagesQuery = (
   query: Parameters<typeof apiClient.api.adminChatControllerGetListMessages>[1],
   conversationId: string
 ) => {
-  return useQuery({
+  return useQuery<ListMessageResponseDto>({
     queryKey: ["adminChatMessages", query, conversationId],
-    queryFn: () =>
-      apiClient.api.adminChatControllerGetListMessages(conversationId, query),
+    queryFn: async () =>
+      (
+        await apiClient.api.adminChatControllerGetListMessages(conversationId, {
+          pageSize: query.pageSize,
+          page: query.page,
+        })
+      ).data,
   });
 };
 

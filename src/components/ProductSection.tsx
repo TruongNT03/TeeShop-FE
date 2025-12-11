@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 interface ProductSectionProps {
   title?: string;
   descriptions?: string;
-  itemPerRow: 4 | 6 | 8;
+  itemPerRow: 3 | 4 | 6 | 8;
   items: ProductResponseDto[];
   isLoading?: boolean;
 }
@@ -41,13 +41,7 @@ const ProductSection = (props: ProductSectionProps) => {
           ? Array.from({ length: skeletonCount }).map((_, i) => (
               <div
                 key={i}
-                className={`
-                  px-3 md:px-5 mb-6 md:mb-8
-                  basis-1/2 sm:basis-1/3
-                  ${props.itemPerRow === 4 ? "md:basis-1/3 lg:basis-1/4" : ""} 
-                  ${props.itemPerRow === 6 ? "md:basis-1/4 lg:basis-1/6" : ""} 
-                  ${props.itemPerRow === 8 ? "md:basis-1/6 lg:basis-1/8" : ""} 
-                `}
+                className="px-3 md:px-5 mb-6 md:mb-8 w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/4"
               >
                 <Card className="flex flex-col items-center p-4">
                   <Skeleton className="h-6 w-3/4 mb-3 rounded-md" />
@@ -62,13 +56,7 @@ const ProductSection = (props: ProductSectionProps) => {
           : props.items.map((item, index) => (
               <div
                 key={index}
-                className={`
-                  px-3 md:px-5 mb-6 md:mb-8
-                  basis-1/2 sm:basis-1/3
-                  ${props.itemPerRow === 4 ? "md:basis-1/3 lg:basis-1/4" : ""} 
-                  ${props.itemPerRow === 6 ? "md:basis-1/4 lg:basis-1/6" : ""} 
-                  ${props.itemPerRow === 8 ? "md:basis-1/6 lg:basis-1/8" : ""} 
-                `}
+                className="px-3 md:px-5 mb-6 md:mb-8 w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/4"
               >
                 <Card className="">
                   <Link to={`/product/${item.id}`}>
@@ -78,7 +66,7 @@ const ProductSection = (props: ProductSectionProps) => {
                   </Link>
                   {item.productImages[0]?.url ? (
                     <Image
-                      height={300}
+                      height={220}
                       src={item.productImages[0]?.url}
                       alt={`Product ${index}`}
                       className="object-cover rounded-3xl p-3"
@@ -92,8 +80,8 @@ const ProductSection = (props: ProductSectionProps) => {
                   ) : (
                     <div className="p-3">
                       <Skeleton
-                        className="w-full rounded-3xl"
-                        style={{ maxHeight: "400px" }}
+                        className="w-full rounded-3xl aspect-square"
+                        style={{ height: "220px" }}
                       />
                     </div>
                   )}
