@@ -248,10 +248,7 @@ export const ProfileOrderDetail: React.FC = () => {
               {order.orderItems.map((item, index) => (
                 <div key={item.id}>
                   {index > 0 && <Separator className="my-4" />}
-                  <div
-                    className="flex gap-4 cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition-colors"
-                    onClick={() => navigate(`/product/${item.product.id}`)}
-                  >
+                  <div className="flex gap-4 hover:bg-slate-50 p-2 rounded-lg transition-colors">
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
                       {item.product.productImages?.[0]?.url && (
                         <img
@@ -262,7 +259,10 @@ export const ProfileOrderDetail: React.FC = () => {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-slate-900 truncate hover:text-primary">
+                      <h4
+                        className="font-medium text-slate-900 truncate hover:text-primary cursor-pointer"
+                        onClick={() => navigate(`/product/${item.product.id}`)}
+                      >
                         {item.product.name}
                       </h4>
                       {item.productVariant.variantValues.length > 0 && (
