@@ -3,6 +3,7 @@ import {
   Bot,
   ChevronDown,
   CreditCard,
+  LayoutDashboard,
   Layers,
   LogOut,
   UserPen,
@@ -63,8 +64,7 @@ const AdminSideBar = () => {
             variant="ghost"
             className="hover:bg-transparent w-full flex justify-start p-0 mt-5"
           >
-            <img src="logo.png" alt="" className="w-8 h-8 " />
-            <span className="text-2xl">TEE SHOP</span>
+            <span className="text-2xl pl-2">TEE SHOP</span>
           </Button>
         </Link>
       </SidebarHeader>
@@ -75,6 +75,16 @@ const AdminSideBar = () => {
           <SidebarGroupLabel>Applications</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              {/* Dashboard */}
+              <SidebarMenuItem>
+                <div onClick={() => navigate("/admin")}>
+                  <SidebarMenuButton>
+                    <LayoutDashboard />
+                    <span>Dashboard</span>
+                  </SidebarMenuButton>
+                </div>
+              </SidebarMenuItem>
+
               {/* User */}
               <Collapsible defaultOpen>
                 <SidebarMenuItem>
@@ -143,6 +153,7 @@ const AdminSideBar = () => {
                 </SidebarMenuItem>
               </Collapsible>
 
+              {/* Order */}
               <Collapsible defaultOpen>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton className="group">
@@ -163,6 +174,17 @@ const AdminSideBar = () => {
                 </CollapsibleContent>
               </Collapsible>
 
+              {/* Notifications */}
+              <SidebarMenuItem>
+                <div onClick={() => navigate("/admin/notifications")}>
+                  <SidebarMenuButton>
+                    <Bell />
+                    <span>Notifications</span>
+                  </SidebarMenuButton>
+                </div>
+              </SidebarMenuItem>
+
+              {/* Configuration */}
               <Link to="admin/configuration">
                 <SidebarMenuButton className="group">
                   <Wrench />
@@ -170,6 +192,7 @@ const AdminSideBar = () => {
                 </SidebarMenuButton>
               </Link>
 
+              {/* Chatbot */}
               <Link to="/admin/chatbot">
                 <SidebarMenuButton className="group">
                   <Bot />

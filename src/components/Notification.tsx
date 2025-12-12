@@ -31,6 +31,12 @@ const Notification = () => {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
 
+  // Determine notification path based on current location
+  const isAdminContext = window.location.pathname.startsWith("/admin");
+  const notificationPath = isAdminContext
+    ? "/admin/notifications"
+    : "/profile/notifications";
+
   // Fetch notifications from API
   const { data, isLoading } = useNotifications(20, 1);
 
@@ -123,14 +129,17 @@ const Notification = () => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className="relative cursor-pointer">
-          <Bell className="hover:text-primary" />
+        <Link
+          to={notificationPath}
+          className="relative cursor-pointer inline-block group"
+        >
+          <Bell className="w-5 group-hover:text-primary transition-colors" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-semibold">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
-        </div>
+        </Link>
       </TooltipTrigger>
       <TooltipContent className="bg-white border border-slate-200 shadow-lg rounded-lg p-2 text-sm max-h-[500px] overflow-y-auto">
         <div className="flex flex-col min-w-[280px] gap-1">
@@ -146,11 +155,27 @@ const Notification = () => {
                   "px-3 py-2 rounded-md hover:bg-slate-100 transition-colors cursor-pointer",
                   !notification.isRead && "bg-slate-50"
                 )}
-                onClick={() => handleNotificationClick(notification)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleNotificationClick(notification);
+                }}
               >
-                <div className="flex items-start gap-2">
-                  <div className="flex-shrink-0 mt-0.5">
-                    {getIcon(getNotificationType(notification))}
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                    <div
+                      className={cn(
+                        "w-10 h-10 rounded-lg flex items-center justify-center",
+                        getNotificationType(notification) === "success" &&
+                          "bg-green-100",
+                        getNotificationType(notification) === "warning" &&
+                          "bg-amber-100",
+                        getNotificationType(notification) === "info" &&
+                          "bg-blue-100"
+                      )}
+                    >
+                      {getIcon(getNotificationType(notification))}
+                    </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p
@@ -187,11 +212,7 @@ const Notification = () => {
             <>
               <div className="h-px bg-slate-200 my-1"></div>
               <Link
-                to={
-                  profile?.roles?.includes("admin")
-                    ? "/admin/notifications"
-                    : "/profile/notifications"
-                }
+                to={notificationPath}
                 className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 text-slate-700 hover:text-slate-900 text-xs"
               >
                 Xem tất cả

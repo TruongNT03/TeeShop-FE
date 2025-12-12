@@ -59,6 +59,7 @@ export const useGetChatbotData = (query: {
       const response = await apiClient.api.adminChatbotControllerFindAll(query);
       return response.data;
     },
+    placeholderData: (previousData) => previousData,
   });
 };
 

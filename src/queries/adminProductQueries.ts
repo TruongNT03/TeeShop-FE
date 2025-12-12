@@ -15,6 +15,7 @@ export const getAllProductQuery = (
   return useQuery({
     queryKey: ["products", query],
     queryFn: () => adminProductApi.findAll(query),
+    placeholderData: (previousData) => previousData,
   });
 };
 
@@ -24,11 +25,14 @@ export const getAllCategoryQuery = (
   return useQuery({
     queryKey: ["category", query],
     queryFn: () => adminProductApi.findAllCategories(query),
+    placeholderData: (previousData) => previousData,
   });
 };
 
 export const getAllVariantsQuery = (
-  query: Parameters<typeof apiClient.api.adminProductControllerFindAllVariant>[0]
+  query: Parameters<
+    typeof apiClient.api.adminProductControllerFindAllVariant
+  >[0]
 ) => {
   return useQuery({
     queryKey: ["variants", query],

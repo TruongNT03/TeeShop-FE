@@ -44,7 +44,7 @@ import {
   Download,
   Upload,
 } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -213,14 +213,16 @@ const AdminChatbotConfig = () => {
   };
 
   return (
-    <div className="w-full overflow-auto py-5">
-      <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
-        Cấu hình Chatbot
+    <div className="p-8 space-y-8">
+      <div>
+        <h1 className="text-2xl font-medium uppercase">
+          Chatbot Configuration
+        </h1>
       </div>
 
       {/* Summary Cards */}
-      <div className="w-[95%] flex justify-between mx-auto gap-8 mb-10">
-        <Card className="flex-1 p-6">
+      <div className="flex justify-between gap-8">
+        <Card className="flex-1 p-6 shadow-none">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Tổng câu hỏi</p>
@@ -231,7 +233,7 @@ const AdminChatbotConfig = () => {
             <MessageSquare className="h-8 w-8 text-blue-500" />
           </div>
         </Card>
-        <Card className="flex-1 p-6">
+        <Card className="flex-1 p-6 shadow-none">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Danh mục</p>
@@ -244,7 +246,7 @@ const AdminChatbotConfig = () => {
             </div>
           </div>
         </Card>
-        <Card className="flex-1 p-6 col-span-2">
+        <Card className="flex-1 p-6 col-span-2 shadow-none">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Trạng thái Model</p>
@@ -281,7 +283,7 @@ const AdminChatbotConfig = () => {
       </div>
 
       {/* Search and Actions */}
-      <div className="w-[95%] mx-auto mb-5 flex justify-between">
+      <div className="flex justify-between">
         <div className="flex gap-3">
           <div className="relative">
             <Input
@@ -361,7 +363,7 @@ const AdminChatbotConfig = () => {
       </div>
 
       {/* Table */}
-      <Card className="w-[95%] mx-auto py-0 overflow-hidden">
+      <Card className="py-0 overflow-hidden">
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>
@@ -408,11 +410,46 @@ const AdminChatbotConfig = () => {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-48 text-center">
-                  <Spinner className="w-10 h-10" />
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell className="pl-8">
+                    <Skeleton className="h-4 w-8" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
             ) : qaPairs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-48 text-center text-lg">

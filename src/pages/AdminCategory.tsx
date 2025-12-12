@@ -8,7 +8,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-  PaginationControl, 
+  PaginationControl,
 } from "@/components/ui/pagination";
 import {
   Table,
@@ -18,11 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ArrowUpDown,
-  Plus,
-  Search,
-} from "lucide-react";
+import { ArrowUpDown, Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -30,7 +26,7 @@ import { convertDateTime } from "@/utils/convertDateTime";
 import { Link } from "react-router-dom";
 import type { apiClient } from "@/services/apiClient";
 import type { CategoryResponseDto } from "@/api";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getAllCategoryQuery } from "@/queries/adminProductQueries";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
@@ -152,12 +148,12 @@ const AdminCategory = () => {
   ];
 
   return (
-    <div className="w-full overflow-auto py-5">
-      <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
-        Category Master
+    <div className="p-8 space-y-8">
+      <div>
+        <h1 className="text-2xl font-medium uppercase">Category Master</h1>
       </div>
 
-      <div className="w-[95%] mx-auto mb-5 flex justify-between">
+      <div className="flex justify-between">
         <div className="flex">
           <div className="relative mr-5">
             <Input
@@ -181,7 +177,7 @@ const AdminCategory = () => {
         </div>
       </div>
       {/* Table */}
-      <Card className="w-[95%] mx-auto py-0 overflow-hidden">
+      <Card className="py-0 overflow-hidden">
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>
@@ -205,10 +201,7 @@ const AdminCategory = () => {
                 <div>No.</div>
               </TableHead>
               {tableHeaderTitles.map((value, index) => (
-                <TableHead
-                  key={index}
-                  className={cn("py-5", value.widthClass)}
-                >
+                <TableHead key={index} className={cn("py-5", value.widthClass)}>
                   <div
                     className={cn(
                       "flex items-center",
@@ -232,14 +225,31 @@ const AdminCategory = () => {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={tableHeaderTitles.length + 2}
-                  className="h-48 text-center"
-                >
-                  <Spinner className="w-10 h-10" />
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-4 ml-2" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-8" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
             ) : categories.length === 0 ? (
               <TableRow>
                 <TableCell

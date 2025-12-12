@@ -9,6 +9,7 @@ import Home from "../pages/Home";
 import AdminProduct from "@/pages/AdminProduct";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminProductCreate from "@/pages/AdminProductCreate";
+import AdminDashboard from "@/pages/AdminDashboard";
 import UserLayout from "@/layouts/UserLayout";
 import DemoPage from "@/pages/DemoPage";
 import ForgotPassword from "@/pages/ForgotPassword";
@@ -32,6 +33,7 @@ import AdminOrder from "@/pages/AdminOrder";
 import AdminOrderDetail from "@/pages/AdminOrderDetail";
 import AdminUser from "@/pages/AdminUser";
 import NotificationList from "@/pages/NotificationList";
+import AdminNotification from "@/pages/AdminNotification";
 
 const AppRouter = () => {
   return (
@@ -67,7 +69,7 @@ const AppRouter = () => {
             </Route>
           </Route>
           <Route element={<AdminLayout />}>
-            <Route path="/admin" element={<AdminProduct />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/product" element={<AdminProduct />} />
             <Route
               path="/admin/product/create"
@@ -88,7 +90,10 @@ const AppRouter = () => {
             <Route path="/admin/user" element={<AdminUser />} />
             <Route path="/admin/configuration" element={<AdminConfig />} />
             <Route path="/admin/chatbot" element={<AdminChatbotConfig />} />
-            <Route path="/admin/notifications" element={<NotificationList />} />
+            <Route
+              path="/admin/notifications"
+              element={<AdminNotification />}
+            />
           </Route>
         </Route>
 

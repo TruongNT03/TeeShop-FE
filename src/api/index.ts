@@ -459,6 +459,13 @@ export interface AdminListOrderResponseDto {
   paginate: PaginateMetaDto;
 }
 
+export interface AdminOrderStaticResponseDto {
+  pending: number;
+  confirmed: number;
+  shipping: number;
+  completed: number;
+}
+
 export interface AdminOrderDetailUserResponseDto {
   id: string;
   email: string;
@@ -577,6 +584,30 @@ export interface AdminFaqSummaryResponseDto {
   totalFaqs: number;
   totalFaqCategories: number;
   latestTraining: AdminFaqSummaryLatestTrainingResponseDto;
+}
+
+export interface AdminDashboardStatisticResponseDto {
+  newOrderCount: number;
+  newUserCount: number;
+  revenue: number;
+}
+
+export interface AdminRevenueResponseDto {
+  revenue: number;
+  /** @format date-time */
+  date: string;
+}
+
+export interface AdminDashboardPendingOrderResponseDto {
+  id: string;
+  userName: string;
+  userEmail: string;
+  amount: number;
+  totalItem: number;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
 }
 
 export interface AddItemToCartDto {
@@ -1886,6 +1917,7 @@ export class Api<
          */
         pageSize: number;
         search?: string;
+        orderStatusFilter?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -1893,6 +1925,24 @@ export class Api<
         path: `/api/v1/admin-order`,
         method: "GET",
         query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] ORDER
+     * @name AdminOrderControllerGetOrderStatic
+     * @summary [ADMIN] ORDER STATIC
+     * @request GET:/api/v1/admin-order/static
+     * @secure
+     */
+    adminOrderControllerGetOrderStatic: (params: RequestParams = {}) =>
+      this.request<AdminOrderStaticResponseDto, any>({
+        path: `/api/v1/admin-order/static`,
+        method: "GET",
         secure: true,
         format: "json",
         ...params,
@@ -1945,7 +1995,7 @@ export class Api<
      * @tags [ADMIN] ORDER
      * @name AdminOrderControllerUpdatePaymentStatus
      * @summary [ADMIN] UPDATE PAYMENT STATUS
-     * @request PUT:/api/v1/admin-order/{id}/payemnt-status
+     * @request PUT:/api/v1/admin-order/{id}/payment-status
      * @secure
      */
     adminOrderControllerUpdatePaymentStatus: (
@@ -1954,7 +2004,7 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
-        path: `/api/v1/admin-order/${id}/payemnt-status`,
+        path: `/api/v1/admin-order/${id}/payment-status`,
         method: "PUT",
         body: data,
         secure: true,
@@ -2161,6 +2211,68 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.FormData,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ADMIN DASHBOARD
+     * @name AdminDashboardControllerGetDashboardStatistic
+     * @summary [ADMIN] DASHBOARD STATIC
+     * @request GET:/api/v1/admin-dashboard/statistic
+     * @secure
+     */
+    adminDashboardControllerGetDashboardStatistic: (
+      query?: {
+        statisticBy?: "day" | "mouth" | "year";
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminDashboardStatisticResponseDto, any>({
+        path: `/api/v1/admin-dashboard/statistic`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ADMIN DASHBOARD
+     * @name AdminDashboardControllerGetLastThirtyDayChartData
+     * @summary [ADMIN] GET LAST 30 DAY REVENUE CHART DATA
+     * @request GET:/api/v1/admin-dashboard/chart-data
+     * @secure
+     */
+    adminDashboardControllerGetLastThirtyDayChartData: (
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminRevenueResponseDto[], any>({
+        path: `/api/v1/admin-dashboard/chart-data`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ADMIN DASHBOARD
+     * @name AdminDashboardControllerGetPendingOrder
+     * @summary [ADMIN] OVERVIEW PENDING ORDER
+     * @request GET:/api/v1/admin-dashboard/pending-order
+     * @secure
+     */
+    adminDashboardControllerGetPendingOrder: (params: RequestParams = {}) =>
+      this.request<AdminDashboardPendingOrderResponseDto[], any>({
+        path: `/api/v1/admin-dashboard/pending-order`,
+        method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),

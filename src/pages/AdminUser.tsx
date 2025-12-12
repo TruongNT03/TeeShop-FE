@@ -2,19 +2,14 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PaginationControl } from "@/components/ui/pagination";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import {
-    ArrowUpDown,
-    Search,
-    Users,
-    UserCheck,
-} from "lucide-react";
+import { ArrowUpDown, Search, Users, UserCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
@@ -25,357 +20,383 @@ import { useAdminUsers } from "@/queries/adminUserQueries";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
 import React from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export enum AdminUserSortField {
-    EMAIL = "email",
-    CREATED_AT = "createdAt",
+  EMAIL = "email",
+  CREATED_AT = "createdAt",
 }
 
 export enum SortOrder {
-    DESC = "DESC",
-    ASC = "ASC",
+  DESC = "DESC",
+  ASC = "ASC",
 }
 
 type AdminUserQuery = {
-    page: number;
-    pageSize: number;
-    search?: string;
-    sortBy?: "email" | "createdAt";
-    sortOrder?: "ASC" | "DESC";
+  page: number;
+  pageSize: number;
+  search?: string;
+  sortBy?: "email" | "createdAt";
+  sortOrder?: "ASC" | "DESC";
 };
 
 const AdminUser = () => {
-    const [query, setQuery] = useState<AdminUserQuery>({
-        page: 1,
-        pageSize: 10,
-        search: "",
-        sortBy: "createdAt",
-        sortOrder: "DESC",
-    });
+  const [query, setQuery] = useState<AdminUserQuery>({
+    page: 1,
+    pageSize: 10,
+    search: "",
+    sortBy: "createdAt",
+    sortOrder: "DESC",
+  });
 
-    const [searchTerm, setSearchTerm] = useState("");
-    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-    const [isSelectedAll, setIsSelectedAll] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [isSelectedAll, setIsSelectedAll] = useState(false);
 
-    const { data, isLoading } = useAdminUsers(
-        query.pageSize,
-        query.page,
-        query.search,
-        query.sortBy,
-        query.sortOrder
-    );
+  const { data, isLoading } = useAdminUsers(
+    query.pageSize,
+    query.page,
+    query.search,
+    query.sortBy,
+    query.sortOrder
+  );
 
-    const users = data?.data.data || [];
-    const pagination = data?.data.paginate || {
-        page: 1,
-        pageSize: 10,
-        totalItem: 0,
-        totalPage: 1,
+  const users = data?.data.data || [];
+  const pagination = data?.data.paginate || {
+    page: 1,
+    pageSize: 10,
+    totalItem: 0,
+    totalPage: 1,
+  };
+
+  // Debug: Log user data to check structure
+  useEffect(() => {
+    if (users.length > 0) {
+      console.log("First user data:", users[0]);
+      console.log("User keys:", Object.keys(users[0]));
+    }
+  }, [users]);
+
+  useEffect(() => {
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      search: debouncedSearchTerm,
+      page: 1,
+    }));
+  }, [debouncedSearchTerm]);
+
+  const handleSort = (field: AdminUserSortField) => {
+    const isCurrentSort = query.sortBy === field;
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      sortBy: field,
+      sortOrder:
+        isCurrentSort && prevQuery.sortOrder === "DESC" ? "ASC" : "DESC",
+    }));
+  };
+
+  const getGenderBadge = (gender: string) => {
+    const colors = {
+      male: "border-blue-500 text-blue-500",
+      female: "border-pink-500 text-pink-500",
+      other: "border-gray-500 text-gray-500",
     };
-
-    // Debug: Log user data to check structure
-    useEffect(() => {
-        if (users.length > 0) {
-            console.log("First user data:", users[0]);
-            console.log("User keys:", Object.keys(users[0]));
-        }
-    }, [users]);
-
-    useEffect(() => {
-        setQuery((prevQuery) => ({
-            ...prevQuery,
-            search: debouncedSearchTerm,
-            page: 1,
-        }));
-    }, [debouncedSearchTerm]);
-
-    const handleSort = (field: AdminUserSortField) => {
-        const isCurrentSort = query.sortBy === field;
-        setQuery((prevQuery) => ({
-            ...prevQuery,
-            sortBy: field,
-            sortOrder:
-                isCurrentSort && prevQuery.sortOrder === "DESC" ? "ASC" : "DESC",
-        }));
-    };
-
-    const getGenderBadge = (gender: string) => {
-        const colors = {
-            male: "border-blue-500 text-blue-500",
-            female: "border-pink-500 text-pink-500",
-            other: "border-gray-500 text-gray-500",
-        };
-
-        return (
-            <Badge variant="outline" className={colors[gender as keyof typeof colors] || colors.other}>
-                {gender === "male" ? "Nam" : gender === "female" ? "Nữ" : "Khác"}
-            </Badge>
-        );
-    };
-
-    const getRoleBadges = (roles: string[]) => {
-        return (
-            <div className="flex flex-wrap gap-1">
-                {roles.map((role, index) => (
-                    <Badge
-                        key={index}
-                        variant="outline"
-                        className={role === "admin" ? "border-purple-500 text-purple-500" : "border-green-500 text-green-500"}
-                    >
-                        {role}
-                    </Badge>
-                ))}
-            </div>
-        );
-    };
-
-    const tableHeaderTitles = [
-        {
-            key: "name",
-            title: "Name",
-            sortable: false,
-            render: (value: string): React.ReactNode => (
-                <TableCell className="font-medium">{value || "N/A"}</TableCell>
-            ),
-        },
-        {
-            key: "email",
-            title: "Email",
-            sortable: true,
-            render: (value: string): React.ReactNode => (
-                <TableCell>{value}</TableCell>
-            ),
-        },
-        {
-            key: "phoneNumber",
-            title: "Phone Number",
-            sortable: false,
-            render: (value: string): React.ReactNode => (
-                <TableCell>{value || "N/A"}</TableCell>
-            ),
-        },
-        {
-            key: "gender",
-            title: "Gender",
-            sortable: false,
-            render: (value: string): React.ReactNode => (
-                <TableCell>{getGenderBadge(value)}</TableCell>
-            ),
-        },
-        {
-            key: "roles",
-            title: "Roles",
-            sortable: false,
-            render: (value: string[]): React.ReactNode => (
-                <TableCell>{getRoleBadges(value)}</TableCell>
-            ),
-        },
-        {
-            key: "createdAt",
-            title: "Created At",
-            sortable: true,
-            render: (value: string): React.ReactNode => (
-                <TableCell>{convertDateTime(value)}</TableCell>
-            ),
-        },
-    ];
-
-    const handlePageChange = (newPage: number) => {
-        if (newPage < 1 || newPage > pagination.totalPage) return;
-        setQuery((prevQuery) => ({
-            ...prevQuery,
-            page: newPage,
-        }));
-    };
-
-    // Calculate statistics
-    const totalUsers = pagination.totalItem;
-    const adminUsers = users.filter((u) => u.roles.includes("admin")).length;
 
     return (
-        <div className="w-full overflow-auto py-5">
-            <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
-                User Management
-            </div>
-
-            {/* Statistics Cards */}
-            <div className="w-[95%] flex justify-between mx-auto gap-8 mb-10">
-                <Card className="flex-1 p-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-muted-foreground">Total Users</p>
-                            <p className="text-3xl font-bold mt-2">{totalUsers}</p>
-                        </div>
-                        <Users className="w-12 h-12 text-primary opacity-20" />
-                    </div>
-                </Card>
-                <Card className="flex-1 p-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-muted-foreground">Admin Users</p>
-                            <p className="text-3xl font-bold mt-2 text-purple-500">
-                                {adminUsers}
-                            </p>
-                        </div>
-                        <UserCheck className="w-12 h-12 text-purple-500 opacity-20" />
-                    </div>
-                </Card>
-                <Card className="flex-1 p-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-muted-foreground">Regular Users</p>
-                            <p className="text-3xl font-bold mt-2 text-green-500">
-                                {totalUsers - adminUsers}
-                            </p>
-                        </div>
-                        <Users className="w-12 h-12 text-green-500 opacity-20" />
-                    </div>
-                </Card>
-            </div>
-
-            {/* Search */}
-            <div className="w-[95%] mx-auto mb-5 flex justify-between">
-                <div className="flex gap-5">
-                    <div className="relative">
-                        <Input
-                            className="w-[400px] py-0 pl-10"
-                            type="search"
-                            placeholder="Tìm theo email hoặc tên..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
-                    </div>
-                </div>
-            </div>
-
-            {/* Table */}
-            <Card className="w-[95%] mx-auto py-0 overflow-hidden">
-                <Table>
-                    <TableHeader className="bg-muted">
-                        <TableRow>
-                            <TableHead>
-                                <Checkbox
-                                    className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
-                                    checked={isSelectedAll}
-                                    onCheckedChange={(checked) => {
-                                        if (checked && users) {
-                                            setSelectedUsers(users.map((u) => u.id));
-                                        } else {
-                                            setSelectedUsers([]);
-                                        }
-                                        setIsSelectedAll(!!checked);
-                                    }}
-                                />
-                            </TableHead>
-                            <TableHead>
-                                <div>No.</div>
-                            </TableHead>
-                            {tableHeaderTitles.map((value, index) => (
-                                <TableHead key={index} className="py-5">
-                                    <div
-                                        className={cn(
-                                            "flex items-center",
-                                            value.sortable ? "cursor-pointer" : ""
-                                        )}
-                                        onClick={() =>
-                                            value.sortable &&
-                                            handleSort(value.key as AdminUserSortField)
-                                        }
-                                    >
-                                        {value.title}{" "}
-                                        {value.sortable && (
-                                            <span className="ml-1">
-                                                <ArrowUpDown className="scale-[60%]" />
-                                            </span>
-                                        )}
-                                    </div>
-                                </TableHead>
-                            ))}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={tableHeaderTitles.length + 2}
-                                    className="h-48 text-center"
-                                >
-                                    <Spinner className="w-10 h-10" />
-                                </TableCell>
-                            </TableRow>
-                        ) : users.length === 0 ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={tableHeaderTitles.length + 2}
-                                    className="h-48 text-center text-lg"
-                                >
-                                    Không tìm thấy người dùng nào.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-
-                            users.map((user, index) => (
-                                <TableRow
-                                    key={user.id}
-                                    className={`${index % 2 ? "bg-muted" : ""}`}
-                                >
-                                    <TableCell className="py-5">
-                                        <Checkbox
-                                            className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
-                                            checked={selectedUsers.includes(user.id)}
-                                            onCheckedChange={(checked) => {
-                                                if (checked) {
-                                                    const updated = [...selectedUsers, user.id];
-                                                    setSelectedUsers(updated);
-                                                    if (updated.length === users.length) {
-                                                        setIsSelectedAll(true);
-                                                    }
-                                                } else {
-                                                    const updated = selectedUsers.filter(
-                                                        (value) => value !== user.id
-                                                    );
-                                                    setSelectedUsers(updated);
-                                                    setIsSelectedAll(false);
-                                                }
-                                            }}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        {index + 1 + (query.page - 1) * query.pageSize}
-                                    </TableCell>
-
-                                    {tableHeaderTitles.map((tableHeaderTitle, idx) => {
-                                        const value = user[tableHeaderTitle.key as keyof UserResponseDto] as string & string[];
-
-                                        return (
-                                            <React.Fragment key={idx}>
-                                                {tableHeaderTitle.render(value)}
-                                            </React.Fragment>
-                                        );
-                                    })}
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-
-                <div className="w-full py-3 flex justify-between items-center px-5">
-                    <div className="text-sm text-muted-foreground">
-                        Tổng: <b>{pagination.totalItem}</b> người dùng
-                    </div>
-
-                    <PaginationControl
-                        currentPage={pagination.page}
-                        totalPage={pagination.totalPage}
-                        onPageChange={handlePageChange}
-                    />
-                </div>
-            </Card>
-        </div>
+      <Badge
+        variant="outline"
+        className={colors[gender as keyof typeof colors] || colors.other}
+      >
+        {gender === "male" ? "Nam" : gender === "female" ? "Nữ" : "Khác"}
+      </Badge>
     );
+  };
+
+  const getRoleBadges = (roles: string[]) => {
+    return (
+      <div className="flex flex-wrap gap-1">
+        {roles.map((role, index) => (
+          <Badge
+            key={index}
+            variant="outline"
+            className={
+              role === "admin"
+                ? "border-purple-500 text-purple-500"
+                : "border-green-500 text-green-500"
+            }
+          >
+            {role}
+          </Badge>
+        ))}
+      </div>
+    );
+  };
+
+  const tableHeaderTitles = [
+    {
+      key: "name",
+      title: "Name",
+      sortable: false,
+      render: (value: string): React.ReactNode => (
+        <TableCell className="font-medium">{value || "N/A"}</TableCell>
+      ),
+    },
+    {
+      key: "email",
+      title: "Email",
+      sortable: true,
+      render: (value: string): React.ReactNode => (
+        <TableCell>{value}</TableCell>
+      ),
+    },
+    {
+      key: "phoneNumber",
+      title: "Phone Number",
+      sortable: false,
+      render: (value: string): React.ReactNode => (
+        <TableCell>{value || "N/A"}</TableCell>
+      ),
+    },
+    {
+      key: "gender",
+      title: "Gender",
+      sortable: false,
+      render: (value: string): React.ReactNode => (
+        <TableCell>{getGenderBadge(value)}</TableCell>
+      ),
+    },
+    {
+      key: "roles",
+      title: "Roles",
+      sortable: false,
+      render: (value: string[]): React.ReactNode => (
+        <TableCell>{getRoleBadges(value)}</TableCell>
+      ),
+    },
+    {
+      key: "createdAt",
+      title: "Created At",
+      sortable: true,
+      render: (value: string): React.ReactNode => (
+        <TableCell>{convertDateTime(value)}</TableCell>
+      ),
+    },
+  ];
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > pagination.totalPage) return;
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      page: newPage,
+    }));
+  };
+
+  // Calculate statistics
+  const totalUsers = pagination.totalItem;
+  const adminUsers = users.filter((u) => u.roles.includes("admin")).length;
+
+  return (
+    <div className="p-8 space-y-8">
+      <div>
+        <h1 className="text-2xl font-medium uppercase">User Management</h1>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="flex justify-between gap-8">
+        <Card className="flex-1 p-6 shadow-none">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Total Users</p>
+              <p className="text-3xl font-bold mt-2">{totalUsers}</p>
+            </div>
+            <Users className="w-12 h-12 text-primary opacity-20" />
+          </div>
+        </Card>
+        <Card className="flex-1 p-6 shadow-none">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Admin Users</p>
+              <p className="text-3xl font-bold mt-2 text-purple-500">
+                {adminUsers}
+              </p>
+            </div>
+            <UserCheck className="w-12 h-12 text-purple-500 opacity-20" />
+          </div>
+        </Card>
+        <Card className="flex-1 p-6 shadow-none">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Regular Users</p>
+              <p className="text-3xl font-bold mt-2 text-green-500">
+                {totalUsers - adminUsers}
+              </p>
+            </div>
+            <Users className="w-12 h-12 text-green-500 opacity-20" />
+          </div>
+        </Card>
+      </div>
+
+      {/* Search */}
+      <div className="flex justify-between">
+        <div className="flex gap-5">
+          <div className="relative">
+            <Input
+              className="w-[400px] py-0 pl-10"
+              type="search"
+              placeholder="Tìm theo email hoặc tên..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <Card className="py-0 overflow-hidden">
+        <Table>
+          <TableHeader className="bg-muted">
+            <TableRow>
+              <TableHead>
+                <Checkbox
+                  className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                  checked={isSelectedAll}
+                  onCheckedChange={(checked) => {
+                    if (checked && users) {
+                      setSelectedUsers(users.map((u) => u.id));
+                    } else {
+                      setSelectedUsers([]);
+                    }
+                    setIsSelectedAll(!!checked);
+                  }}
+                />
+              </TableHead>
+              <TableHead>
+                <div>No.</div>
+              </TableHead>
+              {tableHeaderTitles.map((value, index) => (
+                <TableHead key={index} className="py-5">
+                  <div
+                    className={cn(
+                      "flex items-center",
+                      value.sortable ? "cursor-pointer" : ""
+                    )}
+                    onClick={() =>
+                      value.sortable &&
+                      handleSort(value.key as AdminUserSortField)
+                    }
+                  >
+                    {value.title}{" "}
+                    {value.sortable && (
+                      <span className="ml-1">
+                        <ArrowUpDown className="scale-[60%]" />
+                      </span>
+                    )}
+                  </div>
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-4 ml-2" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-8" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-48" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-28" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : users.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={tableHeaderTitles.length + 2}
+                  className="h-48 text-center text-lg"
+                >
+                  Không tìm thấy người dùng nào.
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((user, index) => (
+                <TableRow
+                  key={user.id}
+                  className={`${index % 2 ? "bg-muted" : ""}`}
+                >
+                  <TableCell className="py-5">
+                    <Checkbox
+                      className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                      checked={selectedUsers.includes(user.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          const updated = [...selectedUsers, user.id];
+                          setSelectedUsers(updated);
+                          if (updated.length === users.length) {
+                            setIsSelectedAll(true);
+                          }
+                        } else {
+                          const updated = selectedUsers.filter(
+                            (value) => value !== user.id
+                          );
+                          setSelectedUsers(updated);
+                          setIsSelectedAll(false);
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {index + 1 + (query.page - 1) * query.pageSize}
+                  </TableCell>
+
+                  {tableHeaderTitles.map((tableHeaderTitle, idx) => {
+                    const value = user[
+                      tableHeaderTitle.key as keyof UserResponseDto
+                    ] as string & string[];
+
+                    return (
+                      <React.Fragment key={idx}>
+                        {tableHeaderTitle.render(value)}
+                      </React.Fragment>
+                    );
+                  })}
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+
+        <div className="w-full py-3 flex justify-between items-center px-5">
+          <div className="text-sm text-muted-foreground">
+            Tổng: <b>{pagination.totalItem}</b> người dùng
+          </div>
+
+          <PaginationControl
+            currentPage={pagination.page}
+            totalPage={pagination.totalPage}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      </Card>
+    </div>
+  );
 };
 
 export default AdminUser;

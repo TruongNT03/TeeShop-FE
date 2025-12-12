@@ -116,6 +116,7 @@ apiClient.instance.interceptors.response.use(
         processQueue(err, null);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        window.location.href = "/login";
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

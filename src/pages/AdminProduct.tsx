@@ -60,6 +60,7 @@ import {
 } from "@/components/ui/command";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export enum AdminProductSortField {
   NAME = "name",
@@ -282,19 +283,19 @@ const AdminProduct = () => {
   };
 
   return (
-    <div className="w-full overflow-auto py-5">
-      <div className="w-[95%] mx-auto font-semibold text-2xl mb-5">
-        Product Master
+    <div className="p-8 space-y-8">
+      <div>
+        <h1 className="text-2xl font-medium uppercase">Product Master</h1>
       </div>
       {/* Total */}
-      <div className="w-[95%] flex justify-between mx-auto gap-8 mb-10">
-        <Card className="flex-1"></Card>
-        <Card className="flex-1"></Card>
-        <Card className="flex-1"></Card>
-        <Card className="flex-1"></Card>
+      <div className="flex justify-between gap-8">
+        <Card className="flex-1 shadow-none"></Card>
+        <Card className="flex-1 shadow-none"></Card>
+        <Card className="flex-1 shadow-none"></Card>
+        <Card className="flex-1 shadow-none"></Card>
       </div>
       {/* Search and Filter */}
-      <div className="w-[95%] mx-auto mb-5 flex justify-between">
+      <div className="flex justify-between">
         <div className="flex">
           <div className="relative mr-5">
             <Input
@@ -368,7 +369,7 @@ const AdminProduct = () => {
         </div>
       </div>
       {/* Table */}
-      <Card className="w-[95%] mx-auto py-0 overflow-hidden">
+      <Card className="py-0 overflow-hidden">
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>
@@ -416,14 +417,40 @@ const AdminProduct = () => {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={tableHeaderTitles.length + 2}
-                  className="h-48 text-center"
-                >
-                  <Spinner className="w-10 h-10" />
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-4 ml-2" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-8" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-12 w-12 rounded" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
             ) : (products as AdminProductResponseDto[]).length === 0 ? (
               <TableRow>
                 <TableCell
