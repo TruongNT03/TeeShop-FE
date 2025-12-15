@@ -10,12 +10,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUpDown, Search, Package, Clock, Truck } from "lucide-react";
+import {
+  ArrowUpDown,
+  Search,
+  Package,
+  Clock,
+  Truck,
+  Check,
+  Ellipsis,
+  CheckCircle,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { convertDateTime } from "@/utils/convertDateTime";
-import type { AdminOrderResponseDto } from "@/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminOrders } from "@/queries/adminOrderQueries";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -121,13 +129,27 @@ const AdminOrder = () => {
             variant="outline"
             className="border-yellow-500 text-yellow-500"
           >
-            <Clock className="w-3 h-3 mr-1" />
+            <Ellipsis className="w-3 h-3 mr-1" />
             Pending
+          </Badge>
+        );
+      case "confirmed":
+        return (
+          <Badge variant="outline" className="border-blue-500 text-blue-500">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Confirmed
+          </Badge>
+        );
+      case "completed":
+        return (
+          <Badge variant="outline" className="border-green-500 text-green-500">
+            <Check className="w-3 h-3 mr-1" />
+            Completed
           </Badge>
         );
       case "shipping":
         return (
-          <Badge variant="outline" className="border-blue-500 text-blue-500">
+          <Badge variant="outline" className="border-cyan-400 text-cyan-400">
             <Truck className="w-3 h-3 mr-1" />
             Shipping
           </Badge>
@@ -135,7 +157,7 @@ const AdminOrder = () => {
       default:
         return (
           <Badge variant="outline" className="border-gray-500 text-gray-500">
-            {status}
+            {status.substring(0, 1).toUpperCase() + status.substring(1)}
           </Badge>
         );
     }
@@ -212,7 +234,7 @@ const AdminOrder = () => {
 
       {/* Statistics Cards */}
       <div className="flex justify-between gap-8">
-        <Card className="flex-1 p-6">
+        <Card className="flex-1 p-6 shadow-none">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Total Orders</p>
@@ -221,7 +243,7 @@ const AdminOrder = () => {
             <Package className="w-12 h-12 text-primary opacity-20" />
           </div>
         </Card>
-        <Card className="flex-1 p-6">
+        <Card className="flex-1 p-6 shadow-none">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Pending</p>
@@ -232,7 +254,7 @@ const AdminOrder = () => {
             <Clock className="w-12 h-12 text-yellow-500 opacity-20" />
           </div>
         </Card>
-        <Card className="flex-1 p-6">
+        <Card className="flex-1 p-6 shadow-none">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Shipping</p>
@@ -276,7 +298,7 @@ const AdminOrder = () => {
       </div>
 
       {/* Table */}
-      <Card className="py-0 overflow-hidden">
+      <Card className="py-0 overflow-hidden shadow-none">
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>

@@ -7,6 +7,7 @@ import {
 import type { Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import { toast } from "sonner";
 
 export const useAdminChatWidget = () => {
   const [selectedConversationId, setSelectedConversationId] =
@@ -94,6 +95,19 @@ export const useAdminChatWidget = () => {
           newSet.add(data.conversationId);
           return newSet;
         });
+
+        // Show toast notification for new message from other conversations
+        const conversation = conversationsData?.data?.find(
+          (c) => c.id === data.conversationId
+        );
+        const senderName = conversation?.user?.name || "Người dùng";
+        toast.info(`Tin nhắn mới từ ${senderName}`, {
+          description:
+            data.content.length > 50
+              ? data.content.substring(0, 50) + "..."
+              : data.content,
+          duration: 4000,
+        });
       }
 
       // Always refetch conversations to update latest message
@@ -101,6 +115,10 @@ export const useAdminChatWidget = () => {
     }); // Listen for new conversation
     socket.on("newConversation", () => {
       console.log("🆕 New conversation created");
+      toast.success("Có cuộc trò chuyện mới!", {
+        description: "Một khách hàng vừa bắt đầu cuộc trò chuyện",
+        duration: 4000,
+      });
       refetchConversations();
     });
 

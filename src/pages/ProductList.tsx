@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { Filter, X, ChevronDown, ChevronUp } from "lucide-react";
 import type { CategoryResponseDto } from "@/api";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   Pagination,
   PaginationContent,
@@ -26,6 +27,7 @@ const ProductList = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
   const [sortBy, setSortBy] = useState<string>("newest");
   const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const debouncedSearchKeyword = useDebounce(searchKeyword, 500);
   const [showFilters, setShowFilters] = useState(true);
   const [showCategorySection, setShowCategorySection] = useState(true);
   const [showPriceSection, setShowPriceSection] = useState(true);
@@ -45,7 +47,7 @@ const ProductList = () => {
       selectedCategories,
       priceRange,
       sortBy,
-      searchKeyword,
+      debouncedSearchKeyword,
       currentPage,
     ],
     queryFn: () =>
@@ -53,7 +55,7 @@ const ProductList = () => {
         {
           page: currentPage,
           pageSize: pageSize,
-          search: searchKeyword || undefined,
+          search: debouncedSearchKeyword || undefined,
           categoryIds:
             selectedCategories.length > 0 ? selectedCategories : undefined,
           lowPrice: priceRange[0],

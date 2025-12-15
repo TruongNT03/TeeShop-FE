@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCartTooltip } from "@/hooks/useCardTooltip";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { Badge } from "./ui/badge";
+import { Skeleton } from "./ui/skeleton";
 import Notification from "./Notification";
 
 const NavHeader = () => {
@@ -129,22 +130,12 @@ const NavHeader = () => {
                             >
                               {cartItem.product?.productImages[0]?.url ? (
                                 <img
-                                  src={cartItem.product?.productImages[0]?.url}
+                                  src={cartItem.product.productImages[0].url}
                                   alt={cartItem.product.name}
-                                  onError={(e) => {
-                                    e.currentTarget.setAttribute(
-                                      "src",
-                                      "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM="
-                                    );
-                                  }}
                                   className="w-16 h-16 rounded-md object-cover flex-shrink-0"
                                 />
                               ) : (
-                                <img
-                                  src="https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM="
-                                  alt={cartItem.product.name}
-                                  className="w-16 h-16 rounded-md object-cover flex-shrink-0"
-                                />
+                                <Skeleton className="w-16 h-16 rounded-md flex-shrink-0" />
                               )}
                               <div className="flex flex-col gap-1 flex-1 min-w-0">
                                 <div className="font-medium text-sm line-clamp-1 uppercase">
@@ -162,16 +153,12 @@ const NavHeader = () => {
                                     <>
                                       <span>•</span>
                                       <div className="flex gap-1 flex-wrap">
-                                        {cartItem.productVariant.variantValues.map(
-                                          (variantValue, idx) => (
-                                            <span
-                                              key={idx}
-                                              className="text-slate-600"
-                                            >
-                                              {variantValue.value}
-                                            </span>
+                                        {cartItem.productVariant.variantValues
+                                          .map(
+                                            (variantValue, idx) =>
+                                              variantValue.value
                                           )
-                                        )}
+                                          .join(" - ")}
                                       </div>
                                     </>
                                   )}

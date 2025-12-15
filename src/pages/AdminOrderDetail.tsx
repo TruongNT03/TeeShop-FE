@@ -12,7 +12,10 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAdminOrder, useUpdateOrderStatus } from "@/queries/adminOrderQueries";
+import {
+  useAdminOrder,
+  useUpdateOrderStatus,
+} from "@/queries/adminOrderQueries";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { convertDateTime } from "@/utils/convertDateTime";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -88,9 +91,7 @@ const AdminOrderDetail: React.FC = () => {
     return (
       <div className="text-center py-12">
         <Package className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-slate-900">
-          Order not found
-        </h3>
+        <h3 className="text-lg font-medium text-slate-900">Order not found</h3>
         <button
           onClick={() => navigate("/admin/order")}
           className="mt-4 text-sm font-medium text-primary hover:underline"
@@ -133,34 +134,38 @@ const AdminOrderDetail: React.FC = () => {
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-slate-900">
-            Order Detail
-          </h1>
+          <h1 className="text-2xl font-bold text-slate-900">Order Detail</h1>
           <p className="text-sm text-slate-500 mt-1">
             #{order.id.substring(0, 8).toUpperCase()}
           </p>
         </div>
-        
+
         <div className="flex items-center gap-3">
-            <Select
-                value={order.status}
-                onValueChange={handleStatusChange}
-                disabled={updateStatusMutation.isPending}
-            >
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                    <SelectItem value="shipping">Shipping</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-            </Select>
-            <Badge className={cn("gap-1.5 py-1.5 px-3", statusConfig.bg, statusConfig.color)}>
+          <Select
+            value={order.status}
+            onValueChange={handleStatusChange}
+            disabled={updateStatusMutation.isPending}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="confirmed">Confirmed</SelectItem>
+              <SelectItem value="shipping">Shipping</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Badge
+            className={cn(
+              "gap-1.5 py-1.5 px-3",
+              statusConfig.bg,
+              statusConfig.color
+            )}
+          >
             <StatusIcon className="h-3.5 w-3.5" />
             {statusConfig.text}
-            </Badge>
+          </Badge>
         </div>
       </div>
 
@@ -170,7 +175,7 @@ const AdminOrderDetail: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card>
+        <Card className="shadow-none">
           <CardHeader>
             <CardTitle className="text-lg">Order Information</CardTitle>
           </CardHeader>
@@ -195,64 +200,70 @@ const AdminOrderDetail: React.FC = () => {
 
       {/* User Info & Shipping Address */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-          >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="text-lg">User Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden">
-                        {order.user.avatar ? (
-                            <img src={order.user.avatar} alt={order.user.email} className="w-full h-full object-cover" />
-                        ) : (
-                            <User className="w-full h-full p-2 text-slate-400" />
-                        )}
-                    </div>
-                    <div>
-                        <p className="font-medium">{order.user.email}</p>
-                        <p className="text-sm text-slate-500 capitalize">{order.user.gender}</p>
-                    </div>
-                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <Card className="h-full shadow-none">
+            <CardHeader>
+              <CardTitle className="text-lg">User Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden">
+                  {order.user.avatar ? (
+                    <img
+                      src={order.user.avatar}
+                      alt={order.user.email}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-full h-full p-2 text-slate-400" />
+                  )}
+                </div>
+                <div>
+                  <p className="font-medium">{order.user.email}</p>
+                  <p className="text-sm text-slate-500 capitalize">
+                    {order.user.gender}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-          >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="text-lg">Shipping Address</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <User className="h-5 w-5 text-slate-400 mt-0.5" />
-                  <div>
-                    <p className="font-medium">{order.address.name}</p>
-                  </div>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <Card className="h-full shadow-none">
+            <CardHeader>
+              <CardTitle className="text-lg">Shipping Address</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-start gap-3">
+                <User className="h-5 w-5 text-slate-400 mt-0.5" />
+                <div>
+                  <p className="font-medium">{order.address.name}</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <Phone className="h-5 w-5 text-slate-400 mt-0.5" />
-                  <div>
-                    <p className="text-slate-700">{order.address.phoneNumber}</p>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Phone className="h-5 w-5 text-slate-400 mt-0.5" />
+                <div>
+                  <p className="text-slate-700">{order.address.phoneNumber}</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
-                  <div>
-                    <p className="text-slate-700">{order.address.detail}</p>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
+                <div>
+                  <p className="text-slate-700">{order.address.detail}</p>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       {/* Order Items */}
@@ -261,7 +272,7 @@ const AdminOrderDetail: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <Card>
+        <Card className="shadow-none">
           <CardHeader>
             <CardTitle className="text-lg">
               Products ({order.orderItems.length})

@@ -17,12 +17,15 @@ export const getListMessagesQuery = (
   });
 };
 
-export const getListMessagesInfiniteQuery = (opts: { pageSize: number }) => {
-  const { pageSize } = opts;
+export const getListMessagesInfiniteQuery = (opts: {
+  pageSize: number;
+  conversationId?: string;
+}) => {
+  const { pageSize, conversationId } = opts;
   return useInfiniteQuery<ListMessageResponseDto>({
-    queryKey: ["chatMessagesInfinite", pageSize],
+    queryKey: ["chatMessagesInfinite", pageSize, conversationId],
     initialPageParam: 1,
-    enabled: isAuthenticated(),
+    enabled: isAuthenticated() && !!conversationId,
     queryFn: async ({ pageParam }: QueryFunctionContext) => {
       return (
         await apiClient.api.chatControllerGetListMessages({

@@ -24,6 +24,7 @@ export const adminGetListMessagesQuery = (
 ) => {
   return useQuery<ListMessageResponseDto>({
     queryKey: ["adminChatMessages", query, conversationId],
+    enabled: !!conversationId,
     queryFn: async () =>
       (
         await apiClient.api.adminChatControllerGetListMessages(conversationId, {

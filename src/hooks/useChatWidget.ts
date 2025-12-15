@@ -20,11 +20,19 @@ export const useChatWidget = () => {
   const socketRef = useRef<Socket | null>(null);
 
   const {
+    data: conversation,
+    isSuccess: isGetConversationSuccess,
+    refetch: refetchConversation,
+  } = getConversationQuery();
+
+  const conversationId = conversation?.data.id;
+
+  const {
     data: chatMessages,
     fetchNextPage: listMessageFetchNextPage,
     hasNextPage: listMessageHasNextPage,
     isFetchingNextPage: listMessageIsFetchingNextPage,
-  } = getListMessagesInfiniteQuery({ pageSize: 10 });
+  } = getListMessagesInfiniteQuery({ pageSize: 10, conversationId });
 
   useEffect(() => {
     const socketUrl = `${import.meta.env.VITE_BACKEND_BASE_URL}/chat`;
@@ -61,14 +69,6 @@ export const useChatWidget = () => {
       socketRef.current = null;
     };
   }, []);
-
-  const {
-    data: conversation,
-    isSuccess: isGetConversationSuccess,
-    refetch: refetchConversation,
-  } = getConversationQuery();
-
-  const conversationId = conversation?.data.id;
 
   const { isPending: isSendMessagePending, mutate: sendMessageMute } =
     sendMessageMutation();

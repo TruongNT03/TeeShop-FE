@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   CreditCard,
   MapPin,
@@ -61,6 +62,9 @@ const Checkout = () => {
   const [qrImageUrl, setQrImageUrl] = useState<string>("");
   const [paymentId, setPaymentId] = useState<string>("");
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  const [loadingImages, setLoadingImages] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   // Form state for new address
   const [newAddressData, setNewAddressData] = useState({
@@ -172,9 +176,8 @@ const Checkout = () => {
       return;
     }
 
-    // Show modal and create order for both payment types
+    // Show modal for confirmation
     setShowPaymentModal(true);
-    handleConfirmOrder();
   };
 
   // Handle confirm order (after modal confirmation for COD, or direct for QR)
@@ -449,14 +452,15 @@ const Checkout = () => {
 
                   return (
                     <div key={item.id} className="flex gap-3">
+                      {loadingImages[item.id] !== false ? (
+                        <Skeleton className="w-16 h-16 rounded" />
+                      ) : null}
                       <img
                         src={productImage}
                         alt={productName}
-                        className="w-16 h-16 object-cover rounded"
-                        onError={(e) => {
-                          e.currentTarget.src =
-                            "https://via.placeholder.com/80";
-                        }}
+                        className={`w-16 h-16 object-cover rounded ${
+                          loadingImages[item.id] !== false ? "hidden" : ""
+                        }`}
                       />
                       <div className="flex-1">
                         <div className="font-medium text-sm">{productName}</div>

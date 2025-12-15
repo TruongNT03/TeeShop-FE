@@ -146,7 +146,7 @@ const AdminConfig = () => {
       <div className="flex gap-6">
         {/* Left Sidebar - Steps */}
         <div className="w-72 flex-shrink-0 sticky top-8 self-start">
-          <Card>
+          <Card className="shadow-none">
             <CardContent className="p-6">
               <div className="space-y-0">
                 {steps.map((step, index) => {
@@ -219,7 +219,7 @@ const AdminConfig = () => {
         {/* Right Content - Config Cards */}
         <div className="flex-1 space-y-6">
           {/* Banner Config */}
-          <Card id="banner">
+          <Card id="banner" className="shadow-none">
             <CardHeader>
               <CardTitle>Cấu hình Banner</CardTitle>
             </CardHeader>
@@ -310,7 +310,7 @@ const AdminConfig = () => {
           </Card>
 
           {/* Homepage Config */}
-          <Card id="homepage">
+          <Card id="homepage" className="shadow-none">
             <CardHeader>
               <CardTitle>Cấu hình Trang chủ</CardTitle>
             </CardHeader>
@@ -408,7 +408,7 @@ const AdminConfig = () => {
           </Card>
 
           {/* Promotion Config */}
-          <Card id="promotion">
+          <Card id="promotion" className="shadow-none">
             <CardHeader>
               <CardTitle>Cấu hình Khuyến mãi</CardTitle>
             </CardHeader>
