@@ -34,6 +34,7 @@ import AdminOrderDetail from "@/pages/AdminOrderDetail";
 import AdminUser from "@/pages/AdminUser";
 import NotificationList from "@/pages/NotificationList";
 import AdminNotification from "@/pages/AdminNotification";
+import GoogleCallback from "@/pages/GoogleCallback";
 
 const AppRouter = () => {
   return (
@@ -47,6 +48,7 @@ const AppRouter = () => {
           </Route>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/auth/google/callback" element={<GoogleCallback />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/demo" element={<DemoPage />} />
         </Route>

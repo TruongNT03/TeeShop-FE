@@ -18,13 +18,17 @@ export const useAuth = () => {
     };
   }, []);
 
-  const saveToken = (token: string) => {
+  const saveToken = (token: string, refreshToken?: string) => {
     localStorage.setItem("accessToken", token);
+    if (refreshToken) {
+      localStorage.setItem("refreshToken", refreshToken);
+    }
     setAccessToken(token);
   };
 
   const clearToken = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     setAccessToken(null);
   };
 

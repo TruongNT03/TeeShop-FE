@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +30,8 @@ import {
 import { CheckCircle2, Home } from "lucide-react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { motion } from "motion/react";
+import { FaGoogle } from "react-icons/fa";
+import { useAuth } from "@/hooks/useAuth";
 
 const registerSchema = z
   .object({
@@ -64,9 +66,30 @@ const Register = () => {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const { saveToken } = useAuth();
 
   const regMutation = registerMutation();
   const verifyMutation = verifyRegisterMutation();
+
+  useEffect(() => {
+    // Listen for messages from popup
+    const handleMessage = (event: MessageEvent) => {
+      // Verify origin for security
+      if (event.origin !== window.location.origin) return;
+
+      if (event.data.type === "GOOGLE_AUTH_SUCCESS") {
+        const { accessToken, refreshToken } = event.data;
+        saveToken(accessToken, refreshToken);
+        toast.success("Đăng ký thành công!");
+        navigate("/");
+      } else if (event.data.type === "GOOGLE_AUTH_ERROR") {
+        toast.error(event.data.message || "Đăng ký thất bại!");
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [saveToken, navigate]);
 
   const registerForm = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -111,6 +134,21 @@ const Register = () => {
           }, 3000);
         },
       }
+    );
+  };
+
+  const handleGoogleRegister = () => {
+    const backendUrl =
+      import.meta.env.VITE_BACKEND_BASE_URL || "http://localhost:8080";
+    const width = 500;
+    const height = 600;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+
+    window.open(
+      `${backendUrl}/api/v1/auth/google`,
+      "Google Login",
+      `width=${width},height=${height},left=${left},top=${top}`
     );
   };
 
@@ -209,8 +247,16 @@ const Register = () => {
             >
               {regMutation.isPending ? <Spinner /> : "Đăng ký"}
             </Button>
+            <Button
+              type="button"
+              onClick={handleGoogleRegister}
+              className="w-full mt-3 bg-red-400 hover:bg-red-500"
+            >
+              <FaGoogle className="mr-2" />
+              Đăng ký với Google
+            </Button>
             <Link to="/">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full mt-3">
                 Quay về trang chủ
               </Button>
             </Link>

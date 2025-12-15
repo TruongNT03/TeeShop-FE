@@ -27,6 +27,11 @@ export interface RegisterResponseDto {
   token: string;
 }
 
+export interface LoginResponseDto {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export interface VerifyRegisterDto {
   /**
    * OTP use to verify register account
@@ -50,11 +55,6 @@ export interface LoginDto {
    * @example "12345678Aa@"
    */
   password: string;
-}
-
-export interface LoginResponseDto {
-  accessToken: string;
-  refreshToken: string;
 }
 
 export interface SuccessResponseDto {
@@ -991,6 +991,56 @@ export class Api<
      * No description
      *
      * @tags Auth
+     * @name AuthControllerGoogleAuth
+     * @summary LOGIN WITH GOOGLE
+     * @request GET:/api/v1/auth/google
+     */
+    authControllerGoogleAuth: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/auth/google`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthControllerGoogleAuthCallback
+     * @summary GOOGLE OAUTH CALLBACK
+     * @request GET:/api/v1/auth/google/callback
+     */
+    authControllerGoogleAuthCallback: (params: RequestParams = {}) =>
+      this.request<LoginResponseDto, any>({
+        path: `/api/v1/auth/google/callback`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthControllerGoogleVerifyCode
+     * @summary GOOGLE OAUTH CALLBACK VERIFY CODE TO GET TOKEN
+     * @request GET:/api/v1/auth/google/callback/verify-code/{code}
+     */
+    authControllerGoogleVerifyCode: (
+      code: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<LoginResponseDto, any>({
+        path: `/api/v1/auth/google/callback/verify-code/${code}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
      * @name AuthControllerVerifyRegister
      * @summary VERIFY REGISTER REQUEST
      * @request POST:/api/v1/auth/register/verify/{id}
@@ -1186,6 +1236,22 @@ export class Api<
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthControllerResendOtp
+     * @summary RESEND OPT
+     * @request POST:/api/v1/auth/resend-otp/{token}
+     */
+    authControllerResendOtp: (token: string, params: RequestParams = {}) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/auth/resend-otp/${token}`,
+        method: "POST",
         format: "json",
         ...params,
       }),
