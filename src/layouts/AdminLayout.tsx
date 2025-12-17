@@ -10,8 +10,8 @@ const AdminLayout = () => {
       <AdminSideBar />
       <main className="w-full">
         <AdminChatWidget />
-        <div className="h-12 border-b-2 border-border flex flex-col justify-center">
-          <div className="w-[95%] mx-auto flex items-center justify-between">
+        <div className="h-12 border-b-[1px] border-border flex flex-col justify-center">
+          <div className="w-full mx-auto flex items-center justify-between px-8">
             <SidebarTrigger />
             <Notification />
           </div>

@@ -35,6 +35,9 @@ import AdminUser from "@/pages/AdminUser";
 import NotificationList from "@/pages/NotificationList";
 import AdminNotification from "@/pages/AdminNotification";
 import GoogleCallback from "@/pages/GoogleCallback";
+import AdminVoucher from "@/pages/AdminVoucher";
+import AdminCreateVoucher from "@/pages/AdminCreateVoucher";
+import UserVouchers from "@/pages/UserVouchers";
 
 const AppRouter = () => {
   return (
@@ -45,6 +48,7 @@ const AppRouter = () => {
             <Route index path="/" element={<Home />} />
             <Route path="/product" element={<ProductList />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/vouchers" element={<UserVouchers />} />
           </Route>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
@@ -95,6 +99,11 @@ const AppRouter = () => {
             <Route
               path="/admin/notifications"
               element={<AdminNotification />}
+            />
+            <Route path="/admin/voucher" element={<AdminVoucher />} />
+            <Route
+              path="/admin/voucher/create"
+              element={<AdminCreateVoucher />}
             />
           </Route>
         </Route>

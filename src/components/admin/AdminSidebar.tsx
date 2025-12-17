@@ -9,6 +9,8 @@ import {
   UserPen,
   UserRound,
   Wrench,
+  Ticket,
+  ChevronsLeftRight,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -25,6 +27,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "../ui/sidebar";
 import { Collapsible, CollapsibleTrigger } from "../ui/collapsible";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
@@ -35,7 +38,8 @@ import { toast } from "sonner";
 
 const AdminSideBar = () => {
   const navigate = useNavigate();
-  const { logoutMutate } = useAuth();
+  const { logoutMutate, profile } = useAuth();
+  const { state } = useSidebar();
 
   const handleLogout = () => {
     logoutMutate(undefined, {
@@ -56,17 +60,19 @@ const AdminSideBar = () => {
   };
 
   return (
-    <Sidebar collapsible="offcanvas" className="font-medium">
+    <Sidebar collapsible="icon" className="font-medium">
       {/* Header */}
       <SidebarHeader>
-        <Link to="/admin">
-          <Button
-            variant="ghost"
-            className="hover:bg-transparent w-full flex justify-start p-0 mt-5"
-          >
-            <span className="text-2xl pl-2">TEE SHOP</span>
-          </Button>
-        </Link>
+        {state !== "collapsed" && (
+          <Link to="/admin">
+            <Button
+              variant="ghost"
+              className="hover:bg-transparent w-full flex justify-start p-0 mt-5"
+            >
+              <span className="text-2xl pl-2">TEE SHOP</span>
+            </Button>
+          </Link>
+        )}
       </SidebarHeader>
 
       {/* Content */}
@@ -86,7 +92,7 @@ const AdminSideBar = () => {
               </SidebarMenuItem>
 
               {/* User */}
-              <Collapsible defaultOpen>
+              <Collapsible>
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton className="group">
@@ -117,7 +123,7 @@ const AdminSideBar = () => {
               </Collapsible>
 
               {/* Product */}
-              <Collapsible defaultOpen>
+              <Collapsible>
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton className="group">
@@ -154,25 +160,15 @@ const AdminSideBar = () => {
               </Collapsible>
 
               {/* Order */}
-              <Collapsible defaultOpen>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="group">
+
+              <SidebarMenuItem>
+                <div onClick={() => navigate("/admin/order")}>
+                  <SidebarMenuButton>
                     <CreditCard />
                     <span>Order</span>
-                    <ChevronDown className="ml-auto transition-transform duration-300 group-data-[state=open]:rotate-180" />
                   </SidebarMenuButton>
-                </CollapsibleTrigger>
-
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      <div onClick={() => navigate("/admin/order")}>
-                        <SidebarMenuSubButton>Management</SidebarMenuSubButton>
-                      </div>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </Collapsible>
+                </div>
+              </SidebarMenuItem>
 
               {/* Notifications */}
               <SidebarMenuItem>
@@ -180,6 +176,16 @@ const AdminSideBar = () => {
                   <SidebarMenuButton>
                     <Bell />
                     <span>Notifications</span>
+                  </SidebarMenuButton>
+                </div>
+              </SidebarMenuItem>
+
+              {/* Voucher */}
+              <SidebarMenuItem>
+                <div onClick={() => navigate("/admin/voucher")}>
+                  <SidebarMenuButton>
+                    <Ticket />
+                    <span>Voucher</span>
                   </SidebarMenuButton>
                 </div>
               </SidebarMenuItem>
@@ -208,42 +214,53 @@ const AdminSideBar = () => {
       <SidebarFooter>
         <Popover>
           <PopoverTrigger asChild>
-            <Button className="w-full h-12" variant="outline">
-              <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBixXPQcgpyjTzShiuqLP6cbwiXz5MX5F_xA&s"
-                alt=""
-                className="w-8 h-8 rounded-md"
-              />
-              <div className="flex flex-col items-start">
-                <div>Truong. NT</div>
-                <div className="font-normal">ntt26072003@gmail.com</div>
+            <Button
+              className={`w-full h-12 border-none ${
+                state !== "collapsed" ? "" : "border-none hover:bg-transparent"
+              }`}
+              variant="outline"
+            >
+              <div className="w-8 h-8 rounded-sm bg-primary/10 flex items-center justify-center text-primary font-semibold flex-shrink-0">
+                {profile?.name?.charAt(0).toUpperCase() || "A"}
               </div>
+              {state !== "collapsed" && (
+                <div className="flex flex-col items-start justify-start overflow-hidden ml-3">
+                  <div className="truncate">{profile?.name || "Admin"}</div>
+                  <div className="font-normal text-xs truncate w-full text-muted-foreground">
+                    {profile?.email || "admin@example.com"}
+                  </div>
+                </div>
+              )}
+              {state !== "collapsed" && (
+                <ChevronsLeftRight className="rotate-90" />
+              )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-64 ml-56">
-            <Button
-              className="w-full h-12 hover:bg-transparent cursor-default"
-              variant="ghost"
-            >
-              <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBixXPQcgpyjTzShiuqLP6cbwiXz5MX5F_xA&s"
-                alt=""
-                className="w-8 h-8 rounded-md"
-              />
-              <div className="flex flex-col items-start">
-                <div>Truong. NT</div>
-                <div className="font-normal">ntt26072003@gmail.com</div>
+          <PopoverContent className="w-64 ml-2" side="right" align="end">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
+                {profile?.name?.charAt(0).toUpperCase() || "A"}
               </div>
-            </Button>
-            <div className="text-sm">Role: Admin</div>
-            <div className="w-full h-[1px] bg-gray-300 my-1" />
+              <div className="flex flex-col overflow-hidden">
+                <div className="font-semibold truncate">
+                  {profile?.name || "Admin"}
+                </div>
+                <div className="text-sm text-muted-foreground truncate">
+                  {profile?.email || "admin@example.com"}
+                </div>
+              </div>
+            </div>
+            <div className="text-sm text-muted-foreground mb-2">
+              Role: Admin
+            </div>
+            <div className="w-full h-[1px] bg-gray-300 my-2" />
             <Button variant="ghost" className="w-full flex justify-start gap-3">
-              <UserPen />
+              <UserPen className="w-4 h-4" />
               <span>Profile</span>
             </Button>
 
             <Button variant="ghost" className="w-full flex justify-start gap-3">
-              <Bell />
+              <Bell className="w-4 h-4" />
               <span>Notification</span>
             </Button>
 
@@ -252,7 +269,7 @@ const AdminSideBar = () => {
               className="w-full flex justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50"
               onClick={handleLogout}
             >
-              <LogOut />
+              <LogOut className="w-4 h-4" />
               <span>Logout</span>
             </Button>
           </PopoverContent>

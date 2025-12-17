@@ -205,11 +205,17 @@ const ProductDetail = () => {
           <div className="space-y-4">
             {/* Main Image */}
             <div className="aspect-square bg-slate-50 rounded-xl overflow-hidden">
-              <img
-                src={selectedImageUrl}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+              {selectedImageUrl ? (
+                <img
+                  src={selectedImageUrl}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Package className="w-24 h-24 text-slate-300" />
+                </div>
+              )}
             </div>
 
             {/* Thumbnails */}
@@ -483,75 +489,80 @@ const ProductDetail = () => {
           ) : reviewsQuery.data?.data && reviewsQuery.data.data.length > 0 ? (
             <>
               <div className="space-y-6">
-                {reviewsQuery.data.data.map((review, index) => (
-                  <motion.div
-                    key={review.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                    className="bg-slate-50 rounded-xl p-6 border border-slate-200 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex gap-4">
-                      <Avatar className="w-12 h-12 ring-2 ring-slate-200">
-                        <AvatarImage src={review.user.avatar} />
-                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white font-semibold">
-                          {review.user.name.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-3">
-                            <span className="font-semibold text-slate-900">
-                              {review.user.name}
+                {reviewsQuery.data.data.map((review, index) => {
+                  // Nếu user không tồn tại, bỏ qua review này
+                  if (!review.user) return null;
+
+                  return (
+                    <motion.div
+                      key={review.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                      className="bg-slate-50 rounded-xl p-6 border border-slate-200 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex gap-4">
+                        <Avatar className="w-12 h-12 ring-2 ring-slate-200">
+                          <AvatarImage src={review.user.avatar || ""} />
+                          <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white font-semibold">
+                            {review.user.name?.charAt(0).toUpperCase() || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-3">
+                              <span className="font-semibold text-slate-900">
+                                {review.user.name || "Anonymous"}
+                              </span>
+                              <div className="flex gap-0.5">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={cn(
+                                      "h-4 w-4",
+                                      i < review.rating
+                                        ? "fill-amber-400 text-amber-400"
+                                        : "fill-slate-300 text-slate-300"
+                                    )}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <span className="text-sm text-slate-500 flex-shrink-0">
+                              {new Date(review.createdAt).toLocaleDateString(
+                                "vi-VN",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )}
                             </span>
-                            <div className="flex gap-0.5">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={cn(
-                                    "h-4 w-4",
-                                    i < review.rating
-                                      ? "fill-amber-400 text-amber-400"
-                                      : "fill-slate-300 text-slate-300"
-                                  )}
-                                />
+                          </div>
+                          <p className="text-slate-700 leading-relaxed mb-4 whitespace-pre-line">
+                            {review.comment}
+                          </p>
+                          {review.images && review.images.length > 0 && (
+                            <div className="flex gap-3 flex-wrap">
+                              {review.images.map((img, idx) => (
+                                <div
+                                  key={idx}
+                                  className="relative group cursor-pointer"
+                                >
+                                  <img
+                                    src={img}
+                                    alt={`Review ${idx + 1}`}
+                                    className="w-24 h-24 object-cover rounded-lg border-2 border-slate-200 group-hover:border-slate-400 transition-all group-hover:scale-105"
+                                  />
+                                </div>
                               ))}
                             </div>
-                          </div>
-                          <span className="text-sm text-slate-500 flex-shrink-0">
-                            {new Date(review.createdAt).toLocaleDateString(
-                              "vi-VN",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              }
-                            )}
-                          </span>
+                          )}
                         </div>
-                        <p className="text-slate-700 leading-relaxed mb-4 whitespace-pre-line">
-                          {review.comment}
-                        </p>
-                        {review.images && review.images.length > 0 && (
-                          <div className="flex gap-3 flex-wrap">
-                            {review.images.map((img, idx) => (
-                              <div
-                                key={idx}
-                                className="relative group cursor-pointer"
-                              >
-                                <img
-                                  src={img}
-                                  alt={`Review ${idx + 1}`}
-                                  className="w-24 h-24 object-cover rounded-lg border-2 border-slate-200 group-hover:border-slate-400 transition-all group-hover:scale-105"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </div>
 
               {/* Pagination */}

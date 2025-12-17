@@ -27,11 +27,6 @@ export interface RegisterResponseDto {
   token: string;
 }
 
-export interface LoginResponseDto {
-  accessToken: string;
-  refreshToken: string;
-}
-
 export interface VerifyRegisterDto {
   /**
    * OTP use to verify register account
@@ -55,6 +50,11 @@ export interface LoginDto {
    * @example "12345678Aa@"
    */
   password: string;
+}
+
+export interface LoginResponseDto {
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface SuccessResponseDto {
@@ -411,7 +411,7 @@ export interface AdminListConversationResponseDto {
 }
 
 export interface MessageResponseDto {
-  id: string;
+  id: number;
   conversationId: string;
   content: string;
   senderId: string;
@@ -441,13 +441,34 @@ export interface ConversationResponseDto {
   users: ConversationUserResponseDto[];
 }
 
+export interface AdminVoucherResponseDto {
+  id: string;
+  code: string;
+  type: "fixed" | "percent";
+  discountValue: number;
+  maxDiscountValue: number;
+  minOrderValue: number;
+  stock: number;
+  totalUsed: number;
+  campaignName: string;
+  description: string;
+  /** @format date-time */
+  expiryAt: string;
+  isPublic: boolean;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+}
+
 export interface AdminOrderResponseDto {
   id: string;
   userEmail: string;
-  status: "pending" | "confirmed" | "shipping" | "completed";
+  status: "pending" | "confirmed" | "shipping" | "completed" | "cancel";
   amount: number;
   paymentMethod: "qr" | "cod";
-  paymentStatus: "not_yet" | "failed" | "success" | "pending";
+  paymentStatus: "not_yet" | "failed" | "success" | "pending" | "cancel";
+  voucher: AdminVoucherResponseDto;
   /** @format date-time */
   createdAt: string;
   /** @format date-time */
@@ -508,10 +529,11 @@ export interface OrderItemResponseDto {
 
 export interface AdminOrderDetailResponseDto {
   id: string;
-  status: "pending" | "confirmed" | "shipping" | "completed";
+  status: "pending" | "confirmed" | "shipping" | "completed" | "cancel";
   amount: number;
   paymentMethod: "qr" | "cod";
-  paymentStatus: "not_yet" | "failed" | "success" | "pending";
+  paymentStatus: "not_yet" | "failed" | "success" | "pending" | "cancel";
+  voucher: AdminVoucherResponseDto;
   user: AdminOrderDetailUserResponseDto;
   address: AdminOrderDetailAddressResponseDto;
   orderItems: OrderItemResponseDto[];
@@ -520,11 +542,11 @@ export interface AdminOrderDetailResponseDto {
 }
 
 export interface AdminUpdateOrderStatusDto {
-  status: "pending" | "confirmed" | "shipping" | "completed";
+  status: "pending" | "confirmed" | "shipping" | "completed" | "cancel";
 }
 
 export interface AdminUpdateOrderPaymentStatusDto {
-  paymentStatus: "not_yet" | "failed" | "success" | "pending";
+  paymentStatus: "not_yet" | "failed" | "success" | "pending" | "cancel";
 }
 
 export interface CreateFaqDto {
@@ -610,6 +632,25 @@ export interface AdminDashboardPendingOrderResponseDto {
   updatedAt: string;
 }
 
+export interface AdminCreateVoucherDto {
+  code: string;
+  type: "fixed" | "percent";
+  discountValue: number;
+  maxDiscountValue?: number;
+  minOrderValue?: number;
+  stock: number;
+  /** @format date-time */
+  expiryAt: string;
+  isPublic: boolean;
+  campaignName: string;
+  description: string;
+}
+
+export interface AdminListVoucherResponseDto {
+  data: AdminVoucherResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
 export interface AddItemToCartDto {
   productVariantId: string;
   quantity: number;
@@ -687,6 +728,7 @@ export interface CreateOrderFromCartDto {
   cartItemIds: string[];
   addressId: string;
   paymentType: "qr" | "cod";
+  voucherId?: string;
 }
 
 export interface AddressResponseDto {
@@ -697,12 +739,33 @@ export interface AddressResponseDto {
   isDefault: boolean;
 }
 
+export interface VoucherResponseDto {
+  id: string;
+  code: string;
+  type: "fixed" | "percent";
+  discountValue: number;
+  maxDiscountValue: number;
+  minOrderValue: number;
+  stock: number;
+  totalUsed: number;
+  campaignName: string;
+  description: string;
+  /** @format date-time */
+  expiryAt: string;
+  isClaim: boolean;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+}
+
 export interface OrderResponseDto {
   id: string;
   address: AddressResponseDto;
-  status: "pending" | "confirmed" | "shipping" | "completed";
+  status: "pending" | "confirmed" | "shipping" | "completed" | "cancel";
   orderItems: OrderItemResponseDto[];
   amount: number;
+  voucher: VoucherResponseDto;
   /** @format date-time */
   createdAt: string;
 }
@@ -745,7 +808,7 @@ export interface CreatePaymentResponseDto {
 }
 
 export interface CheckPaymentStatusResponseDto {
-  status: "not_yet" | "failed" | "success" | "pending";
+  status: "not_yet" | "failed" | "success" | "pending" | "cancel";
 }
 
 export interface AskDto {
@@ -781,6 +844,15 @@ export interface ReviewResponseDto {
 export interface ListReviewResponseDto {
   data: ReviewResponseDto[];
   paginate: PaginateMetaDto;
+}
+
+export interface ListVoucherResponseDto {
+  data: VoucherResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface TakeVoucherDto {
+  voucherId: string;
 }
 
 import type {
@@ -1011,29 +1083,9 @@ export class Api<
      * @request GET:/api/v1/auth/google/callback
      */
     authControllerGoogleAuthCallback: (params: RequestParams = {}) =>
-      this.request<LoginResponseDto, any>({
+      this.request<void, any>({
         path: `/api/v1/auth/google/callback`,
         method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Auth
-     * @name AuthControllerGoogleVerifyCode
-     * @summary GOOGLE OAUTH CALLBACK VERIFY CODE TO GET TOKEN
-     * @request GET:/api/v1/auth/google/callback/verify-code/{code}
-     */
-    authControllerGoogleVerifyCode: (
-      code: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<LoginResponseDto, any>({
-        path: `/api/v1/auth/google/callback/verify-code/${code}`,
-        method: "GET",
-        format: "json",
         ...params,
       }),
 
@@ -2346,6 +2398,64 @@ export class Api<
     /**
      * No description
      *
+     * @tags ADMIN VOUCHER
+     * @name AdminVoucherControllerCreate
+     * @summary [ADMIN] CREATE VOUCHER
+     * @request POST:/api/v1/admin-voucher
+     * @secure
+     */
+    adminVoucherControllerCreate: (
+      data: AdminCreateVoucherDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/admin-voucher`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ADMIN VOUCHER
+     * @name AdminVoucherControllerFindAll
+     * @summary [ADMIN] FIND ALL VOUCHER
+     * @request GET:/api/v1/admin-voucher
+     * @secure
+     */
+    adminVoucherControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+        search?: string;
+        typeFilter?: "fixed" | "percent";
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminListVoucherResponseDto, any>({
+        path: `/api/v1/admin-voucher`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags [USER] CART
      * @name CartControllerAddItemToCart
      * @summary [USER] ADD PRODUCT TO CART
@@ -2614,6 +2724,27 @@ export class Api<
     /**
      * No description
      *
+     * @tags [USER] ORDER
+     * @name OrderControllerCancelQrOrder
+     * @summary [USER] CANCEL QR ORDER
+     * @request POST:/api/v1/order/{orderId}/cancel
+     * @secure
+     */
+    orderControllerCancelQrOrder: (
+      orderId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/order/${orderId}/cancel`,
+        method: "POST",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags [USER] ADDRESS
      * @name AddressControllerCreate
      * @summary [USER] CREATE ADDRESS
@@ -2844,6 +2975,95 @@ export class Api<
     ) =>
       this.request<ListReviewResponseDto, any>({
         path: `/api/v1/review/${productId}`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags USER VOUCHER
+     * @name VoucherControllerFindAll
+     * @summary [USER] FIND ALL VOUCHER
+     * @request GET:/api/v1/voucher
+     * @secure
+     */
+    voucherControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ListVoucherResponseDto, any>({
+        path: `/api/v1/voucher`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags USER VOUCHER
+     * @name VoucherControllerTakeVoucher
+     * @summary [USER] TAKE VOUCHER
+     * @request POST:/api/v1/voucher
+     * @secure
+     */
+    voucherControllerTakeVoucher: (
+      data: TakeVoucherDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/voucher`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags USER VOUCHER
+     * @name VoucherControllerFindAllPersonalVoucher
+     * @summary [USER] FIND ALL PERSONAL VOUCHER
+     * @request GET:/api/v1/voucher/personal
+     * @secure
+     */
+    voucherControllerFindAllPersonalVoucher: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ListVoucherResponseDto, any>({
+        path: `/api/v1/voucher/personal`,
         method: "GET",
         query: query,
         secure: true,

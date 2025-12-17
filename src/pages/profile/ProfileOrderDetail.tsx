@@ -11,6 +11,8 @@ import {
   User,
   CheckCircle,
   Star,
+  X,
+  Ticket,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getOrdersQuery } from "@/queries/orderQueries";
@@ -34,7 +36,7 @@ import { useCreateReview } from "@/queries/reviewQueries";
 import { Spinner } from "@/components/ui/spinner";
 
 const getStatusConfig = (
-  status: "pending" | "shipping" | "confirmed" | "completed"
+  status: "pending" | "shipping" | "confirmed" | "completed" | "cancel"
 ) => {
   switch (status) {
     case "completed":
@@ -60,6 +62,14 @@ const getStatusConfig = (
         bg: "bg-blue-100",
         border: "border-blue-200",
         text: "Đang giao",
+      };
+    case "cancel":
+      return {
+        icon: X,
+        color: "text-red-600",
+        bg: "bg-red-100",
+        border: "border-red-200",
+        text: "Hủy",
       };
     case "pending":
     default:
@@ -322,6 +332,27 @@ export const ProfileOrderDetail: React.FC = () => {
                 <span>Tạm tính</span>
                 <span>{formatPriceVND(order.amount)}</span>
               </div>
+              {order.voucher && (
+                <div className="flex justify-between items-center text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Ticket className="w-4 h-4" />
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-sm">
+                        {order.voucher.code}
+                      </span>
+                      <span className="text-xs text-green-600">
+                        {order.voucher.campaignName}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="font-semibold">
+                    -
+                    {order.voucher.type === "percent"
+                      ? `${order.voucher.discountValue}%`
+                      : formatPriceVND(order.voucher.discountValue)}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-slate-600">
                 <span>Phí vận chuyển</span>
                 <span>Miễn phí</span>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-import { Package, Clock, CheckCircle, Truck, XCircle } from "lucide-react";
+import { Package, Clock, CheckCircle, Truck, XCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getOrdersQuery } from "@/queries/orderQueries";
 import { formatPriceVND } from "@/utils/formatPriceVND";
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/pagination";
 
 const getStatusConfig = (
-  status: "pending" | "shipping" | "confirmed" | "completed"
+  status: "pending" | "shipping" | "confirmed" | "completed" | "cancel"
 ) => {
   switch (status) {
     case "completed":
@@ -44,6 +44,14 @@ const getStatusConfig = (
         bg: "bg-blue-100",
         border: "border-blue-200",
         text: "Đang giao",
+      };
+    case "cancel":
+      return {
+        icon: X,
+        color: "text-red-600",
+        bg: "bg-red-100",
+        border: "border-red-200",
+        text: "Hủy",
       };
     case "pending":
     default:

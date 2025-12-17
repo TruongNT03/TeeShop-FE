@@ -7,6 +7,7 @@ import {
   LogOut,
   X,
   ShoppingCart,
+  Ticket,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -95,8 +96,9 @@ const NavHeader = () => {
               <Link to="/product">
                 <li className="cursor-pointer hover:text-primary">Sản phẩm</li>
               </Link>
-              <li className="cursor-pointer hover:text-primary">Giới thiệu</li>
-              <li className="cursor-pointer hover:text-primary">Liên hệ</li>
+              <Link to="/vouchers">
+                <li className="cursor-pointer hover:text-primary">Voucher</li>
+              </Link>
             </ul>
           </div>
 

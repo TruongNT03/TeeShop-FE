@@ -10,6 +10,7 @@ import {
   Phone,
   User,
   CheckCircle,
+  Ticket,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -211,7 +212,7 @@ const AdminOrderDetail: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden">
+                <div className="w-10 h-10 rounded-sm bg-slate-200 overflow-hidden">
                   {order.user.avatar ? (
                     <img
                       src={order.user.avatar}
@@ -335,6 +336,27 @@ const AdminOrderDetail: React.FC = () => {
                 <span>Subtotal</span>
                 <span>{formatPriceVND(order.amount)}</span>
               </div>
+              {order.voucher && (
+                <div className="flex justify-between items-center text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Ticket className="w-4 h-4" />
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-sm">
+                        {order.voucher.code}
+                      </span>
+                      <span className="text-xs text-green-600">
+                        {order.voucher.campaignName}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="font-semibold">
+                    -
+                    {order.voucher.type === "percent"
+                      ? `${order.voucher.discountValue}%`
+                      : formatPriceVND(order.voucher.discountValue)}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-slate-600">
                 <span>Shipping Fee</span>
                 <span>Free</span>

@@ -31,6 +31,8 @@ import {
   Copy,
   CheckCircle2,
   Plus,
+  Ticket,
+  X,
 } from "lucide-react";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { motion } from "motion/react";
@@ -43,6 +45,7 @@ import {
 import { apiClient } from "@/services/apiClient";
 import type { AddressResponseDto } from "@/api";
 import { useNavigate } from "react-router-dom";
+import { usePersonalVouchersQuery } from "@/queries/userVoucherQueries";
 import { toast } from "sonner";
 import QRCode from "qrcode";
 
@@ -61,10 +64,14 @@ const Checkout = () => {
   const [qrCodeString, setQrCodeString] = useState<string>("");
   const [qrImageUrl, setQrImageUrl] = useState<string>("");
   const [paymentId, setPaymentId] = useState<string>("");
+  const [orderId, setOrderId] = useState<string>("");
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  const [isCancellingOrder, setIsCancellingOrder] = useState(false);
   const [loadingImages, setLoadingImages] = useState<{
     [key: string]: boolean;
   }>({});
+  const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+  const [showVoucherModal, setShowVoucherModal] = useState(false);
 
   // Form state for new address
   const [newAddressData, setNewAddressData] = useState({
@@ -78,6 +85,8 @@ const Checkout = () => {
   // Queries & Mutations
   const { data: addressesData, isLoading: isLoadingAddresses } =
     getAddressesQuery(100);
+  const { data: vouchersData, isLoading: isLoadingVouchers } =
+    usePersonalVouchersQuery(1, 100);
   const { mutate: createOrder, isPending: isCreatingOrder } =
     createOrderFromCartMutation();
   const { mutate: createAddress, isPending: isCreatingAddress } =
@@ -112,8 +121,22 @@ const Checkout = () => {
     [checkoutItems]
   );
 
-  const shipping = 30000;
-  const total = subtotal + shipping;
+  // Tính giảm giá từ voucher
+  const discount = useMemo(() => {
+    if (!selectedVoucher) return 0;
+
+    // Kiểm tra điều kiện đơn hàng tối thiểu
+    if (subtotal < selectedVoucher.minOrderValue) return 0;
+
+    if (selectedVoucher.type === "percent") {
+      const discountAmount = (subtotal * selectedVoucher.discountValue) / 100;
+      return Math.min(discountAmount, selectedVoucher.maxDiscountValue);
+    } else {
+      return selectedVoucher.discountValue;
+    }
+  }, [selectedVoucher, subtotal]);
+
+  const total = subtotal - discount;
 
   // Generate QR code image from string
   useEffect(() => {
@@ -139,6 +162,28 @@ const Checkout = () => {
   // Handle new address form input changes
   const handleNewAddressChange = (field: string, value: string) => {
     setNewAddressData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Handle select voucher
+  const handleSelectVoucher = (voucher: any) => {
+    // Kiểm tra điều kiện đơn hàng tối thiểu
+    if (subtotal < voucher.minOrderValue) {
+      toast.error(
+        `Đơn hàng tối thiểu ${formatPriceVND(
+          voucher.minOrderValue
+        )} để sử dụng voucher này`
+      );
+      return;
+    }
+    setSelectedVoucher(voucher);
+    setShowVoucherModal(false);
+    toast.success(`Đã áp dụng voucher ${voucher.code}`);
+  };
+
+  // Handle remove voucher
+  const handleRemoveVoucher = () => {
+    setSelectedVoucher(null);
+    toast.info("Đã gỡ voucher");
   };
 
   // Handle add new address
@@ -192,10 +237,12 @@ const Checkout = () => {
         cartItemIds: cartItemIds,
         addressId: selectedAddressId,
         paymentType: selectedPayment,
+        ...(selectedVoucher && { voucherId: selectedVoucher.id }),
       },
       {
         onSuccess: async (response) => {
           const createdOrderId = response.data.id;
+          setOrderId(createdOrderId); // Lưu orderId để có thể hủy nếu cần
 
           if (selectedPayment === "qr") {
             // QR payment - create payment and get QR image
@@ -232,6 +279,36 @@ const Checkout = () => {
         },
       }
     );
+  };
+
+  // Handle cancel QR order
+  const handleCancelOrder = async () => {
+    if (!orderId) {
+      toast.error("Đơn hàng không tồn tại");
+      return;
+    }
+
+    setIsCancellingOrder(true);
+    try {
+      await apiClient.api.orderControllerCancelQrOrder(orderId);
+      toast.success("Đã hủy đơn hàng thành công");
+      setShowPaymentModal(false);
+      // Reset states
+      setOrderId("");
+      setPaymentId("");
+      setQrCodeString("");
+      setQrImageUrl("");
+      setPaymentStatus("pending");
+      // Redirect to home
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error: any) {
+      console.error("Cancel order error:", error);
+      toast.error(error?.response?.data?.message || "Hủy đơn hàng thất bại");
+    } finally {
+      setIsCancellingOrder(false);
+    }
   };
 
   // Handle check payment status
@@ -490,10 +567,57 @@ const Checkout = () => {
                 <span className="text-gray-600">Tạm tính</span>
                 <span>{formatPriceVND(subtotal)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Vận chuyển</span>
-                <span>{formatPriceVND(shipping)}</span>
-              </div>
+            </div>
+
+            {/* Voucher Section */}
+            <div className="my-4">
+              {selectedVoucher ? (
+                <div className="border border-green-200 bg-green-50 rounded-lg p-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-2 flex-1">
+                      <Ticket className="w-5 h-5 text-green-600 mt-0.5" />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-green-700">
+                            {selectedVoucher.code}
+                          </span>
+                          <span className="text-xs text-green-600">
+                            {selectedVoucher.type === "percent"
+                              ? `-${selectedVoucher.discountValue}%`
+                              : `-${formatPriceVND(
+                                  selectedVoucher.discountValue
+                                )}`}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600">
+                          {selectedVoucher.campaignName}
+                        </p>
+                        <p className="text-sm text-green-700 font-semibold mt-1">
+                          -{formatPriceVND(discount)}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-gray-500 hover:text-red-600"
+                      onClick={handleRemoveVoucher}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full border-dashed border-primary hover:bg-primary/5"
+                  onClick={() => setShowVoucherModal(true)}
+                  disabled={isLoadingVouchers}
+                >
+                  <Ticket className="w-4 h-4 mr-2" />
+                  Chọn voucher giảm giá
+                </Button>
+              )}
             </div>
 
             <Separator className="my-4" />
@@ -602,7 +726,7 @@ const Checkout = () => {
               </div>
             </div>
           ) : (
-            // QR Payment - show QR code
+            // QR Payment - show QR code OR confirmation
             <div className="space-y-4">
               {paymentStatus === "success" ? (
                 <Card className="p-6 bg-green-50 border-green-200">
@@ -672,16 +796,82 @@ const Checkout = () => {
                   </Button>
 
                   <Button
-                    variant="outline"
+                    variant="destructive"
                     className="w-full"
-                    onClick={() => {
-                      setShowPaymentModal(false);
-                      setQrImageUrl("");
-                      setPaymentId("");
-                    }}
+                    onClick={handleCancelOrder}
+                    disabled={isCancellingOrder}
                   >
-                    Hủy
+                    {isCancellingOrder ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin mr-2" />
+                        Đang hủy...
+                      </>
+                    ) : (
+                      <>
+                        <X className="w-4 h-4 mr-2" />
+                        Hủy đơn hàng
+                      </>
+                    )}
                   </Button>
+                </>
+              ) : !qrImageUrl && !orderId ? (
+                // Chưa tạo order - hiển thị nút xác nhận
+                <>
+                  <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-blue-100 rounded-lg">
+                        <QrCode className="w-8 h-8 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-blue-900 mb-1">
+                          Thanh toán qua QR Code
+                        </h3>
+                        <p className="text-sm text-blue-700">
+                          Bạn sẽ thanh toán {formatPriceVND(total)} qua QR Code
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Order Total:</span>
+                      <span className="font-semibold">
+                        {formatPriceVND(total)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Items:</span>
+                      <span>{checkoutItems.length}</span>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setShowPaymentModal(false)}
+                      disabled={isCreatingOrder}
+                    >
+                      Hủy
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={handleConfirmOrder}
+                      disabled={isCreatingOrder}
+                    >
+                      {isCreatingOrder ? (
+                        <>
+                          <Loader className="w-4 h-4 animate-spin mr-2" />
+                          Đang xử lý...
+                        </>
+                      ) : (
+                        "Xác nhận đặt hàng"
+                      )}
+                    </Button>
+                  </div>
                 </>
               ) : (
                 <Card className="p-4 bg-blue-50 border-blue-200">
@@ -767,6 +957,148 @@ const Checkout = () => {
             <Button
               variant="outline"
               onClick={() => setShowAddressModal(false)}
+            >
+              Đóng
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Voucher Selection Modal */}
+      <Dialog open={showVoucherModal} onOpenChange={setShowVoucherModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <Ticket className="w-6 h-6" />
+              Chọn voucher
+            </DialogTitle>
+            <DialogDescription>
+              Chọn voucher để áp dụng cho đơn hàng của bạn
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            {isLoadingVouchers ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader className="w-8 h-8 animate-spin" />
+              </div>
+            ) : vouchersData?.data && vouchersData.data.length > 0 ? (
+              vouchersData.data.map((voucher) => {
+                const isAvailable = subtotal >= voucher.minOrderValue;
+                const isExpired = new Date(voucher.expiryAt) < new Date();
+                const canUse = isAvailable && !isExpired;
+
+                return (
+                  <div
+                    key={voucher.id}
+                    onClick={() => canUse && handleSelectVoucher(voucher)}
+                    className={`border rounded-lg p-4 transition ${
+                      canUse
+                        ? "cursor-pointer hover:border-primary hover:bg-primary/5"
+                        : "opacity-50 cursor-not-allowed"
+                    } ${
+                      selectedVoucher?.id === voucher.id
+                        ? "border-primary bg-primary/10"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`p-3 rounded-lg ${
+                          voucher.type === "percent"
+                            ? "bg-blue-100"
+                            : "bg-green-100"
+                        }`}
+                      >
+                        <Ticket
+                          className={`w-6 h-6 ${
+                            voucher.type === "percent"
+                              ? "text-blue-600"
+                              : "text-green-600"
+                          }`}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-lg">
+                                {voucher.code}
+                              </span>
+                              <span
+                                className={`text-sm font-semibold px-2 py-0.5 rounded ${
+                                  voucher.type === "percent"
+                                    ? "bg-blue-100 text-blue-700"
+                                    : "bg-green-100 text-green-700"
+                                }`}
+                              >
+                                {voucher.type === "percent"
+                                  ? `-${voucher.discountValue}%`
+                                  : `-${formatPriceVND(voucher.discountValue)}`}
+                              </span>
+                            </div>
+                            <p className="text-sm font-semibold text-gray-700 mt-1">
+                              {voucher.campaignName}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {voucher.description}
+                            </p>
+                          </div>
+                          {selectedVoucher?.id === voucher.id && (
+                            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-gray-500 mt-2 pt-2 border-t">
+                          <span>
+                            Đơn tối thiểu:{" "}
+                            {formatPriceVND(voucher.minOrderValue)}
+                          </span>
+                          <span>
+                            HSD:{" "}
+                            {new Date(voucher.expiryAt).toLocaleDateString(
+                              "vi-VN"
+                            )}
+                          </span>
+                        </div>
+                        {!isAvailable && !isExpired && (
+                          <p className="text-xs text-red-500 mt-2">
+                            Đơn hàng chưa đủ điều kiện sử dụng voucher này
+                          </p>
+                        )}
+                        {isExpired && (
+                          <p className="text-xs text-red-500 mt-2">
+                            Voucher đã hết hạn
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <Ticket className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p className="font-medium">Chưa có voucher nào</p>
+                <p className="text-sm mt-1">Bạn chưa có voucher khả dụng</p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            {selectedVoucher && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSelectedVoucher(null);
+                  setShowVoucherModal(false);
+                }}
+              >
+                Bỏ chọn
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              onClick={() => setShowVoucherModal(false)}
             >
               Đóng
             </Button>
