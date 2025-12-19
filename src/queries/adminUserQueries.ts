@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminUserApi } from "@/services/adminUserApi";
+import { toast } from "sonner";
 
 export const useAdminUsers = (
   pageSize: number,
@@ -13,5 +14,21 @@ export const useAdminUsers = (
     queryFn: () =>
       adminUserApi.getAllUsers(pageSize, page, search, sortBy, sortOrder),
     placeholderData: (previousData) => previousData,
+  });
+};
+
+export const useCreateAdminUser = (onSuccessCallback?: () => void) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: adminUserApi.createAdminUser,
+    onSuccess: () => {
+      toast.success("Tạo tài khoản admin thành công");
+      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
+      onSuccessCallback?.();
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Có lỗi xảy ra");
+    },
   });
 };

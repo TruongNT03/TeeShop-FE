@@ -105,13 +105,13 @@ const AdminCategory = () => {
       key: "image",
       title: "Image",
       sortable: false,
-      widthClass: "w-[100px]",
+      widthClass: "w-[50px]",
       render: (value: string): React.ReactNode => (
-        <TableCell className="w-[100px]">
+        <TableCell className="w-[50px]">
           <img
             src={value}
             alt="category"
-            className="w-16 h-16 object-cover rounded-md border"
+            className="w-12 h-12 object-cover rounded-md border"
           />
         </TableCell>
       ),
@@ -181,9 +181,9 @@ const AdminCategory = () => {
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead>
+              <TableHead className="px-5">
                 <Checkbox
-                  className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                  className=""
                   checked={isSelectedAll}
                   onCheckedChange={(checked) => {
                     if (checked && categories) {
@@ -265,9 +265,9 @@ const AdminCategory = () => {
                   key={category.id}
                   className={`${index % 2 ? "bg-muted" : ""}`}
                 >
-                  <TableCell className="py-5">
+                  <TableCell className="px-5 py-3">
                     <Checkbox
-                      className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                      className=""
                       checked={selectedItems.includes(category.id)}
                       onCheckedChange={(checked) => {
                         if (checked) {
@@ -298,6 +298,17 @@ const AdminCategory = () => {
                 </TableRow>
               ))
             )}
+            {categories.length > 0 &&
+              categories.length < query.pageSize &&
+              Array.from({ length: query.pageSize - categories.length }).map(
+                (_, index) => (
+                  <TableRow key={`empty-${index}`} className="border-none h-16">
+                    <TableCell colSpan={tableHeaderTitles.length + 2}>
+                      &nbsp;
+                    </TableCell>
+                  </TableRow>
+                )
+              )}
           </TableBody>
         </Table>
 

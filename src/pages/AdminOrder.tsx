@@ -302,9 +302,9 @@ const AdminOrder = () => {
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead>
+              <TableHead className="px-8 py-5">
                 <Checkbox
-                  className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                  className=""
                   checked={isSelectedAll}
                   onCheckedChange={(checked) => {
                     if (checked && orders) {
@@ -320,7 +320,7 @@ const AdminOrder = () => {
                 <div>No.</div>
               </TableHead>
               {tableHeaderTitles.map((value, index) => (
-                <TableHead key={index} className="py-5">
+                <TableHead key={index} className="py-3">
                   <div
                     className={cn(
                       "flex items-center",
@@ -385,14 +385,12 @@ const AdminOrder = () => {
               orders.map((order, index) => (
                 <TableRow
                   key={order.id}
-                  className={`${
-                    index % 2 ? "bg-muted" : ""
-                  } cursor-pointer hover:bg-slate-100`}
+                  className={`${index % 2 ? "bg-muted" : ""} cursor-pointer`}
                   onClick={() => navigate(`/admin/order/${order.id}`)}
                 >
-                  <TableCell className="py-5">
+                  <TableCell className="px-8">
                     <Checkbox
-                      className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                      className=""
                       checked={selectedOrders.includes(order.id)}
                       onCheckedChange={(checked) => {
                         if (checked) {
@@ -427,6 +425,17 @@ const AdminOrder = () => {
                 </TableRow>
               ))
             )}
+            {orders.length > 0 &&
+              orders.length < query.pageSize &&
+              Array.from({ length: query.pageSize - orders.length }).map(
+                (_, index) => (
+                  <TableRow key={`empty-${index}`} className="border-none">
+                    <TableCell colSpan={tableHeaderTitles.length + 2}>
+                      &nbsp;
+                    </TableCell>
+                  </TableRow>
+                )
+              )}
           </TableBody>
         </Table>
 

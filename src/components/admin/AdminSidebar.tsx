@@ -11,6 +11,7 @@ import {
   Wrench,
   Ticket,
   ChevronsLeftRight,
+  MapPin,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -112,10 +113,9 @@ const AdminSideBar = () => {
                         </div>
                       </SidebarMenuSubItem>
                       <SidebarMenuSubItem>
-                        <SidebarMenuSubButton>Role</SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton>Permission</SidebarMenuSubButton>
+                        <SidebarMenuSubButton>
+                          Role & Permission
+                        </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     </SidebarMenuSub>
                   </CollapsibleContent>
@@ -166,6 +166,16 @@ const AdminSideBar = () => {
                   <SidebarMenuButton>
                     <CreditCard />
                     <span>Order</span>
+                  </SidebarMenuButton>
+                </div>
+              </SidebarMenuItem>
+
+              {/* Location */}
+              <SidebarMenuItem>
+                <div onClick={() => navigate("/admin/location")}>
+                  <SidebarMenuButton>
+                    <MapPin />
+                    <span>Location</span>
                   </SidebarMenuButton>
                 </div>
               </SidebarMenuItem>

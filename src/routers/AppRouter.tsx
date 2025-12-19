@@ -38,6 +38,7 @@ import GoogleCallback from "@/pages/GoogleCallback";
 import AdminVoucher from "@/pages/AdminVoucher";
 import AdminCreateVoucher from "@/pages/AdminCreateVoucher";
 import UserVouchers from "@/pages/UserVouchers";
+import AdminLocation from "@/pages/AdminLocation";
 
 const AppRouter = () => {
   return (
@@ -94,6 +95,8 @@ const AppRouter = () => {
             <Route path="/admin/order" element={<AdminOrder />} />
             <Route path="/admin/order/:id" element={<AdminOrderDetail />} />
             <Route path="/admin/user" element={<AdminUser />} />
+
+            <Route path="/admin/location" element={<AdminLocation />} />
             <Route path="/admin/configuration" element={<AdminConfig />} />
             <Route path="/admin/chatbot" element={<AdminChatbotConfig />} />
             <Route

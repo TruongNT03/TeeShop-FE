@@ -9,18 +9,38 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUpDown, Search, Users, UserCheck } from "lucide-react";
+import { ArrowUpDown, Search, Users, UserCheck, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { convertDateTime } from "@/utils/convertDateTime";
 import type { UserResponseDto } from "@/api";
-import { Spinner } from "@/components/ui/spinner";
-import { useAdminUsers } from "@/queries/adminUserQueries";
+import { useAdminUsers, useCreateAdminUser } from "@/queries/adminUserQueries";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useAdminLocations } from "@/queries/adminLocationQueries";
+import { Spinner } from "@/components/ui/spinner";
 
 export enum AdminUserSortField {
   EMAIL = "email",
@@ -40,6 +60,17 @@ type AdminUserQuery = {
   sortOrder?: "ASC" | "DESC";
 };
 
+const formSchema = z.object({
+  email: z.string().email("Email không hợp lệ"),
+  name: z.string().min(1, "Tên là bắt buộc"),
+  phoneNumber: z.string().min(1, "Số điện thoại là bắt buộc"),
+  gender: z.enum(["male", "female", "other"]),
+  roles: z.array(z.string()).min(1, "Vui lòng chọn ít nhất một vai trò"),
+  locationId: z.string().min(1, "Vui lòng chọn địa điểm"),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
 const AdminUser = () => {
   const [query, setQuery] = useState<AdminUserQuery>({
     page: 1,
@@ -55,6 +86,9 @@ const AdminUser = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isSelectedAll, setIsSelectedAll] = useState(false);
 
+  // Modal State
+  const [isOpen, setIsOpen] = useState(false);
+
   const { data, isLoading } = useAdminUsers(
     query.pageSize,
     query.page,
@@ -69,6 +103,31 @@ const AdminUser = () => {
     pageSize: 10,
     totalItem: 0,
     totalPage: 1,
+  };
+
+  // Create Admin Logic
+  const createMutation = useCreateAdminUser(() => {
+    setIsOpen(false);
+    form.reset();
+  });
+  const { data: locationsData, isLoading: isLoadingLocations } =
+    useAdminLocations(100, 1, "");
+  const locations = locationsData?.data.data || [];
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      name: "",
+      phoneNumber: "",
+      gender: "male",
+      roles: ["Product Manager"],
+      locationId: "",
+    },
+  });
+
+  const onSubmit = (data: FormValues) => {
+    createMutation.mutate(data as any);
   };
 
   // Debug: Log user data to check structure
@@ -252,6 +311,162 @@ const AdminUser = () => {
             <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
           </div>
         </div>
+
+        <div>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button variant="default">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Admin
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+              <DialogHeader>
+                <DialogTitle>Tạo Tài Khoản Admin</DialogTitle>
+              </DialogHeader>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6 py-4"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Tên hiển thị</Label>
+                    <Input
+                      id="name"
+                      placeholder="Nhập tên hiển thị"
+                      {...form.register("name")}
+                    />
+                    {form.formState.errors.name && (
+                      <p className="text-sm text-red-500">
+                        {form.formState.errors.name.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Nhập email"
+                      {...form.register("email")}
+                    />
+                    {form.formState.errors.email && (
+                      <p className="text-sm text-red-500">
+                        {form.formState.errors.email.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phoneNumber">Số điện thoại</Label>
+                    <Input
+                      id="phoneNumber"
+                      placeholder="Nhập số điện thoại"
+                      {...form.register("phoneNumber")}
+                    />
+                    {form.formState.errors.phoneNumber && (
+                      <p className="text-sm text-red-500">
+                        {form.formState.errors.phoneNumber.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Giới tính</Label>
+                    <Select
+                      onValueChange={(value) =>
+                        form.setValue("gender", value as any)
+                      }
+                      defaultValue={form.getValues("gender")}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Chọn giới tính" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Nam</SelectItem>
+                        <SelectItem value="female">Nữ</SelectItem>
+                        <SelectItem value="other">Khác</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {form.formState.errors.gender && (
+                      <p className="text-sm text-red-500">
+                        {form.formState.errors.gender.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Địa điểm làm việc</Label>
+                    <Select
+                      onValueChange={(value) =>
+                        form.setValue("locationId", value)
+                      }
+                      disabled={isLoadingLocations}
+                    >
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            isLoadingLocations ? "Đang tải..." : "Chọn địa điểm"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {locations.map((location) => (
+                          <SelectItem key={location.id} value={location.id}>
+                            {location.address}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {form.formState.errors.locationId && (
+                      <p className="text-sm text-red-500">
+                        {form.formState.errors.locationId.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Vai trò</Label>
+                    <div className="flex items-center space-x-2 border p-3 rounded-md">
+                      <Checkbox
+                        id="role-pm"
+                        checked={form
+                          .watch("roles")
+                          ?.includes("Product Manager")}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            form.setValue("roles", ["Product Manager"]);
+                          } else {
+                            form.setValue("roles", []);
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor="role-pm"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Product Manager
+                      </label>
+                    </div>
+                    {form.formState.errors.roles && (
+                      <p className="text-sm text-red-500">
+                        {form.formState.errors.roles.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button type="submit" disabled={createMutation.isPending}>
+                    {createMutation.isPending && <Spinner className="mr-2" />}
+                    Tạo tài khoản
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Table */}
@@ -341,7 +556,7 @@ const AdminUser = () => {
                   key={user.id}
                   className={`${index % 2 ? "bg-muted" : ""}`}
                 >
-                  <TableCell className="py-5">
+                  <TableCell className="py-3">
                     <Checkbox
                       className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
                       checked={selectedUsers.includes(user.id)}
@@ -380,6 +595,17 @@ const AdminUser = () => {
                 </TableRow>
               ))
             )}
+            {users.length > 0 &&
+              users.length < query.pageSize &&
+              Array.from({ length: query.pageSize - users.length }).map(
+                (_, index) => (
+                  <TableRow key={`empty-${index}`} className="border-none">
+                    <TableCell colSpan={tableHeaderTitles.length + 2}>
+                      &nbsp;
+                    </TableCell>
+                  </TableRow>
+                )
+              )}
           </TableBody>
         </Table>
 

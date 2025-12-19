@@ -3,19 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Ticket,
-  Clock,
-  Gift,
-  Percent,
-  DollarSign,
-  Zap,
-  Flame,
-  Sparkles,
-} from "lucide-react";
+import { Ticket, Clock } from "lucide-react";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
 import {
   useUserVouchersQuery,
   usePersonalVouchersQuery,
@@ -48,24 +38,18 @@ const VoucherCard = ({
       const hours = Math.floor(
         (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
       );
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
       if (days > 0) {
-        setTimeLeft(`${days} ngày ${hours} giờ`);
+        setTimeLeft(`${days}d`);
       } else if (hours > 0) {
-        setTimeLeft(
-          `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
-            .toString()
-            .padStart(2, "0")}`
-        );
+        setTimeLeft(`${hours}h`);
       } else {
-        setTimeLeft(`${minutes}:${seconds.toString().padStart(2, "0")}`);
+        setTimeLeft("< 1h");
       }
     };
 
     updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
+    const interval = setInterval(updateCountdown, 60000);
 
     return () => clearInterval(interval);
   }, [voucher.expiryAt]);
@@ -75,176 +59,122 @@ const VoucherCard = ({
     : 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50 relative p-0">
-        {/* Flash sale badge */}
-        {!isClaimed && stockPercentage < 30 && (
-          <div className="absolute top-2 right-2 z-10">
-            <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse">
-              <Zap className="w-3 h-3 mr-1" />
-              HOT
-            </Badge>
-          </div>
-        )}
-
-        <div className="flex relative">
-          {/* Decorative corner */}
-          <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-yellow-400/20 to-transparent rounded-br-full"></div>
-
-          {/* Left side - Discount info */}
-          <div
-            className={`w-36 flex flex-col items-center justify-center p-4 relative overflow-hidden ${
-              voucher.type === "percent"
-                ? "bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600"
-                : "bg-gradient-to-br from-green-500 via-green-600 to-emerald-600"
-            } text-white`}
-          >
-            {/* Animated sparkles */}
-            <div className="absolute inset-0 opacity-20">
-              <Sparkles className="absolute top-2 right-2 w-4 h-4 animate-pulse" />
-              <Sparkles className="absolute bottom-4 left-3 w-3 h-3 animate-pulse delay-150" />
-            </div>
-
-            {voucher.type === "percent" ? (
-              <>
-                <div className="relative">
-                  <Percent className="w-10 h-10 mb-2 animate-bounce" />
-                </div>
-                <div className="text-4xl font-black drop-shadow-lg">
-                  {voucher.discountValue}%
-                </div>
-                <div className="text-xs text-center mt-2 font-semibold bg-white/20 px-2 py-1 rounded">
-                  Max {formatPriceVND(voucher.maxDiscountValue)}
-                </div>
-              </>
-            ) : (
-              <>
-                <Flame className="w-10 h-10 mb-2 animate-pulse" />
-                <div className="text-2xl font-black drop-shadow-lg">
-                  {formatPriceVND(voucher.discountValue)}
-                </div>
-                <div className="text-xs mt-1 font-semibold">GIẢM NGAY</div>
-              </>
-            )}
+    <Card className="border border-gray-200 hover:border-primary transition-colors duration-200 overflow-hidden">
+      <div className="flex h-full">
+        {/* Left - Discount */}
+        <div className="w-24 bg-primary text-white flex flex-col items-center justify-center p-3 relative">
+          {/* Serrated edge effect */}
+          <div className="absolute -right-[5px] top-0 bottom-0 w-[10px]">
+            <svg width="10" height="100%" className="absolute right-0">
+              <defs>
+                <pattern
+                  id="serrated"
+                  x="0"
+                  y="0"
+                  width="10"
+                  height="16"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <circle cx="5" cy="6" r="5" fill="white" />
+                </pattern>
+              </defs>
+              <rect width="10" height="100%" fill="url(#serrated)" />
+            </svg>
           </div>
 
-          {/* Right side - Details */}
-          <div className="flex-1 p-4 bg-gradient-to-br from-white to-gray-50">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-bold text-lg bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    {voucher.campaignName}
-                  </h3>
-                  {!isClaimed && stockPercentage < 20 && (
-                    <Badge
-                      variant="destructive"
-                      className="text-xs animate-pulse"
-                    >
-                      <Flame className="w-3 h-3 mr-1" />
-                      Sắp hết
-                    </Badge>
-                  )}
+          {voucher.type === "percent" ? (
+            <>
+              <div className="text-3xl font-bold">{voucher.discountValue}%</div>
+              {voucher.maxDiscountValue && (
+                <div className="text-[10px] text-center mt-1 opacity-80">
+                  Max{" "}
+                  {formatPriceVND(voucher.maxDiscountValue).replace("VNĐ", "k")}
                 </div>
-                <p className="text-sm text-muted-foreground font-medium">
-                  {voucher.description}
-                </p>
-              </div>
+              )}
+            </>
+          ) : (
+            <div className="text-lg font-bold text-center leading-tight">
+              {formatPriceVND(voucher.discountValue).replace("VNĐ", "")}
+            </div>
+          )}
+        </div>
+
+        {/* Right - Content */}
+        <div className="flex-1 p-3 flex flex-col justify-between bg-white">
+          <div>
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <h3 className="font-semibold text-sm line-clamp-1">
+                {voucher.campaignName}
+              </h3>
+              {!isClaimed && stockPercentage < 30 && stockPercentage > 0 && (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] h-5 border-primary text-primary shrink-0"
+                >
+                  Sắp hết
+                </Badge>
+              )}
             </div>
 
-            <div className="space-y-2 mb-3">
-              <div className="flex items-center gap-2 text-sm bg-gray-100 px-3 py-2 rounded-lg border-2 border-dashed border-gray-300">
-                <Ticket className="w-4 h-4 text-primary" />
-                <span className="font-mono font-bold text-primary">
-                  {voucher.code}
-                </span>
+            <div className="space-y-1 text-xs mb-2">
+              <div className="flex items-center gap-1.5 text-gray-600">
+                <Ticket className="w-3 h-3" />
+                <span className="font-mono font-medium">{voucher.code}</span>
               </div>
+
               {voucher.minOrderValue > 0 && (
-                <div className="text-sm text-muted-foreground bg-blue-50 px-3 py-1 rounded">
+                <div className="text-gray-600">
                   Đơn tối thiểu:{" "}
-                  <span className="font-semibold text-blue-600">
+                  <span className="font-medium text-primary">
                     {formatPriceVND(voucher.minOrderValue)}
                   </span>
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Countdown & Stock */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2 text-sm bg-gradient-to-r from-orange-100 to-red-100 px-3 py-2 rounded-lg border border-orange-300">
-                <Clock className="w-4 h-4 text-orange-600 animate-pulse" />
-                <span className="font-bold text-orange-700">{timeLeft}</span>
-              </div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-3 text-xs text-gray-600">
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {timeLeft}
+              </span>
               {!isClaimed && voucher.stock && (
-                <div className="text-sm font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                  Còn:{" "}
-                  <span className="text-primary">
-                    {voucher.stock - voucher.totalUsed}
-                  </span>
-                  /{voucher.stock}
-                </div>
+                <span>
+                  {voucher.stock - voucher.totalUsed}/{voucher.stock}
+                </span>
               )}
             </div>
 
-            {/* Progress bar for stock */}
-            {!isClaimed && voucher.stock && (
-              <div className="mb-3">
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden border-2 border-gray-300">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${100 - stockPercentage}%` }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 h-full rounded-full relative overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-                  </motion.div>
-                </div>
-              </div>
-            )}
-
-            {/* Action button */}
             {!isClaimed ? (
               <Button
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                size="sm"
+                className="bg-primary hover:bg-primary/90 text-white h-7 px-3 text-xs"
                 onClick={() => onClaim?.(voucher.id)}
                 disabled={stockPercentage <= 0 || voucher.isClaim}
               >
-                <Gift className="w-5 h-5 mr-2" />
                 {stockPercentage <= 0
-                  ? "Đã hết"
+                  ? "Hết"
                   : voucher.isClaim
-                  ? "ĐÃ LẤY"
-                  : "LẤY VOUCHER NGAY"}
+                  ? "Đã lấy"
+                  : "Lấy"}
               </Button>
             ) : (
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  {voucher.isUsed ? (
-                    <Badge variant="outline" className="border-gray-400">
-                      Đã sử dụng
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="outline"
-                      className="border-green-500 text-green-600"
-                    >
-                      Chưa sử dụng
-                    </Badge>
-                  )}
-                </div>
-                <Button variant="outline" size="sm" disabled={voucher.isUsed}>
-                  Sử dụng ngay
-                </Button>
-              </div>
+              <Badge
+                variant="outline"
+                className={`text-xs h-6 ${
+                  voucher.isUsed
+                    ? "border-gray-400 text-gray-600"
+                    : "border-primary text-primary"
+                }`}
+              >
+                {voucher.isUsed ? "Đã dùng" : "Chưa dùng"}
+              </Badge>
             )}
           </div>
         </div>
-      </Card>
-    </motion.div>
+      </div>
+    </Card>
   );
 };
 
@@ -293,120 +223,38 @@ const UserVouchers = () => {
   };
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4 py-8 pt-16">
-      {/* Header with gradient background */}
-      <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 p-8 text-white">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="w-8 h-8 animate-pulse" />
-            <h1 className="text-4xl font-black">Kho Voucher</h1>
-            <Zap className="w-8 h-8 animate-bounce" />
-          </div>
-          <p className="text-lg font-semibold text-white/90">
-            Lấy ngay các voucher giảm giá cực shock - Số lượng có hạn!
-          </p>
-        </div>
-        {/* Decorative elements */}
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-yellow-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 hover:shadow-lg transition-shadow">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md">
-                <Gift className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm text-blue-700 font-semibold">
-                  Voucher khả dụng
-                </p>
-                <p className="text-3xl font-black text-blue-900">
-                  {availableVouchers.length}
-                </p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 hover:shadow-lg transition-shadow">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md">
-                <Ticket className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm text-green-700 font-semibold">
-                  Voucher của tôi
-                </p>
-                <p className="text-3xl font-black text-green-900">
-                  {claimedVouchers.length}
-                </p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 hover:shadow-lg transition-shadow">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-md">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm text-purple-700 font-semibold">
-                  Sắp hết hạn
-                </p>
-                <p className="text-3xl font-black text-purple-900">
-                  {
-                    claimedVouchers.filter(
-                      (v) =>
-                        new Date(v.expiryAt).getTime() - Date.now() <
-                        3 * 24 * 60 * 60 * 1000
-                    ).length
-                  }
-                </p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
+    <div className="max-w-[1200px] mx-auto  px-4 py-8 pt-20">
+      {/* Header */}
+      <div className="mb-12">
+        <h1 className="text-2xl font-medium uppercase mb-2">Voucher</h1>
+        <p className="text-gray-600">Lấy và quản lý mã giảm giá của bạn</p>
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="available" className="w-full">
-        <TabsList className="grid w-full md:w-[400px] grid-cols-2">
-          <TabsTrigger value="available" className="cursor-pointer">
-            Voucher Khả Dụng
+        <TabsList className="inline-flex h-10 items-center justify-start rounded-lg bg-gray-100 p-1 mb-8">
+          <TabsTrigger
+            value="available"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-1.5 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm"
+          >
+            Voucher khả dụng
           </TabsTrigger>
-          <TabsTrigger value="claimed" className="cursor-pointer">
-            Voucher Của Tôi
+          <TabsTrigger
+            value="claimed"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-1.5 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm"
+          >
+            Voucher của tôi
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="available" className="mt-6">
+        <TabsContent value="available" className="mt-0">
           {isLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-              <p className="text-muted-foreground mt-4">Đang tải voucher...</p>
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-primary"></div>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {availableVouchers.map((voucher) => (
                   <VoucherCard
                     key={voucher.id}
@@ -416,36 +264,31 @@ const UserVouchers = () => {
                 ))}
               </div>
               {availableVouchers.length === 0 && (
-                <div className="text-center py-12">
-                  <Gift className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">
-                    Hiện chưa có voucher khả dụng
-                  </p>
+                <div className="text-center py-20">
+                  <Ticket className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600">Chưa có voucher khả dụng</p>
                 </div>
               )}
             </>
           )}
         </TabsContent>
 
-        <TabsContent value="claimed" className="mt-6">
+        <TabsContent value="claimed" className="mt-0">
           {isLoadingPersonal ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-              <p className="text-muted-foreground mt-4">Đang tải voucher...</p>
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-primary"></div>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {claimedVouchers.map((voucher) => (
                   <VoucherCard key={voucher.id} voucher={voucher} isClaimed />
                 ))}
               </div>
               {claimedVouchers.length === 0 && (
-                <div className="text-center py-12">
-                  <Ticket className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">
-                    Bạn chưa lấy voucher nào
-                  </p>
+                <div className="text-center py-20">
+                  <Ticket className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600">Bạn chưa lấy voucher nào</p>
                 </div>
               )}
             </>

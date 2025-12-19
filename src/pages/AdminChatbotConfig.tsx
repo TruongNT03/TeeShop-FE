@@ -367,7 +367,7 @@ const AdminChatbotConfig = () => {
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead className="pl-8">
+              <TableHead className="pl-8 py-5">
                 <div>No.</div>
               </TableHead>
               <TableHead className="py-5">
@@ -462,10 +462,10 @@ const AdminChatbotConfig = () => {
                   key={qa.id}
                   className={`${index % 2 ? "bg-muted" : ""}`}
                 >
-                  <TableCell className="pl-8">
+                  <TableCell className="pl-8 py-3">
                     {index + 1 + (query.page - 1) * query.pageSize}
                   </TableCell>
-                  <TableCell className="font-medium max-w-[300px]">
+                  <TableCell className="font-medium max-w-[300px] py-3">
                     {qa.question}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground max-w-[400px] truncate">
@@ -498,6 +498,15 @@ const AdminChatbotConfig = () => {
                 </TableRow>
               ))
             )}
+            {qaPairs.length > 0 &&
+              qaPairs.length < query.pageSize &&
+              Array.from({ length: query.pageSize - qaPairs.length }).map(
+                (_, index) => (
+                  <TableRow key={`empty-${index}`} className="border-none">
+                    <TableCell colSpan={5}>&nbsp;</TableCell>
+                  </TableRow>
+                )
+              )}
           </TableBody>
         </Table>
 

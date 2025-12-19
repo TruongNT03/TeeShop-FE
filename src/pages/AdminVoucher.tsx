@@ -260,7 +260,7 @@ const AdminVoucher = () => {
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead className="pl-8 py-8">Chiến dịch</TableHead>
+              <TableHead className="pl-8 py-5">Chiến dịch</TableHead>
               <TableHead>Mã Voucher</TableHead>
               <TableHead>Loại</TableHead>
               <TableHead>Giá trị</TableHead>
@@ -319,7 +319,7 @@ const AdminVoucher = () => {
             ) : (
               vouchers.map((voucher) => (
                 <TableRow key={voucher.id}>
-                  <TableCell className="pl-8">
+                  <TableCell className="pl-8 py-3">
                     <div className="font-semibold">{voucher.campaignName}</div>
                     {voucher.description && (
                       <div className="text-xs text-muted-foreground mt-0.5">
@@ -389,6 +389,15 @@ const AdminVoucher = () => {
                 </TableRow>
               ))
             )}
+            {vouchers.length > 0 &&
+              vouchers.length < pageSize &&
+              Array.from({ length: pageSize - vouchers.length }).map(
+                (_, index) => (
+                  <TableRow key={`empty-${index}`} className="border-none">
+                    <TableCell colSpan={10}>&nbsp;</TableCell>
+                  </TableRow>
+                )
+              )}
           </TableBody>
         </Table>
       </Card>

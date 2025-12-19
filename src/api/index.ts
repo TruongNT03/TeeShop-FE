@@ -152,6 +152,15 @@ export interface UserListResponseDto {
   paginate: PaginateMetaDto;
 }
 
+export interface AdminCreateUserDto {
+  email: string;
+  name: string;
+  gender: "male" | "female" | "other";
+  phoneNumber: string;
+  roles: "Product Manager"[];
+  locationId: string;
+}
+
 export interface SaveCategoryDto {
   /** @example "Áo thu đông" */
   title: string;
@@ -649,6 +658,42 @@ export interface AdminCreateVoucherDto {
 export interface AdminListVoucherResponseDto {
   data: AdminVoucherResponseDto[];
   paginate: PaginateMetaDto;
+}
+
+export interface AdminCreateLocationDto {
+  address: string;
+  hotline: string;
+  openTime: string;
+  closeTime: string;
+  openDate: string;
+}
+
+export interface AdminLocationResponseDto {
+  id: string;
+  address: string;
+  hotline: string;
+  openTime: string;
+  closeTime: string;
+  openDate: string;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  /** @format date-time */
+  deletedAt: string;
+}
+
+export interface AdminListLocationResponseDto {
+  data: AdminLocationResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface AdminUpdateLocationDto {
+  address?: string;
+  hotline?: string;
+  openTime?: string;
+  closeTime?: string;
+  openDate?: string;
 }
 
 export interface AddItemToCartDto {
@@ -1424,6 +1469,29 @@ export class Api<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags [ADMIN] USER MANAGEMENT
+     * @name AdminUserControllerCreate
+     * @summary [ADMIN] CREATE INTERNAL ACCOUNT
+     * @request POST:/api/v1/user
+     * @secure
+     */
+    adminUserControllerCreate: (
+      data: AdminCreateUserDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/user`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -2449,6 +2517,87 @@ export class Api<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ADMIN LOCATION
+     * @name AdminLocationControllerCreate
+     * @summary [ADMIN] CREATE LOCATION
+     * @request POST:/api/v1/admin-location
+     * @secure
+     */
+    adminLocationControllerCreate: (
+      data: AdminCreateLocationDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/admin-location`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ADMIN LOCATION
+     * @name AdminLocationControllerFindAll
+     * @summary [ADMIN] FIND ALL LOCATION
+     * @request GET:/api/v1/admin-location
+     * @secure
+     */
+    adminLocationControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+        search?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminListLocationResponseDto, any>({
+        path: `/api/v1/admin-location`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ADMIN LOCATION
+     * @name AdminLocationControllerUpdate
+     * @summary [ADMIN] UPDATE LOCATION
+     * @request PUT:/api/v1/admin-location/{id}
+     * @secure
+     */
+    adminLocationControllerUpdate: (
+      id: string,
+      data: AdminUpdateLocationDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/admin-location/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

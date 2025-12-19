@@ -466,7 +466,7 @@ const AdminProduct = () => {
                   key={product.id}
                   className={`${index % 2 ? "bg-muted" : ""}`}
                 >
-                  <TableCell className="py-5">
+                  <TableCell className="py-3">
                     <Checkbox
                       className="ml-2 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
                       checked={selectedProducts.includes(product.id)}
@@ -512,6 +512,19 @@ const AdminProduct = () => {
                 </TableRow>
               ))
             )}
+            {(products as AdminProductResponseDto[]).length > 0 &&
+              (products as AdminProductResponseDto[]).length < query.pageSize &&
+              Array.from({
+                length:
+                  query.pageSize -
+                  (products as AdminProductResponseDto[]).length,
+              }).map((_, index) => (
+                <TableRow key={`empty-${index}`} className="border-none">
+                  <TableCell colSpan={tableHeaderTitles.length + 2}>
+                    &nbsp;
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
 
