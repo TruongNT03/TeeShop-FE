@@ -95,7 +95,7 @@ const AppRouter = () => {
             <Route
               path="/admin/product/edit/:id"
               element={
-                canRead("Product") ? <AdminProductEdit /> : <AccessDenied />
+                canUpdate("Product") ? <AdminProductEdit /> : <AccessDenied />
               }
             />
 
@@ -108,7 +108,11 @@ const AppRouter = () => {
             <Route
               path="/admin/category/create"
               element={
-                canRead("Category") ? <AdminCategoryCreate /> : <AccessDenied />
+                canCreate("Category") ? (
+                  <AdminCategoryCreate />
+                ) : (
+                  <AccessDenied />
+                )
               }
             />
             <Route
@@ -163,7 +167,7 @@ const AppRouter = () => {
             <Route
               path="/admin/voucher/create"
               element={
-                canRead("Voucher") ? <AdminCreateVoucher /> : <AccessDenied />
+                canCreate("Voucher") ? <AdminCreateVoucher /> : <AccessDenied />
               }
             />
           </Route>
