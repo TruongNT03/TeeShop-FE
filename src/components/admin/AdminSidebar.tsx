@@ -12,6 +12,8 @@ import {
   Ticket,
   ChevronsLeftRight,
   MapPin,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -43,10 +45,12 @@ import {
   type RoleType,
 } from "@/types/userRequestPayload";
 import { Badge } from "../ui/badge";
+import { useTheme } from "next-themes";
 
 const AdminSideBar = () => {
   const navigate = useNavigate();
   const { logoutMutate, profile } = useAuth();
+  const { setTheme, theme } = useTheme();
   let roles: RoleType[] = [];
   const accessToken = localStorage.getItem("accessToken");
   if (accessToken) {
@@ -284,15 +288,19 @@ const AdminSideBar = () => {
               ))}
             </div>
             <div className="w-full h-[1px] bg-gray-300 my-2" />
-            {/* <Button variant="ghost" className="w-full flex justify-start gap-3">
-              <UserPen className="w-4 h-4" />
-              <span>Profile</span>
+            
+            <Button
+              variant="ghost"
+              className="w-full flex justify-start gap-3"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
+              <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
             </Button>
-
-            <Button variant="ghost" className="w-full flex justify-start gap-3">
-              <Bell className="w-4 h-4" />
-              <span>Notification</span>
-            </Button> */}
 
             <Button
               variant="ghost"

@@ -8,6 +8,8 @@ import {
   X,
   ShoppingCart,
   Ticket,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -18,6 +20,7 @@ import { formatPriceVND } from "@/utils/formatPriceVND";
 import { Badge } from "./ui/badge";
 import { Skeleton } from "./ui/skeleton";
 import Notification from "./Notification";
+import { useTheme } from "next-themes";
 
 const NavHeader = () => {
   const { cartSummaryData } = useCartTooltip();
@@ -26,6 +29,7 @@ const NavHeader = () => {
   const [isHiddenNavHeader, setIsHiddenNavHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { logoutMutate, profile, accessToken } = useAuth();
+  const { setTheme, theme } = useTheme();
 
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -240,6 +244,21 @@ const NavHeader = () => {
                       <MapPin className="h-4 w-4" />
                       <span>Địa chỉ nhận hàng</span>
                     </Link>
+                    <button
+                      onClick={() =>
+                        setTheme(theme === "dark" ? "light" : "dark")
+                      }
+                      className="px-3 py-2 rounded-md hover:bg-slate-100 transition-colors flex items-center gap-2 text-slate-700 hover:text-slate-900 w-full text-left cursor-pointer"
+                    >
+                      {theme === "dark" ? (
+                        <Sun className="h-4 w-4" />
+                      ) : (
+                        <Moon className="h-4 w-4" />
+                      )}
+                      <span>
+                        {theme === "dark" ? "Chế độ sáng" : "Chế độ tối"}
+                      </span>
+                    </button>
                     <div className="h-px bg-slate-200 my-1"></div>
                     <Link
                       to="/"
