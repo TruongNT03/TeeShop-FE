@@ -33,6 +33,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Spinner } from "@/components/ui/spinner";
+import { usePermissions } from "@/contexts/PermissionsContext";
 
 const formSchema = z.object({
   address: z.string().min(1, "Địa chỉ là bắt buộc"),
@@ -50,6 +51,8 @@ const AdminLocation = () => {
     pageSize: 10,
     search: "",
   });
+
+  const { canCreate, canRead, canUpdate, canDelete } = usePermissions();
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -213,7 +216,7 @@ const AdminLocation = () => {
         <div>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button variant="default">
+              <Button variant="default" disabled={!canCreate("Location")}>
                 <Plus className="mr-2 h-4 w-4" />
                 Create Location
               </Button>
@@ -321,103 +324,111 @@ const AdminLocation = () => {
         </div>
       </div>
       {/* Table */}
-      <Card className="py-0 overflow-hidden">
-        <Table>
-          <TableHeader className="bg-muted">
-            <TableRow>
-              <TableHead className="w-[60px] px-8">
-                <div>No.</div>
-              </TableHead>
-              {tableHeaderTitles.map((value, index) => (
-                <TableHead key={index} className="py-5">
-                  {value.title}
+      {canRead("Location") ? (
+        <Card className="py-0 overflow-hidden">
+          <Table>
+            <TableHeader className="bg-muted">
+              <TableRow>
+                <TableHead className="w-[60px] px-8">
+                  <div>No.</div>
                 </TableHead>
-              ))}
-              <TableHead className="text-right px-8">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Skeleton className="h-4 w-4 ml-2" />
-                  </TableCell>
-                  {tableHeaderTitles.map((_, idx) => (
-                    <TableCell key={idx}>
-                      <Skeleton className="h-4 w-24" />
+                {tableHeaderTitles.map((value, index) => (
+                  <TableHead key={index} className="py-5">
+                    {value.title}
+                  </TableHead>
+                ))}
+                <TableHead className="text-right px-8">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-4 ml-2" />
                     </TableCell>
-                  ))}
-                  <TableCell>
-                    <Skeleton className="h-8 w-16 ml-auto" />
+                    {tableHeaderTitles.map((_, idx) => (
+                      <TableCell key={idx}>
+                        <Skeleton className="h-4 w-24" />
+                      </TableCell>
+                    ))}
+                    <TableCell>
+                      <Skeleton className="h-8 w-16 ml-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : locations.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={tableHeaderTitles.length + 2}
+                    className="h-48 text-center text-lg"
+                  >
+                    Không tìm thấy địa điểm nào.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : locations.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={tableHeaderTitles.length + 2}
-                  className="h-48 text-center text-lg"
-                >
-                  Không tìm thấy địa điểm nào.
-                </TableCell>
-              </TableRow>
-            ) : (
-              locations.map(
-                (location: AdminLocationResponseDto, index: number) => (
-                  <TableRow
-                    key={location.id}
-                    className={`${index % 2 ? "bg-muted" : ""}`}
-                  >
-                    <TableCell className="w-[60px] px-8">
-                      {index + 1 + ((query.page ?? 1) - 1) * query.pageSize}
-                    </TableCell>
+              ) : (
+                canRead("Location") &&
+                locations.map(
+                  (location: AdminLocationResponseDto, index: number) => (
+                    <TableRow
+                      key={location.id}
+                      className={`${index % 2 ? "bg-muted" : ""}`}
+                    >
+                      <TableCell className="w-[60px] px-8">
+                        {index + 1 + ((query.page ?? 1) - 1) * query.pageSize}
+                      </TableCell>
 
-                    {tableHeaderTitles.map((tableHeaderTitle, idx) => (
-                      <div key={idx} style={{ display: "contents" }}>
-                        {tableHeaderTitle.render(location)}
-                      </div>
-                    ))}
+                      {tableHeaderTitles.map((tableHeaderTitle, idx) => (
+                        <div key={idx} style={{ display: "contents" }}>
+                          {tableHeaderTitle.render(location)}
+                        </div>
+                      ))}
 
-                    <TableCell className="text-right px-8">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(location)}
-                      >
-                        Edit
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )
-              )
-            )}
-            {locations.length > 0 &&
-              locations.length < query.pageSize &&
-              Array.from({ length: query.pageSize - locations.length }).map(
-                (_, index) => (
-                  <TableRow key={`empty-${index}`} className="border-none">
-                    <TableCell colSpan={tableHeaderTitles.length + 2}>
-                      &nbsp;
-                    </TableCell>
-                  </TableRow>
+                      <TableCell className="text-right px-8">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(location)}
+                        >
+                          Edit
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
                 )
               )}
-          </TableBody>
-        </Table>
+              {locations.length > 0 &&
+                locations.length < query.pageSize &&
+                Array.from({ length: query.pageSize - locations.length }).map(
+                  (_, index) => (
+                    <TableRow key={`empty-${index}`} className="border-none">
+                      <TableCell colSpan={tableHeaderTitles.length + 2}>
+                        &nbsp;
+                      </TableCell>
+                    </TableRow>
+                  )
+                )}
+            </TableBody>
+          </Table>
 
-        <div className="w-full py-3 flex justify-between items-center px-5">
-          <div className="text-sm text-muted-foreground">
-            Tổng: <b>{pagination.totalItem}</b> địa điểm
+          <div className="w-full py-3 flex justify-between items-center px-5">
+            <div className="text-sm text-muted-foreground">
+              Tổng: <b>{pagination.totalItem}</b> địa điểm
+            </div>
+
+            <PaginationControl
+              currentPage={pagination.page}
+              totalPage={pagination.totalPage}
+              onPageChange={handlePageChange}
+            />
           </div>
-
-          <PaginationControl
-            currentPage={pagination.page}
-            totalPage={pagination.totalPage}
-            onPageChange={handlePageChange}
-          />
+        </Card>
+      ) : (
+        <div className="w-full h-[650px] flex flex-col gap-8 justify-center items-center">
+          <img src="/access-denied.png" alt="" className="max-h-[300px]" />
+          <div className="text-6xl">Access denied</div>
         </div>
-      </Card>
+      )}
     </div>
   );
 };

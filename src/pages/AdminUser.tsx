@@ -9,7 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUpDown, Search, Users, UserCheck, Plus } from "lucide-react";
+import {
+  ArrowUpDown,
+  Search,
+  Users,
+  UserCheck,
+  Plus,
+  ChevronDown,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
@@ -41,6 +48,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAdminLocations } from "@/queries/adminLocationQueries";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { usePermissions } from "@/contexts/PermissionsContext";
 
 export enum AdminUserSortField {
   EMAIL = "email",
@@ -125,6 +138,8 @@ const AdminUser = () => {
       locationId: "",
     },
   });
+
+  const { canCreate, canDelete, canRead, canUpdate } = usePermissions();
 
   const onSubmit = (data: FormValues) => {
     createMutation.mutate(data as any);
@@ -315,7 +330,7 @@ const AdminUser = () => {
         <div>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button variant="default">
+              <Button variant="default" disabled={!canCreate("User")}>
                 <Plus className="mr-2 h-4 w-4" />
                 Create Admin
               </Button>
@@ -428,27 +443,64 @@ const AdminUser = () => {
 
                   <div className="space-y-2">
                     <Label>Vai trò</Label>
-                    <div className="flex items-center space-x-2 border p-3 rounded-md">
-                      <Checkbox
-                        id="role-pm"
-                        checked={form
-                          .watch("roles")
-                          ?.includes("Product Manager")}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            form.setValue("roles", ["Product Manager"]);
-                          } else {
-                            form.setValue("roles", []);
-                          }
-                        }}
-                      />
-                      <label
-                        htmlFor="role-pm"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Product Manager
-                      </label>
-                    </div>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className="w-full justify-between"
+                          type="button"
+                        >
+                          {form.watch("roles")?.length > 0
+                            ? (() => {
+                                const roles = form.watch("roles");
+                                const displayRole = roles[0];
+                                const remaining = roles.length - 1;
+                                return remaining > 0
+                                  ? `${displayRole} +${remaining}`
+                                  : displayRole;
+                              })()
+                            : "Chọn vai trò"}
+                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <div className="p-2 space-y-2">
+                          {[
+                            "Product Manager",
+                            "Order Manager",
+                            "Technician",
+                          ].map((role) => (
+                            <div
+                              key={role}
+                              className="flex items-center space-x-2 p-2 hover:bg-muted rounded-md cursor-pointer"
+                              onClick={() => {
+                                const currentRoles = form.watch("roles") || [];
+                                if (currentRoles.includes(role)) {
+                                  form.setValue(
+                                    "roles",
+                                    currentRoles.filter((r) => r !== role)
+                                  );
+                                } else {
+                                  form.setValue("roles", [
+                                    ...currentRoles,
+                                    role,
+                                  ]);
+                                }
+                              }}
+                            >
+                              <Checkbox
+                                checked={form.watch("roles")?.includes(role)}
+                                onCheckedChange={() => {}}
+                              />
+                              <label className="text-sm font-medium leading-none cursor-pointer flex-1">
+                                {role}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     {form.formState.errors.roles && (
                       <p className="text-sm text-red-500">
                         {form.formState.errors.roles.message}

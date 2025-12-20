@@ -39,8 +39,13 @@ import AdminVoucher from "@/pages/AdminVoucher";
 import AdminCreateVoucher from "@/pages/AdminCreateVoucher";
 import UserVouchers from "@/pages/UserVouchers";
 import AdminLocation from "@/pages/AdminLocation";
+import AdminRolePermission from "@/pages/AdminRolePermission";
+import AccessDenied from "@/pages/AccessDenied";
+import { usePermissions } from "@/contexts/PermissionsContext";
 
 const AppRouter = () => {
+  const { canRead, canCreate, canDelete, canUpdate, hasFullPermission } =
+    usePermissions();
   return (
     <BrowserRouter>
       <Routes>
@@ -77,40 +82,92 @@ const AppRouter = () => {
           </Route>
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/product" element={<AdminProduct />} />
+            <Route
+              path="/admin/product"
+              element={canRead("Product") ? <AdminProduct /> : <AccessDenied />}
+            />
             <Route
               path="/admin/product/create"
-              element={<AdminProductCreate />}
+              element={
+                canRead("Product") ? <AdminProductCreate /> : <AccessDenied />
+              }
             />
             <Route
               path="/admin/product/edit/:id"
-              element={<AdminProductEdit />}
+              element={
+                canRead("Product") ? <AdminProductEdit /> : <AccessDenied />
+              }
             />
 
-            <Route path="/admin/category" element={<AdminCategory />} />
+            <Route
+              path="/admin/category"
+              element={
+                canRead("Category") ? <AdminCategory /> : <AccessDenied />
+              }
+            />
             <Route
               path="/admin/category/create"
-              element={<AdminCategoryCreate />}
+              element={
+                canRead("Category") ? <AdminCategoryCreate /> : <AccessDenied />
+              }
             />
-            <Route path="/admin/order" element={<AdminOrder />} />
-            <Route path="/admin/order/:id" element={<AdminOrderDetail />} />
-            <Route path="/admin/user" element={<AdminUser />} />
+            <Route
+              path="/admin/order"
+              element={canRead("Order") ? <AdminOrder /> : <AccessDenied />}
+            />
+            <Route
+              path="/admin/order/:id"
+              element={
+                canRead("Order") ? <AdminOrderDetail /> : <AccessDenied />
+              }
+            />
+            <Route
+              path="/admin/user"
+              element={canRead("User") ? <AdminUser /> : <AccessDenied />}
+            />
+            <Route
+              path="/admin/role-permission"
+              element={
+                hasFullPermission("User") ? (
+                  <AdminRolePermission />
+                ) : (
+                  <AccessDenied />
+                )
+              }
+            />
 
-            <Route path="/admin/location" element={<AdminLocation />} />
-            <Route path="/admin/configuration" element={<AdminConfig />} />
-            <Route path="/admin/chatbot" element={<AdminChatbotConfig />} />
+            <Route
+              path="/admin/location"
+              element={
+                canRead("Location") ? <AdminLocation /> : <AccessDenied />
+              }
+            />
+            <Route
+              path="/admin/configuration"
+              element={canRead("Chatbot") ? <AdminConfig /> : <AccessDenied />}
+            />
+            <Route
+              path="/admin/chatbot"
+              element={
+                canRead("Chatbot") ? <AdminChatbotConfig /> : <AccessDenied />
+              }
+            />
             <Route
               path="/admin/notifications"
               element={<AdminNotification />}
             />
-            <Route path="/admin/voucher" element={<AdminVoucher />} />
+            <Route
+              path="/admin/voucher"
+              element={canRead("Voucher") ? <AdminVoucher /> : <AccessDenied />}
+            />
             <Route
               path="/admin/voucher/create"
-              element={<AdminCreateVoucher />}
+              element={
+                canRead("Voucher") ? <AdminCreateVoucher /> : <AccessDenied />
+              }
             />
           </Route>
         </Route>
-
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .env
+
+PERMISSIONS_GUIDE.md
+PERMISSION_SYSTEM_SUMMARY.md

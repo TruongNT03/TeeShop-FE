@@ -157,7 +157,7 @@ export interface AdminCreateUserDto {
   name: string;
   gender: "male" | "female" | "other";
   phoneNumber: string;
-  roles: "Product Manager"[];
+  roles: ("Product Manager" | "Order Manager" | "Technician")[];
   locationId: string;
 }
 
@@ -658,6 +658,40 @@ export interface AdminCreateVoucherDto {
 export interface AdminListVoucherResponseDto {
   data: AdminVoucherResponseDto[];
   paginate: PaginateMetaDto;
+}
+
+export interface AdminRolePermissionRoleResponseDto {
+  id: string;
+  name: string;
+}
+
+export interface AdminRolePermissionResponseDto {
+  id: string;
+  role: AdminRolePermissionRoleResponseDto;
+  module: string;
+  isCreate: boolean;
+  isRead: boolean;
+  isUpdate: boolean;
+  isDelete: boolean;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  updatedAt: string;
+  /** @format date-time */
+  deletedAt: string;
+}
+
+export interface AdminListRolePermissionResponseDto {
+  data: AdminRolePermissionResponseDto[];
+  paginate: PaginateMetaDto;
+}
+
+export interface UpdateRolePermissionDto {
+  id: string;
+  isCreate: boolean;
+  isRead: boolean;
+  isUpdate: boolean;
+  isDelete: boolean;
 }
 
 export interface AdminCreateLocationDto {
@@ -2524,6 +2558,76 @@ export class Api<
     /**
      * No description
      *
+     * @tags ADMIN ROLE PERMISSION
+     * @name AdminRolePermissionControllerFindAll
+     * @summary ADMIN FIND ALL ROLE PERMISSION
+     * @request GET:/api/v1/admin-role-permission
+     * @secure
+     */
+    adminRolePermissionControllerFindAll: (
+      query: {
+        /**
+         * Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * Number of item per page for page size
+         * @example 10
+         */
+        pageSize: number;
+        role?:
+          | "Admin"
+          | "User"
+          | "Product Manager"
+          | "Order Manager"
+          | "Technician";
+        module?:
+          | "Product"
+          | "User"
+          | "Category"
+          | "Order"
+          | "Voucher"
+          | "Chatbot"
+          | "Location";
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminListRolePermissionResponseDto, any>({
+        path: `/api/v1/admin-role-permission`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ADMIN ROLE PERMISSION
+     * @name AdminRolePermissionControllerUpdateList
+     * @summary ADMIN UPDATE LIST ROLE PERMISSION
+     * @request POST:/api/v1/admin-role-permission
+     * @secure
+     */
+    adminRolePermissionControllerUpdateList: (
+      data: UpdateRolePermissionDto[],
+      params: RequestParams = {},
+    ) =>
+      this.request<SuccessResponseDto, any>({
+        path: `/api/v1/admin-role-permission`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags ADMIN LOCATION
      * @name AdminLocationControllerCreate
      * @summary [ADMIN] CREATE LOCATION
@@ -3215,6 +3319,26 @@ export class Api<
         path: `/api/v1/voucher/personal`,
         method: "GET",
         query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ROLE PERMISSION
+     * @name RolePermissionControllerGetSelfRolePermission
+     * @summary [COMMON] GET SELF ROLE PERMISSION
+     * @request GET:/api/v1/role-permission/self
+     * @secure
+     */
+    rolePermissionControllerGetSelfRolePermission: (
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminRolePermissionResponseDto[], any>({
+        path: `/api/v1/role-permission/self`,
+        method: "GET",
         secure: true,
         format: "json",
         ...params,

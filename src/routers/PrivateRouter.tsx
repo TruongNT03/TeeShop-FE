@@ -16,10 +16,17 @@ const PrivateRouter = () => {
   // Decode token to get user info
   let user: UserRequestPayload;
   let isAdmin = false;
+  const adminRoles = [
+    RoleType.ADMIN,
+    RoleType.PRODUCT_MANAGER,
+    RoleType.ORDER_MANAGER,
+    RoleType.TECHNICIAN,
+  ];
 
   try {
     user = jwtDecode(accessToken);
-    isAdmin = user.roles?.includes(RoleType.ADMIN) || false;
+    isAdmin = user.roles?.some((role) => adminRoles.includes(role)) || false;
+    console.log(isAdmin);
   } catch (error) {
     // Invalid token - redirect to login
     localStorage.removeItem("accessToken");
@@ -31,7 +38,7 @@ const PrivateRouter = () => {
   if (isAdminPath) {
     // Admin routes - only admin can access
     if (!isAdmin) {
-      return <Navigate to="/" replace />;
+      return <Navigate to="/" state={{ from: location }} replace />;
     }
   } else {
     // User routes - admin cannot access

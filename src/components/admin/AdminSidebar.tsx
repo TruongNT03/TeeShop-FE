@@ -36,6 +36,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { PermissionGuard } from "../PermissionGuard";
 
 const AdminSideBar = () => {
   const navigate = useNavigate();
@@ -113,9 +114,15 @@ const AdminSideBar = () => {
                         </div>
                       </SidebarMenuSubItem>
                       <SidebarMenuSubItem>
-                        <SidebarMenuSubButton>
-                          Role & Permission
-                        </SidebarMenuSubButton>
+                        <PermissionGuard module="User" action="full">
+                          <div
+                            onClick={() => navigate("/admin/role-permission")}
+                          >
+                            <SidebarMenuSubButton>
+                              Role & Permission
+                            </SidebarMenuSubButton>
+                          </div>
+                        </PermissionGuard>
                       </SidebarMenuSubItem>
                     </SidebarMenuSub>
                   </CollapsibleContent>
