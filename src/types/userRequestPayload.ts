@@ -1,3 +1,5 @@
+import type { AdminLocationResponseDto } from "@/api";
+
 export enum RoleType {
   ADMIN = "Admin",
   USER = "User",
@@ -6,9 +8,16 @@ export enum RoleType {
   TECHNICIAN = "Technician",
 }
 
+export enum LoginType {
+  DEFAULT = "default",
+  GOOGLE = "google",
+}
+
 export interface UserRequestPayload {
   id: string;
   email: string;
   roles?: RoleType[];
+  loginType: LoginType;
   jti: string;
+  location?: AdminLocationResponseDto;
 }

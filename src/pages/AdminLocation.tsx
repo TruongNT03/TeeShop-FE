@@ -388,7 +388,10 @@ const AdminLocation = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleEdit(location)}
+                          disabled={!canUpdate("Location")}
+                          onClick={() =>
+                            canUpdate("Location") && handleEdit(location)
+                          }
                         >
                           Edit
                         </Button>

@@ -61,6 +61,7 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { usePermissions } from "@/contexts/PermissionsContext";
 
 export enum AdminProductSortField {
   NAME = "name",
@@ -106,6 +107,8 @@ const AdminProduct = () => {
   } = useAdminProduct(query as any);
 
   const statusMutation = updateProductStatusMutation();
+
+  const { canCreate, canDelete, canRead, canUpdate } = usePermissions();
 
   const [categorySearch, setCategorySearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
@@ -237,16 +240,29 @@ const AdminProduct = () => {
         <TableCell>
           <div className="flex gap-2">
             <Link to={`/admin/product/edit/${product.id}`}>
-              <SquarePen className="scale-75 text-primary cursor-pointer" />
+              <SquarePen
+                className={`scale-75 text-primary ${
+                  canUpdate("Product") ? "cursor-pointer" : "cursor-not-allowed"
+                } 
+                  ${canUpdate("Product") ? "" : "opacity-30"}`}
+              />
             </Link>
             {product.status === "published" ? (
               <Archive
-                className={`scale-75 text-destructive cursor-pointer ${
+                className={`scale-75 text-destructive 
+                  ${
+                    canUpdate("Product")
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed"
+                  } 
+                  ${canUpdate("Product") ? "" : "opacity-30"}
+                ${
                   statusMutation.isPending
                     ? "opacity-50 pointer-events-none"
                     : ""
                 }`}
                 onClick={() =>
+                  canUpdate("Product") &&
                   statusMutation.mutate({
                     id: product.id,
                     data: { status: "unpublished" },
@@ -288,12 +304,12 @@ const AdminProduct = () => {
         <h1 className="text-2xl font-medium uppercase">Product Master</h1>
       </div>
       {/* Total */}
-      <div className="flex justify-between gap-8">
+      {/* <div className="flex justify-between gap-8">
         <Card className="flex-1 shadow-none"></Card>
         <Card className="flex-1 shadow-none"></Card>
         <Card className="flex-1 shadow-none"></Card>
         <Card className="flex-1 shadow-none"></Card>
-      </div>
+      </div> */}
       {/* Search and Filter */}
       <div className="flex justify-between">
         <div className="flex">
@@ -361,7 +377,7 @@ const AdminProduct = () => {
 
         <div>
           <Link to="/admin/product/create">
-            <Button variant="default">
+            <Button variant="default" disabled={!canCreate("Product")}>
               <Plus />
               Create Product
             </Button>

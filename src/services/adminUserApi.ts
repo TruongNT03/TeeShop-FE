@@ -7,7 +7,8 @@ export const adminUserApi = {
     page?: number,
     search?: string,
     sortBy?: "email" | "createdAt",
-    sortOrder?: "ASC" | "DESC"
+    sortOrder?: "ASC" | "DESC",
+    roleType?: "user" | "admin"
   ) => {
     const params: any = {
       pageSize,
@@ -15,6 +16,7 @@ export const adminUserApi = {
       ...(search && { search }),
       ...(sortBy && { sortBy }),
       ...(sortOrder && { sortOrder }),
+      ...(roleType && { roleType }),
     };
 
     return apiClient.api.adminUserControllerFindAll(params);

@@ -7,12 +7,28 @@ export const useAdminUsers = (
   page?: number,
   search?: string,
   sortBy?: "email" | "createdAt",
-  sortOrder?: "ASC" | "DESC"
+  sortOrder?: "ASC" | "DESC",
+  roleType?: "user" | "admin"
 ) => {
   return useQuery({
-    queryKey: ["adminUsers", pageSize, page, search, sortBy, sortOrder],
+    queryKey: [
+      "adminUsers",
+      pageSize,
+      page,
+      search,
+      sortBy,
+      sortOrder,
+      roleType,
+    ],
     queryFn: () =>
-      adminUserApi.getAllUsers(pageSize, page, search, sortBy, sortOrder),
+      adminUserApi.getAllUsers(
+        pageSize,
+        page,
+        search,
+        sortBy,
+        sortOrder,
+        roleType
+      ),
     placeholderData: (previousData) => previousData,
   });
 };

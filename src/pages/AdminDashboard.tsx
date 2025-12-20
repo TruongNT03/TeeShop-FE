@@ -32,6 +32,17 @@ import {
 } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
+import type { UserRequestPayload } from "@/types/userRequestPayload";
+import { RoleType } from "@/types/userRequestPayload";
+import { jwtDecode } from "jwt-decode";
+import { useAdminLocations } from "@/queries/adminLocationQueries";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -46,6 +57,31 @@ const AdminDashboard = () => {
     mouth: "Tháng này",
     year: "Năm nay",
   };
+
+  const [userInfo, setUserInfo] = useState<UserRequestPayload>();
+  const [selectedLocationId, setSelectedLocationId] = useState<string>("");
+
+  // Check if user is Admin
+  const isAdmin = userInfo?.roles?.includes(RoleType.ADMIN);
+
+  // Fetch locations only for Admin users
+  const { data: locationsData, isLoading: isLoadingLocations } =
+    useAdminLocations(100, 1, "");
+  const locations = locationsData?.data.data || [];
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      const user = jwtDecode<UserRequestPayload>(accessToken);
+      if (user) {
+        setUserInfo(user);
+        // Set default location for non-admin users
+        if (!user.roles?.includes(RoleType.ADMIN) && user.location?.id) {
+          setSelectedLocationId(user.location.id);
+        }
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -135,75 +171,143 @@ const AdminDashboard = () => {
 
       {/* Statistics */}
       <div className="flex items-center justify-between mb-4">
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="cursor-pointer flex items-center justify-between w-[180px] px-3 py-2 text-sm border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            <span>{statisticOptions[statisticBy]}</span>
-            <ChevronDown
-              className={`h-4 w-4 transition-transform ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          <AnimatePresence>
-            {isDropdownOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.15, ease: "easeOut" }}
-                className="absolute z-50 w-full mt-1 border rounded-md bg-popover shadow-md cursor-pointer"
-              >
-                {(
-                  Object.keys(statisticOptions) as Array<
-                    keyof typeof statisticOptions
-                  >
-                ).map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => {
-                      setStatisticBy(key);
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`cursor-pointer w-full px-3 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground transition-colors first:rounded-t-md last:rounded-b-md ${
-                      statisticBy === key ? "bg-accent" : ""
-                    }`}
-                  >
-                    {statisticOptions[key]}
-                  </button>
+        <div className="flex items-center gap-4">
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="cursor-pointer flex items-center justify-between w-[180px] px-3 py-2 text-sm border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <span>{statisticOptions[statisticBy]}</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${
+                  isDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  className="absolute z-50 w-full mt-1 border rounded-md bg-popover shadow-md cursor-pointer"
+                >
+                  {(
+                    Object.keys(statisticOptions) as Array<
+                      keyof typeof statisticOptions
+                    >
+                  ).map((key) => (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setStatisticBy(key);
+                        setIsDropdownOpen(false);
+                      }}
+                      className={`cursor-pointer w-full px-3 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground transition-colors first:rounded-t-md last:rounded-b-md ${
+                        statisticBy === key ? "bg-accent" : ""
+                      }`}
+                    >
+                      {statisticOptions[key]}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Location Dropdown - Only for Admin */}
+          {isAdmin && (
+            <Select
+              value={selectedLocationId}
+              onValueChange={setSelectedLocationId}
+              disabled={isLoadingLocations}
+            >
+              <SelectTrigger className="w-[300px]">
+                <SelectValue
+                  placeholder={
+                    isLoadingLocations ? "Đang tải..." : "Chọn địa điểm"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {locations.map((location) => (
+                  <SelectItem key={location.id} value={location.id}>
+                    {location.address}
+                  </SelectItem>
                 ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </SelectContent>
+            </Select>
+          )}
         </div>
       </div>
       <div className="grid gap-6 md:grid-cols-3">
-        <StatItem
-          title="Đơn hàng mới"
-          value={statistic?.data?.newOrderCount ?? 0}
-          icon={ShoppingCart}
-          gradient="bg-gradient-to-br from-blue-500/10 to-blue-600/5"
-          iconColor="text-blue-600"
-          isLoading={isStatisticLoading}
-        />
-        <StatItem
-          title="Người dùng mới"
-          value={statistic?.data?.newUserCount ?? 0}
-          icon={Users}
-          gradient="bg-gradient-to-br from-green-500/10 to-green-600/5"
-          iconColor="text-green-600"
-          isLoading={isStatisticLoading}
-        />
-        <StatItem
-          title="Doanh thu"
-          value={formatPriceVND(statistic?.data?.revenue ?? 0)}
-          icon={TrendingUp}
-          gradient="bg-gradient-to-br from-orange-500/10 to-orange-600/5"
-          iconColor="text-orange-600"
-          isLoading={isStatisticLoading}
-        />
+        {/* Location Info Card - Show selected location for Admin or user's location */}
+        <Card className="md:col-span-1 gap-1">
+          <CardHeader className="my-0 py-0 flex">
+            <span className="font-semibold">Địa chỉ:</span>
+            {isAdmin
+              ? locations.find((loc) => loc.id === selectedLocationId)
+                  ?.address || "Chưa chọn địa điểm"
+              : userInfo?.location?.address || "N/A"}
+          </CardHeader>
+          <CardContent className="my-0 py-0 text-sm">
+            <div className="flex gap-2">
+              <span className="font-semibold">Hotline:</span>
+              {isAdmin
+                ? locations.find((loc) => loc.id === selectedLocationId)
+                    ?.hotline || "N/A"
+                : userInfo?.location?.hotline || "N/A"}
+            </div>
+            <div className="flex gap-2">
+              <span className="font-semibold">Open time:</span>
+              {isAdmin
+                ? `${
+                    locations.find((loc) => loc.id === selectedLocationId)
+                      ?.openTime || ""
+                  } ${
+                    locations.find((loc) => loc.id === selectedLocationId)
+                      ?.closeTime || ""
+                  }`
+                : `${userInfo?.location?.openTime || ""} ${
+                    userInfo?.location?.closeTime || ""
+                  }`}
+            </div>
+            <div className="flex gap-2">
+              <span className="font-semibold">Open date:</span>
+              {isAdmin
+                ? locations.find((loc) => loc.id === selectedLocationId)
+                    ?.openDate || "N/A"
+                : userInfo?.location?.openDate || "N/A"}
+            </div>
+          </CardContent>
+        </Card>
+        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatItem
+            title="Đơn hàng mới"
+            value={statistic?.data?.newOrderCount ?? 0}
+            icon={ShoppingCart}
+            gradient="bg-gradient-to-br from-blue-500/10 to-blue-600/5"
+            iconColor="text-blue-600"
+            isLoading={isStatisticLoading}
+          />
+          <StatItem
+            title="Người dùng mới"
+            value={statistic?.data?.newUserCount ?? 0}
+            icon={Users}
+            gradient="bg-gradient-to-br from-green-500/10 to-green-600/5"
+            iconColor="text-green-600"
+            isLoading={isStatisticLoading}
+          />
+          <StatItem
+            title="Doanh thu"
+            value={formatPriceVND(statistic?.data?.revenue ?? 0)}
+            icon={TrendingUp}
+            gradient="bg-gradient-to-br from-orange-500/10 to-orange-600/5"
+            iconColor="text-orange-600"
+            isLoading={isStatisticLoading}
+          />
+        </div>
       </div>
 
       {/* Chart and Pending Orders - Two Column Layout */}

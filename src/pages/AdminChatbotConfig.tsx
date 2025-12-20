@@ -60,6 +60,7 @@ import {
 } from "../queries/chatbotQueries";
 import type { AdminFaqResponseDto } from "../api";
 import { PaginationControl } from "@/components/ui/pagination";
+import { usePermissions } from "@/contexts/PermissionsContext";
 
 // FAQ type categories based on API
 const FAQ_CATEGORIES = [
@@ -95,6 +96,8 @@ const AdminChatbotConfig = () => {
     answer: "",
     type: "" as (typeof FAQ_CATEGORIES)[number] | "",
   });
+
+  const { canCreate, canDelete, canRead, canUpdate } = usePermissions();
 
   // API queries and mutations
   const { data, isLoading } = useGetChatbotData(query);
@@ -179,11 +182,11 @@ const AdminChatbotConfig = () => {
   };
 
   const handleTrainModel = async () => {
-    await retrainingMutation.mutateAsync();
+    canUpdate("Chatbot") && (await retrainingMutation.mutateAsync());
   };
 
   const handleDownloadTemplate = async () => {
-    await downloadTemplateMutation.mutateAsync();
+    canRead("Chatbot") && (await downloadTemplateMutation.mutateAsync());
   };
 
   const handleUploadFile = async (
@@ -297,7 +300,7 @@ const AdminChatbotConfig = () => {
           </div>
           <Button
             onClick={handleDownloadTemplate}
-            disabled={downloadTemplateMutation.isPending}
+            disabled={downloadTemplateMutation.isPending || !canRead("Chatbot")}
             variant="outline"
           >
             {downloadTemplateMutation.isPending ? (
@@ -314,7 +317,7 @@ const AdminChatbotConfig = () => {
           </Button>
           <Button
             variant="outline"
-            disabled={uploadFaqFileMutation.isPending}
+            disabled={uploadFaqFileMutation.isPending || !canUpdate("Chatbot")}
             onClick={() => document.getElementById("faq-upload-input")?.click()}
           >
             {uploadFaqFileMutation.isPending ? (
@@ -338,7 +341,7 @@ const AdminChatbotConfig = () => {
           />
           <Button
             onClick={handleTrainModel}
-            disabled={retrainingMutation.isPending}
+            disabled={retrainingMutation.isPending || !canUpdate("Chatbot")}
             variant="outline"
           >
             {retrainingMutation.isPending ? (
@@ -355,7 +358,11 @@ const AdminChatbotConfig = () => {
           </Button>
         </div>
         <div>
-          <Button variant="default" onClick={() => setIsAddModalOpen(true)}>
+          <Button
+            variant="default"
+            onClick={() => canCreate("Chatbot") && setIsAddModalOpen(true)}
+            disabled={!canCreate("Chatbot")}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Tạo câu hỏi
           </Button>
@@ -482,16 +489,30 @@ const AdminChatbotConfig = () => {
                   <TableCell>
                     <div className="flex gap-2">
                       <SquarePen
-                        className="scale-75 text-primary cursor-pointer"
-                        onClick={() => openEditModal(qa)}
+                        className={`scale-75 text-primary
+                          ${
+                            canUpdate("Chatbot")
+                              ? "cursor-pointer"
+                              : "cursor-not-allowed opacity-30"
+                          }
+                          `}
+                        onClick={() =>
+                          canUpdate("Chatbot") && openEditModal(qa)
+                        }
                       />
                       <Trash2
-                        className={`scale-75 text-destructive cursor-pointer ${
+                        className={`scale-75 text-destructive ${
+                          canDelete("Chatbot")
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed opacity-30"
+                        } ${
                           deleteMutation.isPending
                             ? "opacity-50 pointer-events-none"
                             : ""
                         }`}
-                        onClick={() => handleDeleteQA(qa.id)}
+                        onClick={() =>
+                          canDelete("Chatbot") && handleDeleteQA(qa.id)
+                        }
                       />
                     </div>
                   </TableCell>

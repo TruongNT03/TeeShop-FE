@@ -1493,6 +1493,7 @@ export class Api<
          */
         pageSize: number;
         search?: string;
+        roleType?: "admin" | "user";
         sortBy?: "name" | "email" | "phoneNumber" | "gender" | "createdAt";
         sortOrder?: "DESC" | "ASC";
       },

@@ -40,7 +40,14 @@ export const useLogin = () => {
         const user: UserRequestPayload = jwtDecode<UserRequestPayload>(
           response.data.accessToken
         );
-        if (user.roles && user.roles.includes(RoleType.ADMIN)) {
+        const adminRoles = [
+          RoleType.ADMIN,
+          RoleType.PRODUCT_MANAGER,
+          RoleType.ORDER_MANAGER,
+          RoleType.TECHNICIAN,
+        ];
+        const isAdmin = user.roles?.some((role) => adminRoles.includes(role));
+        if (isAdmin) {
           return navigate("/admin");
         }
         navigate("/");

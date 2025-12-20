@@ -14,7 +14,10 @@ const PrivateRouter = () => {
   }
 
   // Decode token to get user info
-  let user: UserRequestPayload;
+  let userRoles: RoleType[] = [];
+  if (accessToken) {
+    userRoles = jwtDecode<UserRequestPayload>(accessToken).roles || [];
+  }
   let isAdmin = false;
   const adminRoles = [
     RoleType.ADMIN,
@@ -24,14 +27,12 @@ const PrivateRouter = () => {
   ];
 
   try {
-    user = jwtDecode(accessToken);
-    isAdmin = user.roles?.some((role) => adminRoles.includes(role)) || false;
-    console.log(isAdmin);
+    isAdmin = userRoles.some((role) => adminRoles.includes(role)) || false;
   } catch (error) {
     // Invalid token - redirect to login
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // Check authorization

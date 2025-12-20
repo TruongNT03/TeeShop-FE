@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { AdminVoucherResponseDto } from "@/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDebounce } from "@/hooks/useDebounce";
+import { usePermissions } from "@/contexts/PermissionsContext";
 
 const AdminVoucher = () => {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ const AdminVoucher = () => {
   );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { canCreate, canDelete, canRead, canUpdate } = usePermissions();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -249,7 +252,12 @@ const AdminVoucher = () => {
         </div>
 
         {/* Create Button */}
-        <Button onClick={() => navigate("/admin/voucher/create")}>
+        <Button
+          onClick={() =>
+            canCreate("Voucher") && navigate("/admin/voucher/create")
+          }
+          disabled={!canCreate("Voucher")}
+        >
           <Plus className="w-4 h-4 mr-2" />
           Tạo Voucher
         </Button>

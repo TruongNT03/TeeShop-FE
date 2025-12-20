@@ -12,11 +12,10 @@ const PublicRoute = () => {
   ];
   let isAdmin = false;
   try {
-    jwtDecode<UserRequestPayload>(accessToken || "")?.roles?.some((role) =>
-      adminRoles.includes(role)
-    )
-      ? (isAdmin = true)
-      : (isAdmin = false);
+    isAdmin =
+      jwtDecode<UserRequestPayload>(accessToken || "")?.roles?.some((role) =>
+        adminRoles.includes(role)
+      ) || false;
   } catch (error) {}
   return isAdmin ? <Navigate to="admin" /> : <Outlet />;
 };

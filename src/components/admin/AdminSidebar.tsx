@@ -37,10 +37,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { PermissionGuard } from "../PermissionGuard";
+import { jwtDecode } from "jwt-decode";
+import {
+  type UserRequestPayload,
+  type RoleType,
+} from "@/types/userRequestPayload";
+import { Badge } from "../ui/badge";
 
 const AdminSideBar = () => {
   const navigate = useNavigate();
   const { logoutMutate, profile } = useAuth();
+  let roles: RoleType[] = [];
+  const accessToken = localStorage.getItem("accessToken");
+  if (accessToken) {
+    roles = jwtDecode<UserRequestPayload>(accessToken).roles || [];
+  }
   const { state } = useSidebar();
 
   const handleLogout = () => {
@@ -267,11 +278,13 @@ const AdminSideBar = () => {
                 </div>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground mb-2">
-              Role: Admin
+            <div className="text-sm text-muted-foreground mb-2 flex flex-col gap-2">
+              {roles.map((role) => (
+                <Badge variant="outline">{role}</Badge>
+              ))}
             </div>
             <div className="w-full h-[1px] bg-gray-300 my-2" />
-            <Button variant="ghost" className="w-full flex justify-start gap-3">
+            {/* <Button variant="ghost" className="w-full flex justify-start gap-3">
               <UserPen className="w-4 h-4" />
               <span>Profile</span>
             </Button>
@@ -279,14 +292,14 @@ const AdminSideBar = () => {
             <Button variant="ghost" className="w-full flex justify-start gap-3">
               <Bell className="w-4 h-4" />
               <span>Notification</span>
-            </Button>
+            </Button> */}
 
             <Button
               variant="ghost"
-              className="w-full flex justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="w-full flex justify-start gap-3"
               onClick={handleLogout}
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut />
               <span>Logout</span>
             </Button>
           </PopoverContent>

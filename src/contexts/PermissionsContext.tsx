@@ -24,28 +24,32 @@ export const PermissionsProvider = ({ children }: { children: ReactNode }) => {
 
   const canCreate = (module: PermissionModule): boolean => {
     const permission = permissions.find(
-      (p: AdminRolePermissionResponseDto) => p.module === module
+      (p: AdminRolePermissionResponseDto) =>
+        p.module === module && p.isCreate === true
     );
     return permission?.isCreate || false;
   };
 
   const canRead = (module: PermissionModule): boolean => {
     const permission = permissions.find(
-      (p: AdminRolePermissionResponseDto) => p.module === module
+      (p: AdminRolePermissionResponseDto) =>
+        p.module === module && p.isRead === true
     );
     return permission?.isRead || false;
   };
 
   const canUpdate = (module: PermissionModule): boolean => {
     const permission = permissions.find(
-      (p: AdminRolePermissionResponseDto) => p.module === module
+      (p: AdminRolePermissionResponseDto) =>
+        p.module === module && p.isUpdate === true
     );
     return permission?.isUpdate || false;
   };
 
   const canDelete = (module: PermissionModule): boolean => {
     const permission = permissions.find(
-      (p: AdminRolePermissionResponseDto) => p.module === module
+      (p: AdminRolePermissionResponseDto) =>
+        p.module === module && p.isDelete === true
     );
     return permission?.isDelete || false;
   };

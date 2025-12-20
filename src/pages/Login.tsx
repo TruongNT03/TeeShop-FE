@@ -28,6 +28,8 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { RoleType, type UserRequestPayload } from "@/types/userRequestPayload";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
   const {
@@ -51,7 +53,18 @@ const Login = () => {
       if (event.data.type === "GOOGLE_AUTH_SUCCESS") {
         const { accessToken, refreshToken } = event.data;
         saveToken(accessToken, refreshToken);
-        navigate("/");
+        let userRoles: RoleType[] = [];
+        if (accessToken) {
+          userRoles = jwtDecode<UserRequestPayload>(accessToken).roles || [];
+        }
+        const adminRoles = [
+          RoleType.ADMIN,
+          RoleType.ORDER_MANAGER,
+          RoleType.PRODUCT_MANAGER,
+          RoleType.TECHNICIAN,
+        ];
+        const isAdmin = userRoles.some((role) => adminRoles.includes(role));
+        isAdmin ? navigate("/admin") : navigate("/");
       } else if (event.data.type === "GOOGLE_AUTH_ERROR") {
         toast.error(event.data.message || "Đăng nhập thất bại!");
       }
