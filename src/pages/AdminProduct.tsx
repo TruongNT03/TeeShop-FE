@@ -62,29 +62,17 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePermissions } from "@/contexts/PermissionsContext";
-
-export enum AdminProductSortField {
-  NAME = "name",
-  DESCRIPTION = "description",
-  STATUS = "status",
-  CREATED_AT = "createdAt",
-  UPDATED_AT = "updatedAt",
-}
-
-export enum SortOrder {
-  DESC = "DESC",
-  ASC = "ASC",
-}
-
-type AdminProductQuery = Omit<
-  Parameters<typeof apiClient.api.adminProductControllerFindAll>[0],
-  "categoriesIds"
-> & {
-  categoriesIds?: number[];
-};
+import {
+  useAdminListProduct,
+  type AdminListProductQuery,
+} from "@/queries/admin/useAdminListProduct";
+import {
+  type AdminListCategoriesQuery,
+  useAdminListCategories,
+} from "@/queries/admin/useAdminListCategories";
 
 const AdminProduct = () => {
-  const [query, setQuery] = useState<AdminProductQuery>({
+  const [query, setQuery] = useState<AdminListProductQuery>({
     page: 1,
     pageSize: 10,
     categoriesIds: [],
@@ -92,6 +80,13 @@ const AdminProduct = () => {
     sortBy: "createdAt",
     sortOrder: "DESC",
   });
+
+  const [categoryQuery, setCategoryQuery] = useState<AdminListCategoriesQuery>({
+    pageSize: 10,
+  });
+
+  const adminListProductQuery = useAdminListProduct(query);
+  const adminListCategoriesQuery = useAdminListCategories(categoryQuery);
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -113,10 +108,6 @@ const AdminProduct = () => {
   const [categorySearch, setCategorySearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
 
-  const { data: categoriesData, isLoading: categoriesLoading } =
-    getAllCategoryQuery({ pageSize: 100, search: categorySearch });
-  const categories = categoriesData?.data.data || [];
-
   useEffect(() => {
     setQuery((prevQuery) => ({
       ...prevQuery,
@@ -125,7 +116,9 @@ const AdminProduct = () => {
     }));
   }, [debouncedSearchTerm]);
 
-  const handleSort = (field: AdminProductSortField) => {
+  const handleSort = (
+    field: "name" | "description" | "status" | "createdAt" | "updatedAt"
+  ) => {
     const isCurrentSort = query.sortBy === field;
     setQuery((prevQuery) => ({
       ...prevQuery,
@@ -136,13 +129,16 @@ const AdminProduct = () => {
   };
 
   const handleCategorySelect = (categoryId: number) => {
-    setQuery((prevQuery) => {
-      const currentIds = prevQuery.categoriesIds || [];
-      const newIds = currentIds.includes(categoryId)
-        ? currentIds.filter((id) => id !== categoryId)
-        : [...currentIds, categoryId];
-
-      return { ...prevQuery, categoriesIds: newIds, page: 1 };
+    setQuery((prev) => {
+      const currentIds = prev.categoriesIds || [];
+      const categoriesIds = [
+        ...new Set([
+          ...(currentIds.includes(categoryId)
+            ? currentIds.filter((id) => id !== categoryId)
+            : [...currentIds, categoryId]),
+        ]),
+      ];
+      return { ...prev, categoriesIds, page: 1 };
     });
   };
 
@@ -344,14 +340,14 @@ const AdminProduct = () => {
                   onValueChange={setCategorySearch}
                 />
                 <CommandList>
-                  {categoriesLoading && (
+                  {adminListCategoriesQuery.isLoading && (
                     <div className="p-2 text-center">
                       <Spinner />
                     </div>
                   )}
                   <CommandEmpty>Không tìm thấy danh mục.</CommandEmpty>
                   <CommandGroup>
-                    {categories.map((category: CategoryResponseDto) => (
+                    {adminListCategoriesQuery.data?.data.map((category) => (
                       <CommandItem
                         key={category.id}
                         value={category.title}
@@ -417,7 +413,14 @@ const AdminProduct = () => {
                     )}
                     onClick={() =>
                       value.sortable &&
-                      handleSort(value.key as AdminProductSortField)
+                      handleSort(
+                        value.key as
+                          | "name"
+                          | "description"
+                          | "status"
+                          | "createdAt"
+                          | "updatedAt"
+                      )
                     }
                   >
                     {value.title}{" "}
@@ -432,7 +435,7 @@ const AdminProduct = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {adminListProductQuery.isLoading ? (
               Array.from({ length: 5 }).map((_, index) => (
                 <TableRow key={index}>
                   <TableCell>
@@ -467,7 +470,7 @@ const AdminProduct = () => {
                   </TableCell>
                 </TableRow>
               ))
-            ) : (products as AdminProductResponseDto[]).length === 0 ? (
+            ) : (adminListProductQuery.data?.data ?? []).length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={tableHeaderTitles.length + 2}
@@ -477,7 +480,7 @@ const AdminProduct = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              (products as AdminProductResponseDto[]).map((product, index) => (
+              (adminListProductQuery.data?.data ?? []).map((product, index) => (
                 <TableRow
                   key={product.id}
                   className={`${index % 2 ? "bg-muted" : ""}`}
@@ -546,12 +549,13 @@ const AdminProduct = () => {
 
         <div className="w-full py-3 flex justify-between items-center px-5">
           <div className="text-sm text-muted-foreground">
-            Tổng: <b>{pagination.totalItem}</b> sản phẩm
+            Tổng: <b>{adminListProductQuery.data?.paginate.totalItem ?? 0}</b>{" "}
+            sản phẩm
           </div>
 
           <PaginationControl
-            currentPage={pagination.currentPage}
-            totalPage={pagination.totalPage}
+            currentPage={adminListProductQuery.data?.paginate.page ?? 1}
+            totalPage={adminListProductQuery.data?.paginate.totalPage ?? 1}
             onPageChange={handlePageChange}
           />
         </div>
