@@ -350,29 +350,34 @@ const Checkout = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="bg-stone-100 min-h-screen py-12 px-[65px]"
+      className="bg-stone-100 min-h-screen py-8 sm:py-12 px-4 sm:px-8 md:px-[65px]"
     >
       {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <ShoppingBag className="w-10 h-10" />
-        <h1 className="text-4xl font-normal uppercase">Thanh toán</h1>
+      <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+        <ShoppingBag className="w-7 h-7 sm:w-10 sm:h-10" />
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-normal uppercase">
+          Thanh toán
+        </h1>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Main Content */}
-        <div className="flex-[3] space-y-6">
+        <div className="w-full lg:flex-[3] space-y-4 sm:space-y-6">
           {/* Shipping Address */}
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
+          <Card className="p-4 sm:p-6 gap-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6 mb-6">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5" />
-                <h2 className="text-2xl font-semibold">Địa chỉ nhận hàng</h2>
+                <h2 className="text-xl md:text-lg sm:text-2xl md:font-semibold">
+                  Địa chỉ nhận hàng
+                </h2>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowAddressModal(true)}
+                  className="text-xs sm:text-sm"
                 >
                   {selectedAddressId ? "Thay đổi" : "Chọn"} địa chỉ
                 </Button>
@@ -380,9 +385,9 @@ const Checkout = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => setShowAddAddressModal(true)}
-                  className="gap-2"
+                  className="gap-2 text-xs sm:text-sm"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                   Thêm mới
                 </Button>
               </div>
@@ -403,11 +408,11 @@ const Checkout = () => {
                           (a) => a.id === selectedAddressId
                         );
                         return addr ? (
-                          <div className="text-sm text-green-700 space-y-1">
+                          <div className="text-xs sm:text-sm text-green-700 space-y-1">
                             <p className="font-medium">
                               {addr.name} - {addr.phoneNumber}
                             </p>
-                            <p>{addr.detail}</p>
+                            <p className="line-clamp-2">{addr.detail}</p>
                           </div>
                         ) : null;
                       })()}
@@ -432,72 +437,79 @@ const Checkout = () => {
 
               {/* Order Notes */}
               <div className="space-y-2">
-                <Label htmlFor="notes">Ghi chú đơn hàng (Tùy chọn)</Label>
+                <Label htmlFor="notes" className="text-sm sm:text-base">
+                  Ghi chú đơn hàng (Tùy chọn)
+                </Label>
                 <Textarea
                   id="notes"
                   placeholder="Ghi chú về đơn hàng của bạn, ví dụ hướng dẫn giao hàng đặc biệt"
                   rows={3}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
+                  className="text-sm"
                 />
               </div>
             </div>
           </Card>
 
           {/* Payment Method */}
-          <Card className="p-6">
-            <div className="flex items-center gap-2 mb-6">
+          <Card className="p-4 sm:p-6">
+            <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <CreditCard className="w-5 h-5" />
-              <h2 className="text-2xl font-semibold">Phương thức thanh toán</h2>
+              <h2 className="text-lg sm:text-2xl font-semibold">
+                Phương thức thanh toán
+              </h2>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div
                 onClick={() => setSelectedPayment("cod")}
-                className={`border rounded-lg p-4 cursor-pointer transition ${
+                className={`border rounded-lg p-3 sm:p-4 cursor-pointer transition ${
                   selectedPayment === "cod"
                     ? "border-primary bg-primary/5"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Truck className="w-5 h-5" />
-                    <div>
-                      <div className="font-medium">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <Truck className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm sm:text-base">
                         Thanh toán khi nhận hàng
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-xs sm:text-sm text-gray-500">
                         Thanh toán khi bạn nhận được đơn hàng
                       </div>
                     </div>
                   </div>
                   {selectedPayment === "cod" && (
-                    <Check className="w-5 h-5 text-primary" />
+                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
                   )}
                 </div>
               </div>
 
               <div
                 onClick={() => setSelectedPayment("qr")}
-                className={`border rounded-lg p-4 cursor-pointer transition ${
+                className={`border rounded-lg p-3 sm:p-4 cursor-pointer transition ${
                   selectedPayment === "qr"
                     ? "border-primary bg-primary/5"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <CreditCard className="w-5 h-5" />
-                    <div>
-                      <div className="font-medium">Thanh toán qua QR Code</div>
-                      <div className="text-sm text-gray-500">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm sm:text-base">
+                        Thanh toán qua QR Code
+                      </div>
+                      <div className="text-xs sm:text-sm text-gray-500">
                         Thanh toán qua mã QR (VNPay, Momo, ZaloPay)
                       </div>
                     </div>
                   </div>
                   {selectedPayment === "qr" && (
-                    <Check className="w-5 h-5 text-primary" />
+                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
                   )}
                 </div>
               </div>
@@ -506,11 +518,13 @@ const Checkout = () => {
         </div>
 
         {/* Order Summary Sidebar */}
-        <div className="flex-[1]">
-          <Card className="p-6 sticky top-6">
-            <h2 className="text-xl font-semibold mb-4">Tóm tắt đơn hàng</h2>
+        <div className="w-full lg:flex-[1]">
+          <Card className="p-4 sm:p-6 sticky top-4 md:top-20">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Tóm tắt đơn hàng
+            </h2>
 
-            <div className="space-y-4 mb-4">
+            <div className="space-y-3 sm:space-y-4 mb-4 max-h-60 sm:max-h-80 overflow-y-auto">
               {isCheckoutItemsLoading ? (
                 <div className="flex justify-center items-center py-8">
                   <Loader className="w-6 h-6 animate-spin" />
@@ -528,25 +542,30 @@ const Checkout = () => {
                       .join(", ") || "";
 
                   return (
-                    <div key={item.id} className="flex gap-3">
+                    <div
+                      key={item.id}
+                      className="flex gap-2 sm:gap-3 pb-3 sm:pb-4 border-b last:border-b-0"
+                    >
                       {loadingImages[item.id] !== false ? (
-                        <Skeleton className="w-16 h-16 rounded" />
+                        <Skeleton className="w-12 h-12 sm:w-16 sm:h-16 rounded flex-shrink-0" />
                       ) : null}
                       <img
                         src={productImage}
                         alt={productName}
-                        className={`w-16 h-16 object-cover rounded ${
+                        className={`w-12 h-12 sm:w-16 sm:h-16 object-cover rounded flex-shrink-0 ${
                           loadingImages[item.id] !== false ? "hidden" : ""
                         }`}
                       />
-                      <div className="flex-1">
-                        <div className="font-medium text-sm">{productName}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-xs sm:text-sm line-clamp-2">
+                          {productName}
+                        </div>
                         {variantText && (
                           <div className="text-xs text-gray-500">
                             {variantText}
                           </div>
                         )}
-                        <div className="text-sm">
+                        <div className="text-xs sm:text-sm">
                           {item.quantity} × {formatPriceVND(productPrice)}
                         </div>
                       </div>
@@ -554,31 +573,31 @@ const Checkout = () => {
                   );
                 })
               ) : (
-                <div className="text-center text-gray-500 py-4">
+                <div className="text-center text-gray-500 py-4 text-sm">
                   No items in cart
                 </div>
               )}
             </div>
 
-            <Separator className="my-4" />
+            <Separator className="my-3 sm:my-4" />
 
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-xs sm:text-sm mb-3 sm:mb-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">Tạm tính</span>
-                <span>{formatPriceVND(subtotal)}</span>
+                <span className="font-medium">{formatPriceVND(subtotal)}</span>
               </div>
             </div>
 
             {/* Voucher Section */}
-            <div className="my-4">
+            <div className="my-3 sm:my-4">
               {selectedVoucher ? (
-                <div className="border border-green-200 bg-green-50 rounded-lg p-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-2 flex-1">
-                      <Ticket className="w-5 h-5 text-green-600 mt-0.5" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-green-700">
+                <div className="border border-green-200 bg-green-50 rounded-lg p-2 sm:p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-2 flex-1 min-w-0">
+                      <Ticket className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1 sm:gap-2 mb-1 flex-wrap">
+                          <span className="font-semibold text-xs sm:text-sm text-green-700">
                             {selectedVoucher.code}
                           </span>
                           <span className="text-xs text-green-600">
@@ -589,10 +608,10 @@ const Checkout = () => {
                                 )}`}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-600">
+                        <p className="text-xs text-gray-600 line-clamp-1">
                           {selectedVoucher.campaignName}
                         </p>
-                        <p className="text-sm text-green-700 font-semibold mt-1">
+                        <p className="text-xs sm:text-sm text-green-700 font-semibold mt-1">
                           -{formatPriceVND(discount)}
                         </p>
                       </div>
@@ -600,35 +619,35 @@ const Checkout = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-gray-500 hover:text-red-600"
+                      className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-gray-500 hover:text-red-600 flex-shrink-0"
                       onClick={handleRemoveVoucher}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Button>
                   </div>
                 </div>
               ) : (
                 <Button
                   variant="outline"
-                  className="w-full border-dashed border-primary hover:bg-primary/5"
+                  className="w-full border-dashed border-primary hover:bg-primary/5 text-xs sm:text-sm"
                   onClick={() => setShowVoucherModal(true)}
                   disabled={isLoadingVouchers}
                 >
-                  <Ticket className="w-4 h-4 mr-2" />
+                  <Ticket className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Chọn voucher giảm giá
                 </Button>
               )}
             </div>
 
-            <Separator className="my-4" />
+            <Separator className="my-3 sm:my-4" />
 
-            <div className="flex justify-between text-lg font-semibold mb-6">
+            <div className="flex justify-between text-base sm:text-lg font-semibold mb-4 sm:mb-6">
               <span>Tổng cộng</span>
               <span className="text-red-600">{formatPriceVND(total)}</span>
             </div>
 
             <Button
-              className="w-full"
+              className="w-full text-sm sm:text-base"
               size="lg"
               disabled={checkoutItems.length === 0 || isCheckoutItemsLoading}
               onClick={handlePlaceOrder}
@@ -643,7 +662,7 @@ const Checkout = () => {
               )}
             </Button>
 
-            <div className="mt-4 text-xs text-gray-500 text-center">
+            <div className="mt-3 sm:mt-4 text-xs text-gray-500 text-center">
               Bằng việc đặt hàng, bạn đồng ý với{" "}
               <a href="#" className="underline">
                 Điều khoản & Điều kiện
@@ -655,14 +674,14 @@ const Checkout = () => {
 
       {/* Payment Confirmation Modal */}
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md mx-auto px-4">
           <DialogHeader>
-            <DialogTitle className="text-2xl">
+            <DialogTitle className="text-lg sm:text-2xl">
               {selectedPayment === "cod"
                 ? "Xác nhận đơn hàng"
                 : "Hoàn tất thanh toán"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
               {selectedPayment === "cod"
                 ? "Vui lòng xác nhận thông tin đơn hàng"
                 : "Quét mã QR để hoàn tất thanh toán"}
@@ -671,15 +690,15 @@ const Checkout = () => {
 
           {selectedPayment === "cod" ? (
             // COD Confirmation
-            <div className="space-y-4">
-              <Card className="p-4 bg-blue-50 border-blue-200">
-                <div className="flex items-start gap-3">
-                  <Truck className="w-5 h-5 text-blue-600 mt-0.5" />
-                  <div className="flex-1">
-                    <h3 className="font-medium text-blue-900 mb-1">
+            <div className="space-y-3 sm:space-y-4">
+              <Card className="p-3 sm:p-4 bg-blue-50 border-blue-200">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-xs sm:text-sm text-blue-900 mb-1">
                       Cash on Delivery
                     </h3>
-                    <p className="text-sm text-blue-700">
+                    <p className="text-xs sm:text-sm text-blue-700">
                       You will pay {formatPriceVND(total)} when you receive your
                       order
                     </p>
@@ -687,7 +706,7 @@ const Checkout = () => {
                 </div>
               </Card>
 
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-xs sm:text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Order Total:</span>
                   <span className="font-semibold">{formatPriceVND(total)}</span>
@@ -700,23 +719,23 @@ const Checkout = () => {
 
               <Separator />
 
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 text-xs sm:text-sm"
                   onClick={() => setShowPaymentModal(false)}
                   disabled={isCreatingOrder}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1"
+                  className="flex-1 text-xs sm:text-sm"
                   onClick={handleConfirmOrder}
                   disabled={isCreatingOrder}
                 >
                   {isCreatingOrder ? (
                     <>
-                      <Loader className="w-4 h-4 animate-spin mr-2" />
+                      <Loader className="w-3 h-3 sm:w-4 sm:h-4 animate-spin mr-1 sm:mr-2" />
                       Processing...
                     </>
                   ) : (
@@ -726,19 +745,19 @@ const Checkout = () => {
               </div>
             </div>
           ) : (
-            // QR Payment - show QR code OR confirmation
-            <div className="space-y-4">
+            // QR Payment
+            <div className="space-y-3 sm:space-y-4">
               {paymentStatus === "success" ? (
-                <Card className="p-6 bg-green-50 border-green-200">
-                  <div className="text-center space-y-4">
+                <Card className="p-4 sm:p-6 bg-green-50 border-green-200">
+                  <div className="text-center space-y-3 sm:space-y-4">
                     <div className="flex justify-center">
-                      <CheckCircle2 className="w-16 h-16 text-green-600" />
+                      <CheckCircle2 className="w-12 h-12 sm:w-16 sm:h-16 text-green-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-xl text-green-900 mb-2">
+                      <h3 className="font-semibold text-base sm:text-xl text-green-900 mb-1 sm:mb-2">
                         Thanh toán thành công!
                       </h3>
-                      <p className="text-sm text-green-700">
+                      <p className="text-xs sm:text-sm text-green-700">
                         Đơn hàng của bạn đã được xác nhận
                       </p>
                     </div>
@@ -746,28 +765,28 @@ const Checkout = () => {
                 </Card>
               ) : qrImageUrl ? (
                 <>
-                  <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
-                    <div className="text-center space-y-4">
-                      <div className="flex items-center justify-center gap-2 mb-4">
-                        <QrCode className="w-5 h-5 text-primary" />
-                        <h3 className="font-semibold text-lg">
+                  <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
+                    <div className="text-center space-y-3 sm:space-y-4">
+                      <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
+                        <QrCode className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                        <h3 className="font-semibold text-sm sm:text-lg">
                           Quét mã QR để thanh toán
                         </h3>
                       </div>
 
                       {/* QR Image */}
-                      <div className="bg-white p-4 rounded-lg inline-block mx-auto">
+                      <div className="bg-white p-2 sm:p-4 rounded-lg inline-block mx-auto">
                         <img
                           src={qrImageUrl}
                           alt="QR Code"
-                          className="w-64 h-64 mx-auto"
+                          className="w-40 h-40 sm:w-64 sm:h-64 mx-auto"
                         />
                       </div>
 
-                      <div className="space-y-2 text-sm text-gray-600">
+                      <div className="space-y-2 text-xs sm:text-sm text-gray-600">
                         <p>
                           Tổng thanh toán:{" "}
-                          <span className="font-semibold text-primary text-base">
+                          <span className="font-semibold text-primary text-sm sm:text-base">
                             {formatPriceVND(total)}
                           </span>
                         </p>
@@ -778,18 +797,18 @@ const Checkout = () => {
 
                   {/* Check Payment Status Button */}
                   <Button
-                    className="w-full"
+                    className="w-full text-xs sm:text-sm"
                     onClick={handleCheckPaymentStatus}
                     disabled={isCheckingPayment}
                   >
                     {isCheckingPayment ? (
                       <>
-                        <Loader className="w-4 h-4 animate-spin mr-2" />
+                        <Loader className="w-3 h-3 sm:w-4 sm:h-4 animate-spin mr-1 sm:mr-2" />
                         Đang kiểm tra...
                       </>
                     ) : (
                       <>
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                         Tôi đã thanh toán thành công
                       </>
                     )}
@@ -797,18 +816,18 @@ const Checkout = () => {
 
                   <Button
                     variant="destructive"
-                    className="w-full"
+                    className="w-full text-xs sm:text-sm"
                     onClick={handleCancelOrder}
                     disabled={isCancellingOrder}
                   >
                     {isCancellingOrder ? (
                       <>
-                        <Loader className="w-4 h-4 animate-spin mr-2" />
+                        <Loader className="w-3 h-3 sm:w-4 sm:h-4 animate-spin mr-1 sm:mr-2" />
                         Đang hủy...
                       </>
                     ) : (
                       <>
-                        <X className="w-4 h-4 mr-2" />
+                        <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                         Hủy đơn hàng
                       </>
                     )}
@@ -817,23 +836,23 @@ const Checkout = () => {
               ) : !qrImageUrl && !orderId ? (
                 // Chưa tạo order - hiển thị nút xác nhận
                 <>
-                  <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-blue-100 rounded-lg">
-                        <QrCode className="w-8 h-8 text-blue-600" />
+                  <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
+                    <div className="flex items-center gap-2 sm:gap-4">
+                      <div className="p-2 sm:p-3 bg-blue-100 rounded-lg flex-shrink-0">
+                        <QrCode className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                       </div>
-                      <div>
-                        <h3 className="font-medium text-blue-900 mb-1">
+                      <div className="min-w-0">
+                        <h3 className="font-medium text-xs sm:text-sm text-blue-900 mb-1">
                           Thanh toán qua QR Code
                         </h3>
-                        <p className="text-sm text-blue-700">
+                        <p className="text-xs sm:text-sm text-blue-700">
                           Bạn sẽ thanh toán {formatPriceVND(total)} qua QR Code
                         </p>
                       </div>
                     </div>
                   </Card>
 
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2 text-xs sm:text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Order Total:</span>
                       <span className="font-semibold">
@@ -848,23 +867,23 @@ const Checkout = () => {
 
                   <Separator />
 
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 sm:gap-3">
                     <Button
                       variant="outline"
-                      className="flex-1"
+                      className="flex-1 text-xs sm:text-sm"
                       onClick={() => setShowPaymentModal(false)}
                       disabled={isCreatingOrder}
                     >
                       Hủy
                     </Button>
                     <Button
-                      className="flex-1"
+                      className="flex-1 text-xs sm:text-sm"
                       onClick={handleConfirmOrder}
                       disabled={isCreatingOrder}
                     >
                       {isCreatingOrder ? (
                         <>
-                          <Loader className="w-4 h-4 animate-spin mr-2" />
+                          <Loader className="w-3 h-3 sm:w-4 sm:h-4 animate-spin mr-1 sm:mr-2" />
                           Đang xử lý...
                         </>
                       ) : (
@@ -874,16 +893,16 @@ const Checkout = () => {
                   </div>
                 </>
               ) : (
-                <Card className="p-4 bg-blue-50 border-blue-200">
-                  <div className="text-center space-y-4 py-6">
+                <Card className="p-4 sm:p-6 bg-blue-50 border-blue-200">
+                  <div className="text-center space-y-3 sm:space-y-4 py-4 sm:py-6">
                     <div className="flex justify-center">
-                      <Loader className="w-16 h-16 animate-spin text-primary" />
+                      <Loader className="w-12 h-12 sm:w-16 sm:h-16 animate-spin text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-xl mb-2">
+                      <h3 className="font-semibold text-base sm:text-xl mb-1 sm:mb-2">
                         Đang tạo mã QR
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs sm:text-sm text-gray-600">
                         Vui lòng đợi trong giây lát...
                       </p>
                     </div>
@@ -897,17 +916,17 @@ const Checkout = () => {
 
       {/* Select Address Modal */}
       <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl mx-auto px-4 max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl">
+            <DialogTitle className="text-lg sm:text-2xl">
               Chọn địa chỉ giao hàng
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
               Chọn một địa chỉ từ danh sách đã lưu
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {isLoadingAddresses ? (
               <div className="flex items-center justify-center py-12">
                 <Loader className="w-8 h-8 animate-spin" />
@@ -920,18 +939,20 @@ const Checkout = () => {
                     setSelectedAddressId(addr.id);
                     setShowAddressModal(false);
                   }}
-                  className={`border rounded-lg p-4 cursor-pointer transition hover:border-primary ${
+                  className={`border rounded-lg p-3 sm:p-4 cursor-pointer transition hover:border-primary ${
                     selectedAddressId === addr.id
                       ? "border-primary bg-primary/10"
                       : "border-gray-200"
                   }`}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-1">
-                      <p className="font-medium">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 space-y-1 min-w-0">
+                      <p className="font-medium text-xs sm:text-sm">
                         {addr.name} - {addr.phoneNumber}
                       </p>
-                      <p className="text-sm text-gray-600">{addr.detail}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+                        {addr.detail}
+                      </p>
                       {addr.isDefault && (
                         <span className="inline-block text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
                           Mặc định
@@ -939,16 +960,18 @@ const Checkout = () => {
                       )}
                     </div>
                     {selectedAddressId === addr.id && (
-                      <Check className="w-5 h-5 text-primary flex-shrink-0 ml-3" />
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 ml-2" />
                     )}
                   </div>
                 </div>
               ))
             ) : (
               <div className="text-center py-12 text-gray-500">
-                <MapPin className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p className="font-medium">Chưa có địa chỉ nào</p>
-                <p className="text-sm mt-1">Thêm địa chỉ mới để bắt đầu</p>
+                <MapPin className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
+                <p className="font-medium text-sm">Chưa có địa chỉ nào</p>
+                <p className="text-xs sm:text-sm mt-1">
+                  Thêm địa chỉ mới để bắt đầu
+                </p>
               </div>
             )}
           </div>
@@ -957,6 +980,7 @@ const Checkout = () => {
             <Button
               variant="outline"
               onClick={() => setShowAddressModal(false)}
+              size="sm"
             >
               Đóng
             </Button>
@@ -966,18 +990,18 @@ const Checkout = () => {
 
       {/* Voucher Selection Modal */}
       <Dialog open={showVoucherModal} onOpenChange={setShowVoucherModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl mx-auto px-4 max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl flex items-center gap-2">
-              <Ticket className="w-6 h-6" />
+            <DialogTitle className="text-lg sm:text-2xl flex items-center gap-2">
+              <Ticket className="w-5 h-5 sm:w-6 sm:h-6" />
               Chọn voucher
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
               Chọn voucher để áp dụng cho đơn hàng của bạn
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {isLoadingVouchers ? (
               <div className="flex items-center justify-center py-12">
                 <Loader className="w-8 h-8 animate-spin" />
@@ -992,7 +1016,7 @@ const Checkout = () => {
                   <div
                     key={voucher.id}
                     onClick={() => canUse && handleSelectVoucher(voucher)}
-                    className={`border rounded-lg p-4 transition ${
+                    className={`border rounded-lg p-3 sm:p-4 transition ${
                       canUse
                         ? "cursor-pointer hover:border-primary hover:bg-primary/5"
                         : "opacity-50 cursor-not-allowed"
@@ -1002,31 +1026,31 @@ const Checkout = () => {
                         : "border-gray-200"
                     }`}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 sm:gap-3">
                       <div
-                        className={`p-3 rounded-lg ${
+                        className={`p-2 sm:p-3 rounded-lg flex-shrink-0 ${
                           voucher.type === "percent"
                             ? "bg-blue-100"
                             : "bg-green-100"
                         }`}
                       >
                         <Ticket
-                          className={`w-6 h-6 ${
+                          className={`w-5 h-5 sm:w-6 sm:h-6 ${
                             voucher.type === "percent"
                               ? "text-blue-600"
                               : "text-green-600"
                           }`}
                         />
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-lg">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1 sm:mb-2">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                              <span className="font-bold text-xs sm:text-lg">
                                 {voucher.code}
                               </span>
                               <span
-                                className={`text-sm font-semibold px-2 py-0.5 rounded ${
+                                className={`text-xs font-semibold px-2 py-0.5 rounded ${
                                   voucher.type === "percent"
                                     ? "bg-blue-100 text-blue-700"
                                     : "bg-green-100 text-green-700"
@@ -1037,7 +1061,7 @@ const Checkout = () => {
                                   : `-${formatPriceVND(voucher.discountValue)}`}
                               </span>
                             </div>
-                            <p className="text-sm font-semibold text-gray-700 mt-1">
+                            <p className="text-xs sm:text-sm font-semibold text-gray-700 mt-1">
                               {voucher.campaignName}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
@@ -1045,10 +1069,10 @@ const Checkout = () => {
                             </p>
                           </div>
                           {selectedVoucher?.id === voucher.id && (
-                            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                            <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
                           )}
                         </div>
-                        <div className="flex items-center justify-between text-xs text-gray-500 mt-2 pt-2 border-t">
+                        <div className="flex items-center justify-between text-xs text-gray-500 mt-2 pt-2 border-t gap-1">
                           <span>
                             Đơn tối thiểu:{" "}
                             {formatPriceVND(voucher.minOrderValue)}
@@ -1077,9 +1101,11 @@ const Checkout = () => {
               })
             ) : (
               <div className="text-center py-12 text-gray-500">
-                <Ticket className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p className="font-medium">Chưa có voucher nào</p>
-                <p className="text-sm mt-1">Bạn chưa có voucher khả dụng</p>
+                <Ticket className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
+                <p className="font-medium text-sm">Chưa có voucher nào</p>
+                <p className="text-xs sm:text-sm mt-1">
+                  Bạn chưa có voucher khả dụng
+                </p>
               </div>
             )}
           </div>
@@ -1092,6 +1118,7 @@ const Checkout = () => {
                   setSelectedVoucher(null);
                   setShowVoucherModal(false);
                 }}
+                size="sm"
               >
                 Bỏ chọn
               </Button>
@@ -1099,6 +1126,7 @@ const Checkout = () => {
             <Button
               variant="outline"
               onClick={() => setShowVoucherModal(false)}
+              size="sm"
             >
               Đóng
             </Button>
@@ -1108,20 +1136,20 @@ const Checkout = () => {
 
       {/* Add New Address Modal */}
       <Dialog open={showAddAddressModal} onOpenChange={setShowAddAddressModal}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl mx-auto px-4">
           <DialogHeader>
-            <DialogTitle className="text-2xl flex items-center gap-2">
-              <Plus className="w-6 h-6" />
+            <DialogTitle className="text-lg sm:text-2xl flex items-center gap-2">
+              <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
               Thêm địa chỉ mới
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
               Nhập thông tin địa chỉ giao hàng
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="modalName">
+              <Label htmlFor="modalName" className="text-xs sm:text-sm">
                 Họ và tên <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1129,11 +1157,12 @@ const Checkout = () => {
                 placeholder="Nguyễn Văn A"
                 value={newAddressData.name}
                 onChange={(e) => handleNewAddressChange("name", e.target.value)}
+                className="text-xs sm:text-sm"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="modalPhone">
+              <Label htmlFor="modalPhone" className="text-xs sm:text-sm">
                 Số điện thoại <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1143,11 +1172,12 @@ const Checkout = () => {
                 onChange={(e) =>
                   handleNewAddressChange("phoneNumber", e.target.value)
                 }
+                className="text-xs sm:text-sm"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="modalDetail">
+              <Label htmlFor="modalDetail" className="text-xs sm:text-sm">
                 Địa chỉ chi tiết <span className="text-red-500">*</span>
               </Label>
               <Textarea
@@ -1158,27 +1188,28 @@ const Checkout = () => {
                 onChange={(e) =>
                   handleNewAddressChange("detail", e.target.value)
                 }
+                className="text-xs sm:text-sm"
               />
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4 border-t">
+          <div className="flex gap-2 sm:gap-3 pt-4 border-t">
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 text-xs sm:text-sm"
               onClick={() => setShowAddAddressModal(false)}
               disabled={isCreatingAddress}
             >
               Hủy
             </Button>
             <Button
-              className="flex-1"
+              className="flex-1 text-xs sm:text-sm"
               onClick={handleAddNewAddress}
               disabled={isCreatingAddress}
             >
               {isCreatingAddress ? (
                 <>
-                  <Loader className="w-4 h-4 animate-spin mr-2" />
+                  <Loader className="w-3 h-3 sm:w-4 sm:h-4 animate-spin mr-1 sm:mr-2" />
                   Đang lưu...
                 </>
               ) : (
