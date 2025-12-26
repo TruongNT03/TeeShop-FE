@@ -27,6 +27,7 @@ import { PaginationControl } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ROLES = [
   "Admin",
@@ -53,6 +54,8 @@ const AdminRolePermission = () => {
     role: undefined as (typeof ROLES)[number] | undefined,
     module: undefined as (typeof MODULES)[number] | undefined,
   });
+
+  const queryClient = useQueryClient();
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedPermissions, setEditedPermissions] = useState<
@@ -142,6 +145,7 @@ const AdminRolePermission = () => {
       );
 
       await updateMutation.mutateAsync(permissionsToUpdate);
+      await queryClient.invalidateQueries({ queryKey: ["userPermissions"] });
       toast.success("Permissions updated successfully!");
       setIsEditMode(false);
       setEditedPermissions({});

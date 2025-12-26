@@ -35,7 +35,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { UserRequestPayload } from "@/types/userRequestPayload";
 import { RoleType } from "@/types/userRequestPayload";
 import { jwtDecode } from "jwt-decode";
-import { useAdminLocations } from "@/queries/adminLocationQueries";
 import {
   Select,
   SelectContent,
@@ -43,6 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAdminListLocation } from "@/queries/admin/useAdminListLocation";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -58,16 +58,16 @@ const AdminDashboard = () => {
     year: "Năm nay",
   };
 
+  const adminListLocationQuery = useAdminListLocation({
+    page: 1,
+    pageSize: 100,
+  });
+
   const [userInfo, setUserInfo] = useState<UserRequestPayload>();
   const [selectedLocationId, setSelectedLocationId] = useState<string>("");
 
   // Check if user is Admin
   const isAdmin = userInfo?.roles?.includes(RoleType.ADMIN);
-
-  // Fetch locations only for Admin users
-  const { data: locationsData, isLoading: isLoadingLocations } =
-    useAdminLocations(100, 1, "");
-  const locations = locationsData?.data.data || [];
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -221,21 +221,24 @@ const AdminDashboard = () => {
             <Select
               value={selectedLocationId}
               onValueChange={setSelectedLocationId}
-              disabled={isLoadingLocations}
+              disabled={adminListLocationQuery.isLoading}
             >
               <SelectTrigger className="w-[300px]">
                 <SelectValue
                   placeholder={
-                    isLoadingLocations ? "Đang tải..." : "Chọn địa điểm"
+                    adminListLocationQuery.isLoading
+                      ? "Đang tải..."
+                      : "Chọn địa điểm"
                   }
                 />
               </SelectTrigger>
               <SelectContent>
-                {locations.map((location) => (
-                  <SelectItem key={location.id} value={location.id}>
-                    {location.address}
-                  </SelectItem>
-                ))}
+                {adminListLocationQuery.isSuccess &&
+                  adminListLocationQuery.data.data.map((location) => (
+                    <SelectItem key={location.id} value={location.id}>
+                      {location.address}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           )}
@@ -247,27 +250,31 @@ const AdminDashboard = () => {
           <CardHeader className="my-0 py-0 flex">
             <span className="font-semibold">Địa chỉ:</span>
             {isAdmin
-              ? locations.find((loc) => loc.id === selectedLocationId)
-                  ?.address || "Chưa chọn địa điểm"
+              ? adminListLocationQuery.data?.data.find(
+                  (loc) => loc.id === selectedLocationId
+                )?.address || "Chưa chọn địa điểm"
               : userInfo?.location?.address || "N/A"}
           </CardHeader>
           <CardContent className="my-0 py-0 text-sm">
             <div className="flex gap-2">
               <span className="font-semibold">Hotline:</span>
               {isAdmin
-                ? locations.find((loc) => loc.id === selectedLocationId)
-                    ?.hotline || "N/A"
+                ? adminListLocationQuery.data?.data.find(
+                    (loc) => loc.id === selectedLocationId
+                  )?.hotline || "N/A"
                 : userInfo?.location?.hotline || "N/A"}
             </div>
             <div className="flex gap-2">
               <span className="font-semibold">Open time:</span>
               {isAdmin
                 ? `${
-                    locations.find((loc) => loc.id === selectedLocationId)
-                      ?.openTime || ""
+                    adminListLocationQuery.data?.data.find(
+                      (loc) => loc.id === selectedLocationId
+                    )?.openTime || ""
                   } ${
-                    locations.find((loc) => loc.id === selectedLocationId)
-                      ?.closeTime || ""
+                    adminListLocationQuery.data?.data.find(
+                      (loc) => loc.id === selectedLocationId
+                    )?.closeTime || ""
                   }`
                 : `${userInfo?.location?.openTime || ""} ${
                     userInfo?.location?.closeTime || ""
@@ -276,8 +283,9 @@ const AdminDashboard = () => {
             <div className="flex gap-2">
               <span className="font-semibold">Open date:</span>
               {isAdmin
-                ? locations.find((loc) => loc.id === selectedLocationId)
-                    ?.openDate || "N/A"
+                ? adminListLocationQuery.data?.data.find(
+                    (loc) => loc.id === selectedLocationId
+                  )?.openDate || "N/A"
                 : userInfo?.location?.openDate || "N/A"}
             </div>
           </CardContent>

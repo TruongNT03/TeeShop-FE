@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const policies: PolicyItemProps[] = [
   {
@@ -46,6 +47,8 @@ const Home = () => {
     newArrivalProductsIsLoading,
     topSellerProductsIsLoading,
   } = useHome();
+
+  const isMobile = useIsMobile();
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -54,7 +57,12 @@ const Home = () => {
       className="w-full bg-stone-100 overflow-x-hidden"
     >
       <Banner />
-      <div className="max-w-[1280px] mx-auto px-4">
+      <div
+        className="
+                  max-w-[1280px] mx-auto px-1
+                  md:px-4
+                  "
+      >
         <ProductSection
           title="Khám Phá Sản Phẩm Mới"
           descriptions="Sản phẩm mới được thêm gần đây!"

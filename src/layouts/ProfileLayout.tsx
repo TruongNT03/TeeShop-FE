@@ -37,11 +37,11 @@ export const ProfileLayout = () => {
 
   return (
     <div className="bg-slate-50/60 min-h-screen pt-20">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto px-2 md:p-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <aside className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow border-[1px] border-border p-4 sticky top-6">
+            <div className="bg-white rounded-lg border-[1px] border-border p-4 sticky top-6">
               {/* User Profile Section */}
               <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-200">
                 <div className="h-12 w-12 rounded-md overflow-hidden bg-slate-100">
@@ -102,7 +102,7 @@ export const ProfileLayout = () => {
 
           {/* Main Content */}
           <main className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow border-[1px] border-border p-6">
+            <div className="bg-white rounded-lg border-[1px] border-border p-6">
               <Outlet />
             </div>
           </main>

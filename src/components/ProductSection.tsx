@@ -20,7 +20,10 @@ const ProductSection = (props: ProductSectionProps) => {
   const skeletonCount = props.itemPerRow * 2;
   return (
     <section id={sectionId} className="w-full pb-[24px] overflow-x-hidden">
-      <div className="flex flex-col gap-4 justify-center items-center py-6 md:py-8 px-4">
+      <div
+        className="flex flex-col gap-4 justify-center items-center py-6 px-0
+      md:py-8 "
+      >
         <div
           className="text-3xl md:text-4xl lg:text-5xl font-semibold text-shadow-lg cursor-pointer text-center"
           onClick={() => {
@@ -36,7 +39,7 @@ const ProductSection = (props: ProductSectionProps) => {
         </div>
       </div>
 
-      <div className="flex flex-wrap px-4 md:px-8 lg:px-[65px]">
+      <div className="flex flex-wrap px-0 md:px-8 lg:px-[65px]">
         {props.isLoading
           ? Array.from({ length: skeletonCount }).map((_, i) => (
               <div
@@ -56,11 +59,23 @@ const ProductSection = (props: ProductSectionProps) => {
           : props.items.map((item, index) => (
               <div
                 key={index}
-                className="px-3 md:px-5 mb-6 md:mb-8 w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/4"
+                className="w-1/2 px-1
+                md:px-5 mb-6 md:mb-8 md:w-1/3 
+                sm:w-1/2 
+                lg:w-1/3 
+                xl:w-1/4"
               >
-                <Card className="shadow-none">
+                <Card
+                  className="
+                                shadow-none gap-1 py-3
+                                md:gap-6 md:py-6"
+                >
                   <Link to={`/product/${item.id}`}>
-                    <CardTitle className="text-center px-2 h-[32px] text-wrap truncate font-medium uppercase">
+                    <CardTitle
+                      className="
+                                text-center px-2 h-[32px] text-wrap truncate font-medium uppercase
+                                md:h-[32px]"
+                    >
                       {capitalizeWords(item.name)}
                     </CardTitle>
                   </Link>
@@ -85,7 +100,11 @@ const ProductSection = (props: ProductSectionProps) => {
                       />
                     </div>
                   )}
-                  <div className="text-center pb-3 px-2">
+                  <div
+                    className="
+                                  text-center pb-0
+                                  md:pb-3 px-2"
+                  >
                     {item.price ? (
                       <span className="text-base font-medium">
                         {formatPriceVND(item.price)}

@@ -32,6 +32,7 @@ import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { motion } from "motion/react";
 import { FaGoogle } from "react-icons/fa";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const registerSchema = z
   .object({
@@ -67,6 +68,7 @@ const Register = () => {
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const { saveToken } = useAuth();
+  const isMobile = useIsMobile();
 
   const regMutation = registerMutation();
   const verifyMutation = verifyRegisterMutation();
@@ -347,14 +349,16 @@ const Register = () => {
           </CardFooter>
         </Card>
       </motion.div>
-      <motion.div
-        className="flex-1 bg-primary z-20 flex justify-center items-center"
-        initial={{ x: "-100%" }}
-        animate={{ x: 0 }}
-        transition={{ duration: 0.7, ease: "easeIn" }}
-      >
-        <img src="login-icon.png" alt="" className="max-w-[350px]" />
-      </motion.div>
+      {!isMobile && (
+        <motion.div
+          className="flex-1 bg-primary z-20 flex justify-center items-center"
+          initial={{ x: "-100%" }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.7, ease: "easeIn" }}
+        >
+          <img src="login-icon.png" alt="" className="max-w-[350px]" />
+        </motion.div>
+      )}
     </div>
   );
 };
