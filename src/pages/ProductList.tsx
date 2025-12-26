@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/services/apiClient";
 import ProductCard from "../components/ProductCard";
@@ -21,6 +21,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useLocation } from "react-router-dom";
 
 const ProductList = () => {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
@@ -34,11 +36,18 @@ const ProductList = () => {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
+  const isMobile = useIsMobile();
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+  const { pathname } = useLocation();
 
   // Scroll to top when page changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
+
+  useEffect(() => {
+    setIsFilterOpen(false);
+  }, [pathname]);
 
   // Fetch products
   const { data: productsData, isLoading: isLoadingProducts } = useQuery({
@@ -138,12 +147,232 @@ const ProductList = () => {
       transition={{ duration: 0.3 }}
       className="min-h-screen bg-stone-100 pt-6"
     >
-      <div className="max-w-[1280px] mx-auto px-4 py-8">
+      <AnimatePresence>
+        {isMobile && isFilterOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed z-[199] w-full h-screen top-0 bg-black/30"
+              onClick={() => setIsFilterOpen(false)}
+            ></motion.div>
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{
+                duration: 0.3,
+                ease: "easeInOut",
+              }}
+              className="fixed w-[75%] h-screen top-0 bg-white z-[200] right-0"
+            >
+              <div className="flex items-center justify-between">
+                <X
+                  className="mt-4 ml-4"
+                  onClick={() => setIsFilterOpen(false)}
+                />
+                <div className="mt-4 mr-4 text-3xl">TEE SHOP</div>
+              </div>
+              <div className="p-6 shadow-none mt-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <Filter className="w-5 h-5" />
+                    Bộ Lọc
+                  </h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearFilters}
+                    className="text-primary hover:text-primary/80"
+                  >
+                    Xóa tất cả
+                  </Button>
+                </div>
+
+                {/* Categories Filter */}
+                <div className="space-y-4">
+                  <div>
+                    <button
+                      onClick={() =>
+                        setShowCategorySection(!showCategorySection)
+                      }
+                      className="flex items-center justify-between w-full text-left font-medium mb-3"
+                    >
+                      <span>Danh Mục</span>
+                      {showCategorySection ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+
+                    {showCategorySection && (
+                      <div className="space-y-3 max-h-64 overflow-y-auto">
+                        {isLoadingCategories ? (
+                          <>
+                            <Skeleton className="h-6 w-full" />
+                            <Skeleton className="h-6 w-full" />
+                            <Skeleton className="h-6 w-full" />
+                          </>
+                        ) : (
+                          categories.map((category: CategoryResponseDto) => (
+                            <div
+                              key={category.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`category-${category.id}`}
+                                checked={selectedCategories.includes(
+                                  category.id
+                                )}
+                                onCheckedChange={() =>
+                                  handleCategoryToggle(category.id)
+                                }
+                              />
+                              <Label
+                                htmlFor={`category-${category.id}`}
+                                className="cursor-pointer text-sm font-normal"
+                              >
+                                {category.title}
+                              </Label>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <button
+                      onClick={() => setShowPriceSection(!showPriceSection)}
+                      className="flex items-center justify-between w-full text-left font-medium mb-3"
+                    >
+                      <span>Khoảng Giá</span>
+                      {showPriceSection ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+
+                    {showPriceSection && (
+                      <div className="space-y-4">
+                        <Slider
+                          min={0}
+                          max={5000000}
+                          step={50000}
+                          value={priceRange}
+                          onValueChange={(value: number[]) =>
+                            setPriceRange(value as [number, number])
+                          }
+                          className="w-full"
+                        />
+                        <div className="flex items-center justify-between text-sm text-slate-600">
+                          <span>{formatPriceVND(priceRange[0])}</span>
+                          <span>-</span>
+                          <span>{formatPriceVND(priceRange[1])}</span>
+                        </div>
+
+                        {/* Quick price filters */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([0, 500000])}
+                            className="text-xs rounded-sm"
+                          >
+                            Dưới 500K
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([500000, 1000000])}
+                            className="text-xs rounded-sm"
+                          >
+                            500K - 1M
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([1000000, 2000000])}
+                            className="text-xs rounded-sm"
+                          >
+                            1M - 2M
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([2000000, 5000000])}
+                            className="text-xs rounded-sm"
+                          >
+                            Trên 2M
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Active Filters */}
+                {(selectedCategories.length > 0 ||
+                  priceRange[0] > 0 ||
+                  priceRange[1] < 5000000) && (
+                  <div className="border-t pt-4 mt-4">
+                    <h3 className="text-sm font-medium mb-3">
+                      Bộ lọc đang áp dụng:
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCategories.map((catId) => {
+                        const category = categories.find(
+                          (c: CategoryResponseDto) => c.id === catId
+                        );
+                        return category ? (
+                          <span
+                            key={catId}
+                            className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-primary/10 text-primary rounded-full"
+                          >
+                            {category.title}
+                            <X
+                              className="w-3 h-3 cursor-pointer hover:text-primary/70"
+                              onClick={() => handleCategoryToggle(catId)}
+                            />
+                          </span>
+                        ) : null;
+                      })}
+                      {(priceRange[0] > 0 || priceRange[1] < 5000000) && (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-primary/10 text-primary rounded-full">
+                          {formatPriceVND(priceRange[0])} -{" "}
+                          {formatPriceVND(priceRange[1])}
+                          <X
+                            className="w-3 h-3 cursor-pointer hover:text-primary/70"
+                            onClick={() => setPriceRange([0, 5000000])}
+                          />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+      <div
+        className="
+                  max-w-[1280px] mx-auto px-2 py-8
+                  md:px-4"
+      >
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+          <div
+            className="
+                      flex mb-4 flex-col gap-4
+                      md:flex-row md:justify-between
+          "
+          >
             <div>
-              <h1 className="text-4xl font-bold text-slate-900 mb-2">
+              <h1 className="text-4xl font-medium text-slate-900 mb-2">
                 Sản Phẩm
               </h1>
               <p className="text-slate-600">
@@ -152,7 +381,7 @@ const ProductList = () => {
             </div>
 
             {/* Sort & Filter Toggle */}
-            <div className="flex items-center gap-4 text-black">
+            <div className="flex items-center gap-4 text-black flex-col\">
               {/* Custom Sort Dropdown */}
               <div className="relative">
                 <button
@@ -213,7 +442,10 @@ const ProductList = () => {
               <Button
                 variant="outline"
                 className="lg:hidden"
-                onClick={() => setShowFilters(!showFilters)}
+                onClick={() => {
+                  setShowFilters(!showFilters);
+                  if (isMobile) setIsFilterOpen(true);
+                }}
               >
                 <Filter className="w-4 h-4 mr-2" />
                 Bộ lọc
@@ -248,188 +480,194 @@ const ProductList = () => {
 
         <div className="flex gap-8">
           {/* Filters Sidebar */}
-          <aside
-            className={`w-80 space-y-6 ${
-              showFilters ? "block" : "hidden lg:block"
-            }`}
-          >
-            <Card className="p-6 shadow-none">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Filter className="w-5 h-5" />
-                  Bộ Lọc
-                </h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClearFilters}
-                  className="text-primary hover:text-primary/80"
-                >
-                  Xóa tất cả
-                </Button>
-              </div>
-
-              {/* Categories Filter */}
-              <div className="space-y-4">
-                <div>
-                  <button
-                    onClick={() => setShowCategorySection(!showCategorySection)}
-                    className="flex items-center justify-between w-full text-left font-medium mb-3"
+          {!isMobile && (
+            <aside
+              className={`w-80 space-y-6 ${
+                showFilters ? "block" : "hidden lg:block"
+              }`}
+            >
+              <Card className="p-6 shadow-none">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <Filter className="w-5 h-5" />
+                    Bộ Lọc
+                  </h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearFilters}
+                    className="text-primary hover:text-primary/80"
                   >
-                    <span>Danh Mục</span>
-                    {showCategorySection ? (
-                      <ChevronUp className="w-4 h-4" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4" />
-                    )}
-                  </button>
+                    Xóa tất cả
+                  </Button>
+                </div>
 
-                  {showCategorySection && (
-                    <div className="space-y-3 max-h-64 overflow-y-auto">
-                      {isLoadingCategories ? (
-                        <>
-                          <Skeleton className="h-6 w-full" />
-                          <Skeleton className="h-6 w-full" />
-                          <Skeleton className="h-6 w-full" />
-                        </>
+                {/* Categories Filter */}
+                <div className="space-y-4">
+                  <div>
+                    <button
+                      onClick={() =>
+                        setShowCategorySection(!showCategorySection)
+                      }
+                      className="flex items-center justify-between w-full text-left font-medium mb-3"
+                    >
+                      <span>Danh Mục</span>
+                      {showCategorySection ? (
+                        <ChevronUp className="w-4 h-4" />
                       ) : (
-                        categories.map((category: CategoryResponseDto) => (
-                          <div
-                            key={category.id}
-                            className="flex items-center space-x-2"
-                          >
-                            <Checkbox
-                              id={`category-${category.id}`}
-                              checked={selectedCategories.includes(category.id)}
-                              onCheckedChange={() =>
-                                handleCategoryToggle(category.id)
-                              }
-                            />
-                            <Label
-                              htmlFor={`category-${category.id}`}
-                              className="cursor-pointer text-sm font-normal"
-                            >
-                              {category.title}
-                            </Label>
-                          </div>
-                        ))
+                        <ChevronDown className="w-4 h-4" />
                       )}
-                    </div>
-                  )}
-                </div>
+                    </button>
 
-                <div className="border-t pt-4">
-                  <button
-                    onClick={() => setShowPriceSection(!showPriceSection)}
-                    className="flex items-center justify-between w-full text-left font-medium mb-3"
-                  >
-                    <span>Khoảng Giá</span>
-                    {showPriceSection ? (
-                      <ChevronUp className="w-4 h-4" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4" />
+                    {showCategorySection && (
+                      <div className="space-y-3 max-h-64 overflow-y-auto">
+                        {isLoadingCategories ? (
+                          <>
+                            <Skeleton className="h-6 w-full" />
+                            <Skeleton className="h-6 w-full" />
+                            <Skeleton className="h-6 w-full" />
+                          </>
+                        ) : (
+                          categories.map((category: CategoryResponseDto) => (
+                            <div
+                              key={category.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`category-${category.id}`}
+                                checked={selectedCategories.includes(
+                                  category.id
+                                )}
+                                onCheckedChange={() =>
+                                  handleCategoryToggle(category.id)
+                                }
+                              />
+                              <Label
+                                htmlFor={`category-${category.id}`}
+                                className="cursor-pointer text-sm font-normal"
+                              >
+                                {category.title}
+                              </Label>
+                            </div>
+                          ))
+                        )}
+                      </div>
                     )}
-                  </button>
+                  </div>
 
-                  {showPriceSection && (
-                    <div className="space-y-4">
-                      <Slider
-                        min={0}
-                        max={5000000}
-                        step={50000}
-                        value={priceRange}
-                        onValueChange={(value: number[]) =>
-                          setPriceRange(value as [number, number])
-                        }
-                        className="w-full"
-                      />
-                      <div className="flex items-center justify-between text-sm text-slate-600">
-                        <span>{formatPriceVND(priceRange[0])}</span>
-                        <span>-</span>
-                        <span>{formatPriceVND(priceRange[1])}</span>
-                      </div>
+                  <div className="border-t pt-4">
+                    <button
+                      onClick={() => setShowPriceSection(!showPriceSection)}
+                      className="flex items-center justify-between w-full text-left font-medium mb-3"
+                    >
+                      <span>Khoảng Giá</span>
+                      {showPriceSection ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
 
-                      {/* Quick price filters */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPriceRange([0, 500000])}
-                          className="text-xs rounded-sm"
-                        >
-                          Dưới 500K
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPriceRange([500000, 1000000])}
-                          className="text-xs rounded-sm"
-                        >
-                          500K - 1M
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPriceRange([1000000, 2000000])}
-                          className="text-xs rounded-sm"
-                        >
-                          1M - 2M
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPriceRange([2000000, 5000000])}
-                          className="text-xs rounded-sm"
-                        >
-                          Trên 2M
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Active Filters */}
-              {(selectedCategories.length > 0 ||
-                priceRange[0] > 0 ||
-                priceRange[1] < 5000000) && (
-                <div className="border-t pt-4 mt-4">
-                  <h3 className="text-sm font-medium mb-3">
-                    Bộ lọc đang áp dụng:
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedCategories.map((catId) => {
-                      const category = categories.find(
-                        (c: CategoryResponseDto) => c.id === catId
-                      );
-                      return category ? (
-                        <span
-                          key={catId}
-                          className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-primary/10 text-primary rounded-full"
-                        >
-                          {category.title}
-                          <X
-                            className="w-3 h-3 cursor-pointer hover:text-primary/70"
-                            onClick={() => handleCategoryToggle(catId)}
-                          />
-                        </span>
-                      ) : null;
-                    })}
-                    {(priceRange[0] > 0 || priceRange[1] < 5000000) && (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-primary/10 text-primary rounded-full">
-                        {formatPriceVND(priceRange[0])} -{" "}
-                        {formatPriceVND(priceRange[1])}
-                        <X
-                          className="w-3 h-3 cursor-pointer hover:text-primary/70"
-                          onClick={() => setPriceRange([0, 5000000])}
+                    {showPriceSection && (
+                      <div className="space-y-4">
+                        <Slider
+                          min={0}
+                          max={5000000}
+                          step={50000}
+                          value={priceRange}
+                          onValueChange={(value: number[]) =>
+                            setPriceRange(value as [number, number])
+                          }
+                          className="w-full"
                         />
-                      </span>
+                        <div className="flex items-center justify-between text-sm text-slate-600">
+                          <span>{formatPriceVND(priceRange[0])}</span>
+                          <span>-</span>
+                          <span>{formatPriceVND(priceRange[1])}</span>
+                        </div>
+
+                        {/* Quick price filters */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([0, 500000])}
+                            className="text-xs rounded-sm"
+                          >
+                            Dưới 500K
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([500000, 1000000])}
+                            className="text-xs rounded-sm"
+                          >
+                            500K - 1M
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([1000000, 2000000])}
+                            className="text-xs rounded-sm"
+                          >
+                            1M - 2M
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([2000000, 5000000])}
+                            className="text-xs rounded-sm"
+                          >
+                            Trên 2M
+                          </Button>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
-              )}
-            </Card>
-          </aside>
+
+                {/* Active Filters */}
+                {(selectedCategories.length > 0 ||
+                  priceRange[0] > 0 ||
+                  priceRange[1] < 5000000) && (
+                  <div className="border-t pt-4 mt-4">
+                    <h3 className="text-sm font-medium mb-3">
+                      Bộ lọc đang áp dụng:
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCategories.map((catId) => {
+                        const category = categories.find(
+                          (c: CategoryResponseDto) => c.id === catId
+                        );
+                        return category ? (
+                          <span
+                            key={catId}
+                            className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-primary/10 text-primary rounded-full"
+                          >
+                            {category.title}
+                            <X
+                              className="w-3 h-3 cursor-pointer hover:text-primary/70"
+                              onClick={() => handleCategoryToggle(catId)}
+                            />
+                          </span>
+                        ) : null;
+                      })}
+                      {(priceRange[0] > 0 || priceRange[1] < 5000000) && (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-primary/10 text-primary rounded-full">
+                          {formatPriceVND(priceRange[0])} -{" "}
+                          {formatPriceVND(priceRange[1])}
+                          <X
+                            className="w-3 h-3 cursor-pointer hover:text-primary/70"
+                            onClick={() => setPriceRange([0, 5000000])}
+                          />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </Card>
+            </aside>
+          )}
 
           {/* Products Grid */}
           <div className="flex-1">
@@ -460,7 +698,15 @@ const ProductList = () => {
               </Card>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div
+                  className="
+                              grid grid-cols-2 gap-3
+                              sm:grid-cols-2 
+                              md:gap-6
+                              xl:grid-cols-4
+                              lg:grid-cols-3
+                              md:grid-cols-3"
+                >
                   {sortedProducts.map((product: any) => (
                     <ProductCard key={product.id} product={product} />
                   ))}

@@ -78,11 +78,11 @@ export const ProfileChangePassword: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-lg bg-primary/10">
-          <Lock className="h-6 w-6 text-primary" />
+          <Lock className="h-8 w-8 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Đổi mật khẩu</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="md:text-2xl font-bold text-slate-900">Đổi mật khẩu</h1>
+          <p className="text-xs md:text-sm text-slate-500">
             Cập nhật mật khẩu của bạn để bảo mật tài khoản
           </p>
         </div>

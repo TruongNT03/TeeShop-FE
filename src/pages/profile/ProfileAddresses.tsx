@@ -150,16 +150,16 @@ export const ProfileAddresses: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-5">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
-            <MapPin className="h-6 w-6 text-primary" />
+            <MapPin className="h-8 w-8 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">
+            <h1 className="md:text-2xl font-bold text-slate-900">
               Địa chỉ nhận hàng
             </h1>
-            <p className="text-sm text-slate-500">
+            <p className="text-xs md:text-sm text-slate-500">
               Quản lý địa chỉ giao hàng của bạn
             </p>
           </div>
@@ -190,7 +190,7 @@ export const ProfileAddresses: React.FC = () => {
                 className={cn(
                   "rounded-lg border-2 p-5",
                   isDefault
-                    ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
+                    ? "border-primary bg-primary/10 shadow-primary/20"
                     : "border-slate-200 bg-white shadow-sm hover:shadow-md hover:border-slate-300"
                 )}
               >

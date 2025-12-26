@@ -13,7 +13,12 @@ const UserLayout = () => {
         <ChatbotWidget />
       </ChatProvider>
       <NavHeader />
-      <main className="pt-[88px] bg-stone-100">
+      <main
+        className="
+                    bg-stone-100 pt-[60px]
+                      md:pt-[88px]
+                      "
+      >
         <Outlet />
       </main>
       <footer>
