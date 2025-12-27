@@ -350,11 +350,11 @@ const Checkout = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="bg-stone-100 min-h-screen py-8 sm:py-12 px-4 sm:px-8 md:px-[65px]"
+      className="bg-stone-100 min-h-screen py-8 sm:py-12 px-3 sm:px-8 md:px-[65px]"
     >
       {/* Header */}
       <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
-        <ShoppingBag className="w-7 h-7 sm:w-10 sm:h-10" />
+        <ShoppingBag className="sm:w-10 sm:h-10" />
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-normal uppercase">
           Thanh toán
         </h1>
@@ -674,7 +674,7 @@ const Checkout = () => {
 
       {/* Payment Confirmation Modal */}
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
-        <DialogContent className="max-w-md mx-auto px-4">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-2xl">
               {selectedPayment === "cod"
@@ -916,7 +916,7 @@ const Checkout = () => {
 
       {/* Select Address Modal */}
       <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
-        <DialogContent className="max-w-2xl mx-auto px-4 max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-2xl">
               Chọn địa chỉ giao hàng
@@ -990,7 +990,7 @@ const Checkout = () => {
 
       {/* Voucher Selection Modal */}
       <Dialog open={showVoucherModal} onOpenChange={setShowVoucherModal}>
-        <DialogContent className="max-w-2xl mx-auto px-4 max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-2xl flex items-center gap-2">
               <Ticket className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -1136,7 +1136,7 @@ const Checkout = () => {
 
       {/* Add New Address Modal */}
       <Dialog open={showAddAddressModal} onOpenChange={setShowAddAddressModal}>
-        <DialogContent className="max-w-2xl mx-auto px-4">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-2xl flex items-center gap-2">
               <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
