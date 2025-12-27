@@ -41,7 +41,7 @@ const CartPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeIn" }}
-      className="px-4 sm:px-8 md:px-[65px] mx-auto py-8 sm:py-12 bg-stone-100 min-h-screen"
+      className="px-3 sm:px-8 md:px-[65px] mx-auto py-8 sm:py-12 bg-stone-100 min-h-screen"
     >
       <div className="flex text-2xl sm:text-3xl md:text-4xl items-center gap-4 my-8 sm:my-12">
         <div className="uppercase">Giỏ hàng của tôi:</div>

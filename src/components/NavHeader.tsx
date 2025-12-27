@@ -128,6 +128,7 @@ const NavHeader = () => {
                             <Link to="profile/addresses">
                               Địa chỉ nhận hàng
                             </Link>
+                            <Link to="profile/notifications">Thông báo</Link>
                           </div>
                         </AccordionContent>
                       </AccordionItem>

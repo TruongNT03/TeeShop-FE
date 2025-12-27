@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
-import { User, Package, Lock, MapPin } from "lucide-react";
+import { User, Package, Lock, MapPin, Bell } from "lucide-react";
 import { Link, Outlet, useLocation, Navigate } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const menuItems = [
   {
@@ -24,11 +25,17 @@ const menuItems = [
     label: "Địa chỉ nhận hàng",
     icon: MapPin,
   },
+  {
+    path: "/profile/notifications",
+    label: "Thông báo",
+    icon: Bell,
+  },
 ];
 
 export const ProfileLayout = () => {
   const location = useLocation();
   const { profile } = useProfile();
+  const isMobile = useIsMobile();
 
   // Redirect /profile to /profile/info
   if (location.pathname === "/profile") {
@@ -36,8 +43,8 @@ export const ProfileLayout = () => {
   }
 
   return (
-    <div className="bg-slate-50/60 min-h-screen pt-20">
-      <div className="max-w-7xl mx-auto px-2 md:p-6">
+    <div className="bg-slate-50/60 min-h-screen pt-20 px-3">
+      <div className="max-w-7xl mx-auto md:p-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <aside className="lg:col-span-1">

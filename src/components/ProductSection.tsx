@@ -19,7 +19,7 @@ const ProductSection = (props: ProductSectionProps) => {
   const sectionId = useId();
   const skeletonCount = props.itemPerRow * 2;
   return (
-    <section id={sectionId} className="w-full pb-[24px] overflow-x-hidden">
+    <section id={sectionId} className="w-full pb-[24px] overflow-x-hidden px-1">
       <div
         className="flex flex-col gap-4 justify-center items-center py-6 px-0
       md:py-8 "

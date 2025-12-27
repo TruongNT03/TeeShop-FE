@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCreateReview } from "@/queries/reviewQueries";
 import { Spinner } from "@/components/ui/spinner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const getStatusConfig = (
   status: "pending" | "shipping" | "confirmed" | "completed" | "cancel"
@@ -94,6 +95,7 @@ export const ProfileOrderDetail: React.FC = () => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const createReviewMutation = useCreateReview();
+  const isMobile = useIsMobile();
 
   const { data, isLoading } = getOrdersQuery(100, 1);
   const order = data?.data?.data?.find((o) => o.id === id);
@@ -185,7 +187,7 @@ export const ProfileOrderDetail: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card>
+        <Card className={`${isMobile ? "border-none" : ""}`}>
           <CardHeader>
             <CardTitle className="text-lg">Thông tin đơn hàng</CardTitle>
           </CardHeader>
@@ -207,14 +209,14 @@ export const ProfileOrderDetail: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div>
-
+      {isMobile && <div className="w-full h-[1px] bg-border"></div>}
       {/* Shipping Address */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <Card>
+        <Card className={`${isMobile ? "border-none" : ""}`}>
           <CardHeader>
             <CardTitle className="text-lg">Địa chỉ giao hàng</CardTitle>
           </CardHeader>
@@ -240,14 +242,14 @@ export const ProfileOrderDetail: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div>
-
+      {isMobile && <div className="w-full h-[1px] bg-border"></div>}
       {/* Order Items */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <Card>
+        <Card className={`${isMobile ? "border-none" : ""}`}>
           <CardHeader>
             <CardTitle className="text-lg">
               Sản phẩm ({order.orderItems.length})
@@ -258,7 +260,9 @@ export const ProfileOrderDetail: React.FC = () => {
               {order.orderItems.map((item, index) => (
                 <div key={item.id}>
                   {index > 0 && <Separator className="my-4" />}
-                  <div className="flex gap-4 hover:bg-slate-50 p-2 rounded-lg transition-colors">
+                  <div
+                    className={`flex justify-between items-end gap-10 md:gap-4 hover:bg-slate-50 mb-5 md:p-2 rounded-lg transition-colors`}
+                  >
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
                       {item.product.productImages?.[0]?.url && (
                         <img
@@ -268,31 +272,36 @@ export const ProfileOrderDetail: React.FC = () => {
                         />
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4
-                        className="font-medium text-slate-900 truncate hover:text-primary cursor-pointer"
-                        onClick={() => navigate(`/product/${item.product.id}`)}
-                      >
-                        {item.product.name}
-                      </h4>
-                      {item.productVariant.variantValues.length > 0 && (
-                        <p className="text-sm text-slate-500 mt-1">
-                          {item.productVariant.variantValues
-                            .map((vv) => `${vv.variant}: ${vv.value}`)
-                            .join(" / ")}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-4 mt-2">
-                        <p className="text-sm text-slate-600">
-                          Số lượng:{" "}
-                          <span className="font-medium">{item.quantity}</span>
-                        </p>
-                        <span className="text-slate-400">•</span>
-                        <p className="font-medium text-slate-900">
-                          {formatPriceVND(item.productVariant.price)}
-                        </p>
+                    {!isMobile && (
+                      <div className="flex-1 min-w-0">
+                        <h4
+                          className="font-medium text-slate-900 truncate hover:text-primary cursor-pointer"
+                          onClick={() =>
+                            navigate(`/product/${item.product.id}`)
+                          }
+                        >
+                          {item.product.name}
+                        </h4>
+                        {item.productVariant.variantValues.length > 0 && (
+                          <p className="text-sm text-slate-500 mt-1">
+                            {item.productVariant.variantValues
+                              .map((vv) => `${vv.variant}: ${vv.value}`)
+                              .join(" / ")}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-4 mt-2">
+                          <p className="text-sm text-slate-600">
+                            Số lượng:{" "}
+                            <span className="font-medium">{item.quantity}</span>
+                          </p>
+                          <span className="text-slate-400">•</span>
+                          <p className="font-medium text-slate-900">
+                            {formatPriceVND(item.productVariant.price)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    )}
+
                     <div className="text-right flex flex-col items-end gap-2">
                       <p className="font-semibold text-slate-900">
                         {formatPriceVND(
@@ -320,6 +329,33 @@ export const ProfileOrderDetail: React.FC = () => {
                       )}
                     </div>
                   </div>
+                  {isMobile && (
+                    <div className="flex-1 min-w-0">
+                      <h4
+                        className="font-medium text-slate-900 truncate hover:text-primary cursor-pointer"
+                        onClick={() => navigate(`/product/${item.product.id}`)}
+                      >
+                        {item.product.name}
+                      </h4>
+                      {item.productVariant.variantValues.length > 0 && (
+                        <p className="text-sm text-slate-500 mt-1">
+                          {item.productVariant.variantValues
+                            .map((vv) => `${vv.variant}: ${vv.value}`)
+                            .join(" / ")}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-4 mt-2">
+                        <p className="text-sm text-slate-600">
+                          Số lượng:{" "}
+                          <span className="font-medium">{item.quantity}</span>
+                        </p>
+                        <span className="text-slate-400">•</span>
+                        <p className="font-medium text-slate-900">
+                          {formatPriceVND(item.productVariant.price)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -358,7 +394,7 @@ export const ProfileOrderDetail: React.FC = () => {
                 <span>Miễn phí</span>
               </div>
               <Separator className="my-3" />
-              <div className="flex justify-between text-lg font-bold text-slate-900">
+              <div className="flex justify-between text-lg font-medium text-slate-900">
                 <span>Tổng cộng</span>
                 <span className="text-primary">
                   {formatPriceVND(order.amount)}
