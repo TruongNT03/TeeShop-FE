@@ -16,9 +16,15 @@ import { Button } from "@/components/ui/button";
 import { IoMdArrowDropup } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  updateCartItemQuantityMutation,
+  deleteCartItemMutation,
+} from "@/queries/cartQueries";
+import { useState } from "react";
 
 const CartPage = () => {
   const navigate = useNavigate();
+  const [openPopovers, setOpenPopovers] = useState<Record<string, boolean>>({});
   const {
     listCartItems,
     isCartItemSuccess,
@@ -36,6 +42,21 @@ const CartPage = () => {
   } = useProductVariantValue();
 
   const { totalAmount, totalQuantity } = checkoutSummaryCalculator;
+
+  const { mutate: updateQuantity } = updateCartItemQuantityMutation();
+  const { mutate: deleteItem } = deleteCartItemMutation();
+
+  const handleQuantityChange = (cartItemId: string, newQuantity: number) => {
+    updateQuantity({ id: cartItemId, data: { quantity: newQuantity } });
+  };
+
+  const handleDelete = (cartItemId: string) => {
+    if (
+      window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")
+    ) {
+      deleteItem(cartItemId);
+    }
+  };
 
   return (
     <motion.div
@@ -180,7 +201,12 @@ const CartPage = () => {
                     </td>
                     <td className="align-middle text-center">
                       <div className="flex justify-center">
-                        <Counter initValue={cartItem.quantity} />
+                        <Counter
+                          initValue={cartItem.quantity}
+                          onChange={(newQuantity) =>
+                            handleQuantityChange(cartItem.id, newQuantity)
+                          }
+                        />
                       </div>
                     </td>
                     <td className="align-middle text-center text-sm">
@@ -190,7 +216,10 @@ const CartPage = () => {
                     </td>
                     <td className="text-center align-middle rounded-r-sm">
                       <div className="flex justify-center">
-                        <Trash className="scale-75 cursor-pointer hover:text-red-500" />
+                        <Trash
+                          className="scale-75 cursor-pointer hover:text-red-500"
+                          onClick={() => handleDelete(cartItem.id)}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -207,19 +236,28 @@ const CartPage = () => {
                   checked={isAllSelected}
                   onCheckedChange={handleCheckAll}
                 />
+
                 <span className="text-sm font-medium">Chọn tất cả</span>
               </div>
             </div>
             {listCartItems.map((cartItem) => (
               <Card key={cartItem.id} className="rounded-lg bg-white">
                 <CardContent className="">
-                  <Checkbox
-                    className="mb-5"
-                    checked={selectedCartItemIds.includes(cartItem.id)}
-                    onCheckedChange={(value) =>
-                      handleCheckedChange(value, cartItem.id)
-                    }
-                  />
+                  <div className="flex justify-between">
+                    <Checkbox
+                      className="mb-5"
+                      checked={selectedCartItemIds.includes(cartItem.id)}
+                      onCheckedChange={(value) =>
+                        handleCheckedChange(value, cartItem.id)
+                      }
+                    />
+
+                    <Trash
+                      className="scale-75 cursor-pointer hover:text-red-500"
+                      onClick={() => handleDelete(cartItem.id)}
+                    />
+                  </div>
+                  <div className="w-full h-[1px] bg-border mb-2"></div>
                   <div className="flex items-center gap-3 mb-4">
                     {cartItem.product?.productImages[0]?.url ? (
                       <img
@@ -315,7 +353,12 @@ const CartPage = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Số lượng:</span>
-                      <Counter initValue={cartItem.quantity} />
+                      <Counter
+                        initValue={cartItem.quantity}
+                        onChange={(newQuantity) =>
+                          handleQuantityChange(cartItem.id, newQuantity)
+                        }
+                      />
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Thành tiền:</span>
@@ -325,10 +368,6 @@ const CartPage = () => {
                         )}
                       </span>
                     </div>
-                  </div>
-
-                  <div className="flex justify-end mt-4 pt-3 border-t">
-                    <Trash className="scale-75 cursor-pointer hover:text-red-500" />
                   </div>
                 </CardContent>
               </Card>

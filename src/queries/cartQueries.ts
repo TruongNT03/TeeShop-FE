@@ -6,7 +6,11 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cartApi } from "@/services/cartApi";
-import type { AddItemToCartDto, UpdateQuantityCartItemDto } from "@/api";
+import type {
+  AddItemToCartDto,
+  UpdateQuantityCartItemDto,
+  UpdateProductVariantCartItemDto,
+} from "@/api";
 import { apiClient } from "@/services/apiClient";
 import { isAuthenticated } from "@/utils/auth";
 
@@ -18,6 +22,7 @@ export const addItemToCartMutation = () => {
     onSuccess: () => {
       toast.success("Đã thêm sản phẩm vào giỏ hàng!");
       queryClient.invalidateQueries({ queryKey: ["cartSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
     },
     onError: (error) => {
       toast.error(error.message || "Thêm vào giỏ hàng thất bại.");
@@ -46,9 +51,32 @@ export const updateCartItemQuantityMutation = () => {
     }) => cartApi.updateItemQuantity(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cartSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
     },
     onError: (error) => {
       toast.error(error.message || "Cập nhật số lượng thất bại.");
+    },
+  });
+};
+
+export const updateCartItemVariantMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["updateCartItemVariant"],
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateProductVariantCartItemDto;
+    }) => cartApi.updateItemVariant(id, data),
+    onSuccess: () => {
+      toast.success("Đã cập nhật phân loại sản phẩm.");
+      queryClient.invalidateQueries({ queryKey: ["cartSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Cập nhật phân loại thất bại.");
     },
   });
 };
@@ -61,6 +89,7 @@ export const deleteCartItemMutation = () => {
     onSuccess: () => {
       toast.success("Đã xóa sản phẩm khỏi giỏ hàng.");
       queryClient.invalidateQueries({ queryKey: ["cartSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
     },
     onError: (error) => {
       toast.error(error.message || "Xóa sản phẩm thất bại.");
