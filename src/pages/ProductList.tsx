@@ -372,7 +372,7 @@ const ProductList = () => {
           "
           >
             <div>
-              <h1 className="text-4xl font-medium text-slate-900 mb-2">
+              <h1 className="w-fit text-2xl font-medium uppercase text-slate-900 mb-2 border-black border-b-[2px]">
                 Sản Phẩm
               </h1>
               <p className="text-slate-600">

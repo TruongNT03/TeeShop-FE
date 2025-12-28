@@ -15,6 +15,7 @@ import { useProductVariantValue } from "@/hooks/useProductVariantValue";
 import { Button } from "@/components/ui/button";
 import { IoMdArrowDropup } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -43,8 +44,11 @@ const CartPage = () => {
       transition={{ duration: 0.3, ease: "easeIn" }}
       className="px-3 sm:px-8 md:px-[65px] mx-auto py-8 sm:py-12 bg-stone-100 min-h-screen"
     >
-      <div className="flex text-2xl sm:text-3xl md:text-4xl items-center gap-4 my-8 sm:my-12">
-        <div className="uppercase">Giỏ hàng của tôi:</div>
+      <div className="flex flex-col items-start text-2xl sm:text-3xl md:text-4xl gap-4 md:my-8 sm:my-12 my-3">
+        <div className="uppercase w-fit border-black border-b-[2px]">
+          Giỏ hàng của tôi
+        </div>
+        <div className="text-sm">Các sản phẩm bạn đã thêm vào giỏ hàng</div>
       </div>
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
         {/* Products Section */}
@@ -52,15 +56,17 @@ const CartPage = () => {
           {/* Desktop View - Table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full border-separate border-spacing-y-4">
-              <thead>
-                <tr className="bg-white rounded-2xl">
+              <thead className="border border-border">
+                <tr className="bg-white rounded-2xl border-border">
                   <th className="py-4 pl-4 sm:pl-5 text-left rounded-l-sm w-12">
                     <Checkbox
                       checked={isAllSelected}
                       onCheckedChange={handleCheckAll}
                     />
                   </th>
-                  <th className="py-4 font-normal text-left">Sản phẩm</th>
+                  <th className="py-4 font-normal text-left pl-[20px]">
+                    Sản phẩm
+                  </th>
                   <th className="py-4 font-normal text-center">Đơn giá</th>
                   <th className="py-4 font-normal text-center">Số lượng</th>
                   <th className="py-4 font-normal text-center">Thành tiền</th>
@@ -82,19 +88,17 @@ const CartPage = () => {
                     </td>
                     <td className="py-4 px-2 sm:px-5">
                       <div className="flex items-start gap-3 sm:gap-4">
-                        <img
-                          src={cartItem.product?.productImages[0]?.url}
-                          alt={cartItem.product.name}
-                          className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md flex-shrink-0"
-                          onError={(e) =>
-                            e.currentTarget.setAttribute(
-                              "src",
-                              "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM="
-                            )
-                          }
-                        />
+                        {cartItem.product?.productImages[0]?.url ? (
+                          <img
+                            src={cartItem.product?.productImages[0]?.url}
+                            alt={cartItem.product.name}
+                            className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md flex-shrink-0"
+                          />
+                        ) : (
+                          <Skeleton className="w-20 h-20" />
+                        )}
                         <div className="flex-1 min-w-0">
-                          <div className="uppercase text-xs sm:text-sm font-medium line-clamp-2">
+                          <div className="uppercase font-medium">
                             {cartItem.product.name}
                           </div>
                           {cartItem.productVariant.variantValues.length > 0 && (
@@ -209,26 +213,24 @@ const CartPage = () => {
             {listCartItems.map((cartItem) => (
               <Card key={cartItem.id} className="rounded-lg bg-white">
                 <CardContent className="p-4">
-                  <div className="flex gap-3 mb-4">
+                  <div className="flex items-center gap-3 mb-4">
                     <Checkbox
                       checked={selectedCartItemIds.includes(cartItem.id)}
                       onCheckedChange={(value) =>
                         handleCheckedChange(value, cartItem.id)
                       }
                     />
-                    <img
-                      src={cartItem.product?.productImages[0]?.url}
-                      alt={cartItem.product.name}
-                      className="w-20 h-20 object-cover rounded-md flex-shrink-0"
-                      onError={(e) =>
-                        e.currentTarget.setAttribute(
-                          "src",
-                          "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM="
-                        )
-                      }
-                    />
+                    {cartItem.product?.productImages[0]?.url ? (
+                      <img
+                        src={cartItem.product?.productImages[0]?.url}
+                        alt={cartItem.product.name}
+                        className="w-20 h-20 object-cover rounded-md flex-shrink-0"
+                      />
+                    ) : (
+                      <Skeleton className="w-20 h-20" />
+                    )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-xs line-clamp-2 mb-1">
+                      <h3 className="font-medium uppercase line-clamp-2 mb-1 truncate">
                         {cartItem.product.name}
                       </h3>
                       {cartItem.productVariant.variantValues.length > 0 && (

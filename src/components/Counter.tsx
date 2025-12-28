@@ -31,7 +31,7 @@ const Counter = ({
     }
   };
   return (
-    <InputGroup className="w-[130px] rounded-sm">
+    <InputGroup className="w-[130px] rounded-md border-primary">
       <InputGroupButton
         className="mx-1 hover:bg-primary/30"
         onClick={handleMinus}
@@ -39,7 +39,9 @@ const Counter = ({
       >
         <Minus />
       </InputGroupButton>
+      <div className="w-[1px] h-full bg-primary"></div>
       <InputGroupInput type="text" className="text-center" value={value} />
+      <div className="w-[1px] h-full bg-primary"></div>
       <InputGroupButton
         className="mx-1 hover:bg-primary/30 "
         onClick={handlePlus}
