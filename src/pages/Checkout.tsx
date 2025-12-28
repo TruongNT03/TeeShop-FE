@@ -353,11 +353,9 @@ const Checkout = () => {
       className="bg-stone-100 min-h-screen py-8 sm:py-12 px-3 sm:px-8 md:px-[65px]"
     >
       {/* Header */}
-      <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
-        <ShoppingBag className="sm:w-10 sm:h-10" />
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-normal uppercase">
-          Thanh toán
-        </h1>
+
+      <div className="text-2xl sm:text-3xl md:text-4xl font-normal uppercase border-b-[2px] border-black w-fit mb-5 md:mb-8">
+        Thanh toán
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -368,7 +366,7 @@ const Checkout = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6 mb-6">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5" />
-                <h2 className="text-xl md:text-lg sm:text-2xl md:font-semibold">
+                <h2 className="text-2xl md:text-2xl sm:text-2xl">
                   Địa chỉ nhận hàng
                 </h2>
               </div>
@@ -456,9 +454,7 @@ const Checkout = () => {
           <Card className="p-4 sm:p-6">
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <CreditCard className="w-5 h-5" />
-              <h2 className="text-lg sm:text-2xl font-semibold">
-                Phương thức thanh toán
-              </h2>
+              <h2 className="text-xl sm:text-2xl">Phương thức thanh toán</h2>
             </div>
 
             <div className="space-y-3 sm:space-y-4">
@@ -520,9 +516,7 @@ const Checkout = () => {
         {/* Order Summary Sidebar */}
         <div className="w-full lg:flex-[1]">
           <Card className="p-4 sm:p-6 sticky top-4 md:top-20">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
-              Tóm tắt đơn hàng
-            </h2>
+            <h2 className="text-2xl mb-4">Tóm tắt đơn hàng</h2>
 
             <div className="space-y-3 sm:space-y-4 mb-4 max-h-60 sm:max-h-80 overflow-y-auto">
               {isCheckoutItemsLoading ? (
@@ -557,7 +551,7 @@ const Checkout = () => {
                         }`}
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-xs sm:text-sm line-clamp-2">
+                        <div className="font-medium uppercase text-xs sm:text-sm line-clamp-2">
                           {productName}
                         </div>
                         {variantText && (

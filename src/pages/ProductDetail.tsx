@@ -32,6 +32,17 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Card } from "antd";
+import { CardContent } from "@/components/ui/card";
+import ProductCard from "@/components/ProductCard";
+import { useListProduct } from "@/queries/user/useListProduct";
 
 const LoadingSkeleton = () => (
   <div className="max-w-[1280px] mx-auto py-12 px-4">
@@ -78,6 +89,9 @@ const ProductDetail = () => {
   const [reviewHasImagesFilter, setReviewHasImagesFilter] = useState<
     boolean | undefined
   >(undefined);
+  const listProductQuery = useListProduct({
+    pageSize: 20,
+  });
 
   const productQuery = findProductByIdQuery(id!, !!id);
   const variantOptionsQuery = findProductVariantOptionsQuery(id!, !!id);
@@ -302,7 +316,7 @@ const ProductDetail = () => {
                           handleOptionSelect(option.variant, value)
                         }
                         className={cn(
-                          "px-6 py-2 text-sm border rounded-sm transition-colors cursor-pointer",
+                          "px-6 py-2 text-sm border rounded-md transition-colors cursor-pointer",
                           isSelected
                             ? "border-primary bg-primary text-white"
                             : "border-primary hover:bg-primary hover:text-white"
@@ -321,7 +335,7 @@ const ProductDetail = () => {
               <div className="text-sm font-medium text-black mb-3">
                 Số lượng
               </div>
-              <div className="inline-flex border border-primary rounded-sm overflow-hidden">
+              <div className="inline-flex border border-primary rounded-md overflow-hidden">
                 <button
                   onClick={() => handleQuantityChange(-1)}
                   disabled={quantity <= 1}
@@ -350,7 +364,7 @@ const ProductDetail = () => {
                 addToCartMutation.isPending
               }
               onClick={handleAddToCart}
-              className="w-full bg-primary text-white py-4 rounded-sm hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-primary text-white py-4 rounded-md hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
             >
               {addToCartMutation.isPending ? (
                 <Spinner className="w-5 h-5" />
@@ -367,19 +381,22 @@ const ProductDetail = () => {
             </button>
 
             {/* Benefits */}
-            <div className="space-y-3 pt-6 border-t border-slate-200 text-black">
+            <div className="space-y-8 pt-6 border-t border-slate-200 text-black uppercase">
               <div className="flex items-center gap-3 text-sm">
-                <Truck className="w-5 h-5" />
+                <Truck className="" />
+                <div className="w-[1px] bg-black h-[20px]"></div>
                 <span className="">
                   Miễn phí vận chuyển cho đơn từ 500.000đ
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Shield className="w-5 h-5" />
+                <Shield className="" />
+                <div className="w-[1px] bg-black h-[20px]"></div>
                 <span className="">Bảo hành chính hãng</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Package className="w-5 h-5" />
+                <Package className="" />
+                <div className="w-[1px] bg-black h-[20px]"></div>
                 <span className="">Đổi trả trong 7 ngày</span>
               </div>
             </div>
@@ -388,22 +405,22 @@ const ProductDetail = () => {
 
         {/* Description */}
         <div className="mt-16 border-t border-slate-200 pt-16">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-6">
+          <div className="w-fit text-2xl uppercase font-medium border-b-[2px] border-black pb-1">
             Mô tả sản phẩm
-          </h2>
+          </div>
           <div
-            className="prose prose-slate max-w-none"
+            className="prose prose-slate max-w-none mt-5"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
         </div>
 
         {/* Reviews Section */}
         <div className="mt-16 border-t border-slate-200 pt-16">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-semibold text-slate-900">
+          <div className="flex flex-col justify-start items-start md:flex-row md:items-center md:justify-between mb-8">
+            <div className="w-fit mt-8 text-2xl uppercase font-medium border-b-[2px] border-black pb-1">
               Đánh giá sản phẩm
-            </h2>
-            <div className="flex items-center gap-2">
+            </div>
+            <div className="flex items-center gap-2 mt-5">
               <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
               <span className="text-lg font-semibold">
                 {(product.averageRating || 0).toFixed(1)}
@@ -416,11 +433,11 @@ const ProductDetail = () => {
 
           {/* Filter Controls */}
           <div className="flex items-center gap-4 mb-6 flex-wrap">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col justify-start items-start md:items-center md:flex-row gap-2">
               <span className="text-sm font-medium text-slate-700">
                 Lọc theo:
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Button
                   variant={
                     reviewRatingFilter === undefined ? "default" : "outline"
@@ -447,7 +464,14 @@ const ProductDetail = () => {
                     }}
                     className="gap-1 transition-none"
                   >
-                    {rating} <Star className="h-3 w-3 fill-current" />
+                    {rating}{" "}
+                    <Star
+                      className={`h-5 w-5 ${
+                        reviewRatingFilter === rating
+                          ? "fill-white text-white"
+                          : "fill-amber-400 text-amber-400"
+                      } `}
+                    />
                   </Button>
                 ))}
               </div>
@@ -499,22 +523,22 @@ const ProductDetail = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="bg-slate-50 rounded-xl p-6 border border-slate-200 hover:shadow-md transition-shadow"
+                      className="bg-slate-50 rounded-xl p-6 border border-border hover:shadow-md transition-shadow"
                     >
                       <div className="flex gap-4">
-                        <Avatar className="w-12 h-12 ring-2 ring-slate-200">
+                        <Avatar className="w-12 h-12 ring-0 rounded-lg">
                           <AvatarImage src={review.user.avatar || ""} />
                           <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white font-semibold">
                             {review.user.name?.charAt(0).toUpperCase() || "U"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-3">
-                              <span className="font-semibold text-slate-900">
+                          <div className="flex flex-col justify-start items-start md:flex-row md:items-center md:justify-between mb-2">
+                            <div className="flex flex-col items-start md:flex-row md:items-center gap-1 md:gap-3">
+                              <span className="font-medium text-slate-900">
                                 {review.user.name || "Anonymous"}
                               </span>
-                              <div className="flex gap-0.5">
+                              <div className="flex gap-0.5 mb-3 md:mb-0">
                                 {[...Array(5)].map((_, i) => (
                                   <Star
                                     key={i}
@@ -603,6 +627,48 @@ const ProductDetail = () => {
             </div>
           )}
         </div>
+        <div className="w-full h-[1px] bg-border mt-5"></div>
+        <div className="w-fit mt-8 text-2xl uppercase font-medium border-b-[2px] border-black pb-1">
+          Sản phẩm tương tự
+        </div>
+        <Carousel
+          opts={{
+            align: "start",
+          }}
+          className="w-full py-8"
+        >
+          <CarouselContent>
+            {listProductQuery.isSuccess &&
+              listProductQuery.data.data.map((product, index) => (
+                <CarouselItem
+                  key={index}
+                  className="basis-1/2 md:basis-1/3 lg:basis-1/5"
+                >
+                  <ProductCard product={product}></ProductCard>
+                </CarouselItem>
+              ))}
+          </CarouselContent>
+          <CarouselPrevious
+            variant="ghost"
+            className="
+                      -left-6
+                      md:-left-12
+                      h-9 w-9
+                      active:bg-border
+                      "
+          />
+
+          <CarouselNext
+            variant="ghost"
+            className="
+                      -right-6
+                      md:-right-12
+                      h-9 w-9
+                      active:bg-border
+                      "
+          />
+        </Carousel>
+        <div className="w-full h-[1px] bg-border"></div>
       </div>
     </div>
   );

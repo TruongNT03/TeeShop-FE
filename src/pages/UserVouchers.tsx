@@ -226,7 +226,9 @@ const UserVouchers = () => {
     <div className="max-w-[1200px] mx-auto  px-4 py-8 pt-20">
       {/* Header */}
       <div className="mb-12">
-        <h1 className="text-2xl font-medium uppercase mb-2">Voucher</h1>
+        <h1 className="text-2xl font-medium uppercase mb-2 border-b-[2px] border-black w-fit">
+          Voucher
+        </h1>
         <p className="text-gray-600">Lấy và quản lý mã giảm giá của bạn</p>
       </div>
 

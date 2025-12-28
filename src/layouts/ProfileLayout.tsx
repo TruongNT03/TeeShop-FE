@@ -43,8 +43,14 @@ export const ProfileLayout = () => {
   }
 
   return (
-    <div className="bg-slate-50/60 min-h-screen pt-20 px-3">
+    <div className="bg-slate-50/60 min-h-screen pt-8 md:pt-20 px-3">
       <div className="max-w-7xl mx-auto md:p-6">
+        <div className="text-2xl uppercase font-medium border-b-[2px] border-black w-fit mb-3">
+          Hồ sơ
+        </div>
+        <div className="mb-3 text-slate-500">
+          Theo dõi, chỉnh sửa thông tin cá nhân của bạn
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <aside className="lg:col-span-1">
