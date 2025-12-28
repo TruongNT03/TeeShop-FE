@@ -212,14 +212,15 @@ const CartPage = () => {
             </div>
             {listCartItems.map((cartItem) => (
               <Card key={cartItem.id} className="rounded-lg bg-white">
-                <CardContent className="p-4">
+                <CardContent className="">
+                  <Checkbox
+                    className="mb-5"
+                    checked={selectedCartItemIds.includes(cartItem.id)}
+                    onCheckedChange={(value) =>
+                      handleCheckedChange(value, cartItem.id)
+                    }
+                  />
                   <div className="flex items-center gap-3 mb-4">
-                    <Checkbox
-                      checked={selectedCartItemIds.includes(cartItem.id)}
-                      onCheckedChange={(value) =>
-                        handleCheckedChange(value, cartItem.id)
-                      }
-                    />
                     {cartItem.product?.productImages[0]?.url ? (
                       <img
                         src={cartItem.product?.productImages[0]?.url}
