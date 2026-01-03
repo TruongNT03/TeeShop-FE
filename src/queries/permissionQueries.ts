@@ -13,7 +13,5 @@ export const useGetUserPermissions = () => {
       return response.data;
     },
     enabled: !!accessToken,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
 };

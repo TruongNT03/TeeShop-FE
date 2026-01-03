@@ -7,6 +7,7 @@ import type { PermissionModule } from "@/types/permission";
 interface PermissionsContextType {
   permissions: AdminRolePermissionResponseDto[];
   isLoading: boolean;
+  isSuccess: boolean;
   canCreate: (module: PermissionModule) => boolean;
   canRead: (module: PermissionModule) => boolean;
   canUpdate: (module: PermissionModule) => boolean;
@@ -20,7 +21,11 @@ const PermissionsContext = createContext<PermissionsContextType | undefined>(
 );
 
 export const PermissionsProvider = ({ children }: { children: ReactNode }) => {
-  const { data: permissions = [], isLoading } = useGetUserPermissions();
+  const {
+    data: permissions = [],
+    isLoading,
+    isSuccess,
+  } = useGetUserPermissions();
 
   const canCreate = (module: PermissionModule): boolean => {
     const permission = permissions.find(
@@ -31,6 +36,9 @@ export const PermissionsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const canRead = (module: PermissionModule): boolean => {
+    if (isLoading) {
+      return true;
+    }
     const permission = permissions.find(
       (p: AdminRolePermissionResponseDto) =>
         p.module === module && p.isRead === true
@@ -39,6 +47,9 @@ export const PermissionsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const canUpdate = (module: PermissionModule): boolean => {
+    if (isLoading) {
+      return true;
+    }
     const permission = permissions.find(
       (p: AdminRolePermissionResponseDto) =>
         p.module === module && p.isUpdate === true
@@ -47,6 +58,9 @@ export const PermissionsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const canDelete = (module: PermissionModule): boolean => {
+    if (isLoading) {
+      return true;
+    }
     const permission = permissions.find(
       (p: AdminRolePermissionResponseDto) =>
         p.module === module && p.isDelete === true
@@ -55,6 +69,9 @@ export const PermissionsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const hasAnyPermission = (module: PermissionModule): boolean => {
+    if (isLoading) {
+      return true;
+    }
     const permission = permissions.find(
       (p: AdminRolePermissionResponseDto) => p.module === module
     );
@@ -68,6 +85,9 @@ export const PermissionsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const hasFullPermission = (module: PermissionModule): boolean => {
+    if (isLoading) {
+      return true;
+    }
     const permission = permissions.find(
       (p: AdminRolePermissionResponseDto) => p.module === module
     );
@@ -84,6 +104,7 @@ export const PermissionsProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       permissions,
       isLoading,
+      isSuccess,
       canCreate,
       canRead,
       canUpdate,
