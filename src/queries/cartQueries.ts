@@ -124,5 +124,6 @@ export const getProductVariantValue = (productId: string) => {
       apiClient.api
         .productControllerGetProductVariantValue(productId)
         .then((res) => res.data),
+    enabled: !!productId,
   });
 };

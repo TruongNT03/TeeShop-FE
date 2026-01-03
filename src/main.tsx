@@ -11,15 +11,15 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <PermissionsProvider>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <App />
-          <ReactQueryDevtools initialIsOpen />
-          <Toaster richColors position="top-right" />
-        </ThemeProvider>
-      </PermissionsProvider>
-    </QueryClientProvider>
-  </StrictMode>
+  // <StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <PermissionsProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <App />
+        <ReactQueryDevtools initialIsOpen />
+        <Toaster richColors position="top-right" />
+      </ThemeProvider>
+    </PermissionsProvider>
+  </QueryClientProvider>
+  // </StrictMode>
 );

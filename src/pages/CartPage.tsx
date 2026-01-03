@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingBag, ShoppingCart, Trash } from "lucide-react";
+import { LoaderCircle, ShoppingBag, ShoppingCart, Trash } from "lucide-react";
 import Counter from "@/components/Counter";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useProductVariantValue } from "@/hooks/useProductVariantValue";
+// import { useProductVariantValue } from "@/hooks/useProductVariantValue";
 import { Button } from "@/components/ui/button";
 import { IoMdArrowDropup } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
@@ -20,11 +20,81 @@ import {
   updateCartItemQuantityMutation,
   deleteCartItemMutation,
 } from "@/queries/cartQueries";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useProductDetail } from "@/queries/user/useProductDetail";
+import type { CartItemResponseDto, ProductVariantResponseDto } from "@/api";
+import { useProductVariantValue } from "@/queries/user/useProductVariantValue";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEY } from "@/queries/user/key";
+import { useUpdateVariantValueCartItem } from "@/queries/user/useUpdateVariantValueCartItem";
+import { PopoverClose } from "@radix-ui/react-popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const [openPopovers, setOpenPopovers] = useState<Record<string, boolean>>({});
+  const queryClient = useQueryClient();
+  const [productId, setProductId] = useState<string>();
+  const [productVariant, setProductVariant] =
+    useState<ProductVariantResponseDto>();
+  const [selectedVariantValue, setSelectedVariantValue] =
+    useState<Record<string, string>>();
+  const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
+
+  // const {
+  //   productVariantValue,
+  //   isProductVariantValueSuccess,
+  //   setProductWannaSeeVariantId,
+  // } = useProductVariantValue();
+
+  const productVariantValueQuery = useProductVariantValue(productId as string);
+  const productDetailQuery = useProductDetail(productId as string);
+  const updateCartItemQuantity = useUpdateVariantValueCartItem();
+
+  const handleOpenPopover = (cartItem: CartItemResponseDto) => {
+    setProductId(cartItem.product.id);
+    cartItem.productVariant.variantValues.map((variantValue) =>
+      setSelectedVariantValue((prev) => ({
+        ...prev,
+        [variantValue.variant]: variantValue.value,
+      }))
+    );
+  };
+
+  const handleChangeSelectedVariantValue = (variant: string, value: string) => {
+    const nextSelectedVariantValue = {
+      ...selectedVariantValue,
+      [variant]: value,
+    };
+
+    setSelectedVariantValue(nextSelectedVariantValue);
+
+    if (productDetailQuery.data) {
+      const productVariants = productDetailQuery.data.productVariants;
+
+      const matchedVariant = productVariants.find((productVariant) =>
+        productVariant.variantValues.every(
+          (variantValue) =>
+            nextSelectedVariantValue[variantValue.variant] ===
+            variantValue.value
+        )
+      );
+
+      if (matchedVariant) {
+        setProductVariant(matchedVariant);
+      }
+    }
+  };
+
   const {
     listCartItems,
     isCartItemSuccess,
@@ -34,12 +104,6 @@ const CartPage = () => {
     handleCheckAll,
     isAllSelected,
   } = useCart();
-
-  const {
-    productVariantValue,
-    isProductVariantValueSuccess,
-    setProductWannaSeeVariantId,
-  } = useProductVariantValue();
 
   const { totalAmount, totalQuantity } = checkoutSummaryCalculator;
 
@@ -51,11 +115,7 @@ const CartPage = () => {
   };
 
   const handleDelete = (cartItemId: string) => {
-    if (
-      window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")
-    ) {
-      deleteItem(cartItemId);
-    }
+    deleteItem(cartItemId);
   };
 
   return (
@@ -76,7 +136,7 @@ const CartPage = () => {
         <div className="w-full lg:flex-[3] gap-12">
           {/* Desktop View - Table */}
 
-          <Card className="hidden md:block overflow-x-auto px-5 py-8">
+          <Card className="hidden md:block overflow-x-auto px-5 pb-24">
             <table className="w-full">
               <thead className="">
                 <tr className="bg-white rounded-2xl border-border">
@@ -133,15 +193,24 @@ const CartPage = () => {
                             {cartItem.product.name}
                           </div>
                           {cartItem.productVariant.variantValues.length > 0 && (
-                            <Popover>
-                              <PopoverTrigger asChild>
+                            <Popover
+                              open={openPopoverId === cartItem.id}
+                              onOpenChange={(open) =>
+                                setOpenPopoverId(open ? cartItem.id : null)
+                              }
+                            >
+                              <PopoverTrigger
+                                asChild
+                                onClick={() => {
+                                  handleOpenPopover(cartItem);
+                                  setOpenPopoverId(cartItem.id);
+                                }}
+                              >
                                 <div
                                   className="flex items-center cursor-pointer gap-1 mt-2 text-xs my-2"
-                                  onClick={() =>
-                                    setProductWannaSeeVariantId(
-                                      cartItem.product.id
-                                    )
-                                  }
+                                  onClick={() => {
+                                    handleOpenPopover(cartItem);
+                                  }}
                                 >
                                   Phân loại:
                                   <IoMdArrowDropup className="rotate-180" />
@@ -169,44 +238,86 @@ const CartPage = () => {
                                 )}
                               </div>
                               <PopoverContent>
-                                {isProductVariantValueSuccess && (
+                                {productVariantValueQuery.isSuccess ? (
                                   <div className="flex flex-col gap-4">
-                                    {productVariantValue?.map((value) => (
-                                      <div
-                                        key={value.variant}
-                                        className="flex flex-row gap-2 items-center"
-                                      >
-                                        <div className="text-sm">
-                                          {value.variant}:
-                                        </div>
-                                        {value.value.map((val) => (
-                                          <Badge
-                                            key={val}
-                                            className="rounded-sm"
-                                            variant={
-                                              cartItem.productVariant.variantValues
-                                                .map(
-                                                  (variantValue) =>
-                                                    variantValue.value
+                                    {productVariantValueQuery.data?.map(
+                                      (value) => (
+                                        <div
+                                          key={value.variant}
+                                          className="flex flex-row gap-2 items-center"
+                                        >
+                                          <div className="text-sm">
+                                            {value.variant}:
+                                          </div>
+                                          {value.value.map((val) => (
+                                            <Badge
+                                              key={val}
+                                              className="rounded-sm cursor-pointer"
+                                              onClick={() =>
+                                                handleChangeSelectedVariantValue(
+                                                  value.variant,
+                                                  val
                                                 )
-                                                .includes(val)
-                                                ? "default"
-                                                : "outline"
-                                            }
-                                          >
-                                            {val}
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    ))}
+                                              }
+                                              variant={
+                                                selectedVariantValue &&
+                                                selectedVariantValue[
+                                                  value.variant
+                                                ] === val
+                                                  ? "default"
+                                                  : "outline"
+                                              }
+                                            >
+                                              {val}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      )
+                                    )}
                                     <div className="flex justify-between items-center">
                                       <div className="text-sm">
-                                        Còn hàng: {"12"}
+                                        Còn hàng:{" "}
+                                        {productVariant
+                                          ? productVariant.stock
+                                          : cartItem.productVariant.stock}
                                       </div>
-                                      <Button variant="outline" size="sm">
-                                        Thay đổi
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-24 flex justify-center items-center"
+                                        disabled={
+                                          updateCartItemQuantity.isPending
+                                        }
+                                        onClick={() =>
+                                          updateCartItemQuantity.mutate(
+                                            {
+                                              id: cartItem.id,
+                                              data: {
+                                                productVariantId:
+                                                  productVariant?.id as string,
+                                              },
+                                            },
+                                            {
+                                              onSuccess: () => {
+                                                setOpenPopoverId(null);
+                                              },
+                                            }
+                                          )
+                                        }
+                                      >
+                                        {updateCartItemQuantity.isPending ? (
+                                          <div>
+                                            <LoaderCircle className="animate-spin" />
+                                          </div>
+                                        ) : (
+                                          <div>Thay đổi</div>
+                                        )}
                                       </Button>
                                     </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex justify-center items-center">
+                                    <LoaderCircle className="animate-spin" />
                                   </div>
                                 )}
                               </PopoverContent>
@@ -237,10 +348,30 @@ const CartPage = () => {
                     </td>
                     <td className="text-center align-middle rounded-r-sm border-b-1">
                       <div className="flex justify-center">
-                        <Trash
-                          className="scale-75 cursor-pointer hover:text-red-500"
-                          onClick={() => handleDelete(cartItem.id)}
-                        />
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Trash className="scale-75 cursor-pointer hover:text-red-500" />
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Xóa sản phẩm khỏi giỏ hàng
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Bạn có chắc chắn muốn xóa sản phẩm khỏi giỏ
+                                hàng?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Hủy</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(cartItem.id)}
+                              >
+                                Xác nhận
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </td>
                   </tr>
@@ -298,9 +429,9 @@ const CartPage = () => {
                           <PopoverTrigger asChild>
                             <div
                               className="flex items-center cursor-pointer gap-1 text-xs text-blue-600"
-                              onClick={() =>
-                                setProductWannaSeeVariantId(cartItem.product.id)
-                              }
+                              // onClick={() =>
+                              //   setProductWannaSeeVariantId(cartItem.product.id)
+                              // }
                             >
                               Phân loại
                               <IoMdArrowDropup className="rotate-180 scale-75" />
@@ -319,9 +450,9 @@ const CartPage = () => {
                             )}
                           </div>
                           <PopoverContent>
-                            {isProductVariantValueSuccess && (
+                            {productVariantValueQuery.isSuccess && (
                               <div className="flex flex-col gap-4">
-                                {productVariantValue?.map((value) => (
+                                {productVariantValueQuery.data?.map((value) => (
                                   <div
                                     key={value.variant}
                                     className="flex flex-row gap-2 items-center"
@@ -351,7 +482,8 @@ const CartPage = () => {
                                 ))}
                                 <div className="flex justify-between items-center">
                                   <div className="text-sm">
-                                    Còn hàng: {"12"}
+                                    Còn hàng:{" "}
+                                    {productVariant ? productVariant.stock : 0}
                                   </div>
                                   <Button variant="outline" size="sm">
                                     Thay đổi
