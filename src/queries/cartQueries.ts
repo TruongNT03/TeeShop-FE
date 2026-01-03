@@ -13,6 +13,7 @@ import type {
 } from "@/api";
 import { apiClient } from "@/services/apiClient";
 import { isAuthenticated } from "@/utils/auth";
+import { QUERY_KEY } from "./user/key";
 
 export const addItemToCartMutation = () => {
   const queryClient = useQueryClient();
@@ -21,7 +22,7 @@ export const addItemToCartMutation = () => {
     mutationFn: (data: AddItemToCartDto) => cartApi.addItem(data),
     onSuccess: () => {
       toast.success("Đã thêm sản phẩm vào giỏ hàng!");
-      queryClient.invalidateQueries({ queryKey: ["cartSummary"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY.CART.SUMMARY] });
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
     },
     onError: (error) => {
@@ -32,7 +33,7 @@ export const addItemToCartMutation = () => {
 
 export const getCartSummaryQuery = () => {
   return useQuery({
-    queryKey: ["cartSummary"],
+    queryKey: [QUERY_KEY.CART.SUMMARY],
     queryFn: () => apiClient.api.cartControllerGetCartSummary(),
     enabled: isAuthenticated(),
   });
