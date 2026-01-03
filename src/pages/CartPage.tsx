@@ -71,27 +71,34 @@ const CartPage = () => {
         </div>
         <div className="text-sm">Các sản phẩm bạn đã thêm vào giỏ hàng</div>
       </div>
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-6">
         {/* Products Section */}
         <div className="w-full lg:flex-[3] gap-12">
           {/* Desktop View - Table */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full border-separate border-spacing-y-4">
-              <thead className="border border-border">
+
+          <Card className="hidden md:block overflow-x-auto px-5 py-8">
+            <table className="w-full">
+              <thead className="">
                 <tr className="bg-white rounded-2xl border-border">
-                  <th className="py-4 pl-4 sm:pl-5 text-left rounded-l-sm w-12">
+                  <th className="py-4 pl-4 sm:pl-5 text-left rounded-l-sm w-12 border-b-1">
                     <Checkbox
                       checked={isAllSelected}
                       onCheckedChange={handleCheckAll}
                     />
                   </th>
-                  <th className="py-4 font-normal text-left pl-[20px]">
+                  <th className="py-4 font-normal text-left pl-[20px] border-b-1">
                     Sản phẩm
                   </th>
-                  <th className="py-4 font-normal text-center">Đơn giá</th>
-                  <th className="py-4 font-normal text-center">Số lượng</th>
-                  <th className="py-4 font-normal text-center">Thành tiền</th>
-                  <th className="py-4 pr-4 sm:pr-5 font-normal text-center rounded-r-sm">
+                  <th className="py-4 font-normal text-center border-b-1">
+                    Đơn giá
+                  </th>
+                  <th className="py-4 font-normal text-center border-b-1">
+                    Số lượng
+                  </th>
+                  <th className="py-4 font-normal text-center border-b-1">
+                    Thành tiền
+                  </th>
+                  <th className="py-4 pr-4 sm:pr-5 font-normal text-center rounded-r-sm border-b-1">
                     Thao tác
                   </th>
                 </tr>
@@ -99,15 +106,18 @@ const CartPage = () => {
               <tbody>
                 {listCartItems.map((cartItem) => (
                   <tr key={cartItem.id} className="bg-white">
-                    <td className="p-4 sm:p-5 max-w-[40px] rounded-l-sm">
+                    <td className="p-4 sm:p-5 max-w-[40px] rounded-l-sm border-b-1">
                       <Checkbox
+                        disabled={
+                          cartItem.quantity > cartItem.productVariant.stock
+                        }
                         checked={selectedCartItemIds.includes(cartItem.id)}
                         onCheckedChange={(value) =>
                           handleCheckedChange(value, cartItem.id)
                         }
                       />
                     </td>
-                    <td className="py-4 px-2 sm:px-5">
+                    <td className="py-4 px-2 sm:px-5 border-b-1">
                       <div className="flex items-start gap-3 sm:gap-4">
                         {cartItem.product?.productImages[0]?.url ? (
                           <img
@@ -126,7 +136,7 @@ const CartPage = () => {
                             <Popover>
                               <PopoverTrigger asChild>
                                 <div
-                                  className="flex items-center cursor-pointer gap-1 mt-2 text-xs"
+                                  className="flex items-center cursor-pointer gap-1 mt-2 text-xs my-2"
                                   onClick={() =>
                                     setProductWannaSeeVariantId(
                                       cartItem.product.id
@@ -147,6 +157,15 @@ const CartPage = () => {
                                       {variantValue.value}
                                     </Badge>
                                   )
+                                )}
+                              </div>
+                              <div className="text-xs mt-2 flex gap-1">
+                                <div>
+                                  Tồn kho: {cartItem.productVariant.stock}
+                                </div>
+                                {cartItem.quantity >
+                                  cartItem.productVariant.stock && (
+                                  <div className="text-red-500">{`(Sản phẩm không còn đủ số lượng với yêu cầu của bạn)`}</div>
                                 )}
                               </div>
                               <PopoverContent>
@@ -196,25 +215,27 @@ const CartPage = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="align-middle text-center text-sm">
+                    <td className="align-middle text-center text-sm border-b-1">
                       <div>{formatPriceVND(cartItem.productVariant.price)}</div>
                     </td>
-                    <td className="align-middle text-center">
+                    <td className="align-middle text-center border-b-1">
                       <div className="flex justify-center">
                         <Counter
                           initValue={cartItem.quantity}
+                          minValue={1}
+                          maxValue={cartItem.productVariant.stock}
                           onChange={(newQuantity) =>
                             handleQuantityChange(cartItem.id, newQuantity)
                           }
                         />
                       </div>
                     </td>
-                    <td className="align-middle text-center text-sm">
+                    <td className="align-middle text-center text-sm border-b-1">
                       {formatPriceVND(
                         cartItem.productVariant.price * cartItem.quantity
                       )}
                     </td>
-                    <td className="text-center align-middle rounded-r-sm">
+                    <td className="text-center align-middle rounded-r-sm border-b-1">
                       <div className="flex justify-center">
                         <Trash
                           className="scale-75 cursor-pointer hover:text-red-500"
@@ -226,7 +247,7 @@ const CartPage = () => {
                 ))}
               </tbody>
             </table>
-          </div>
+          </Card>
 
           {/* Mobile View - Cards */}
           <div className="md:hidden space-y-4">
