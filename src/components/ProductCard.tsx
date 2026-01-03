@@ -52,9 +52,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 src={mainImage}
                 alt={product.name}
                 className="!w-full !h-full object-cover rounded-3xl p-3"
-                onError={(e) => {
-                  e.currentTarget.src = "https://via.placeholder.com/300";
-                }}
               />
             ) : (
               <div className="p-3">

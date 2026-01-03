@@ -160,7 +160,7 @@ const NavHeader = () => {
               isHiddenHeaderNotification ? "h-0" : "h-[33px]"
             } overflow-hidden transition-all duration-300`}
           >
-            <div className="max-w-[1280px] mx-auto px-4 h-full flex items-center uppercase">
+            <div className="max-w-[14400px] mx-auto px-4 h-full flex items-center uppercase">
               <div className="hover:underline cursor-pointer flex-1 text-center">
                 Free Shipping & Returns On All US Orders
               </div>
@@ -178,7 +178,7 @@ const NavHeader = () => {
               isHiddenHeaderNotification ? "" : "mt-0"
             }`}
           >
-            <div className="max-w-[1280px] mx-auto px-4 h-[60px] md:h-[88px] flex justify-between items-center">
+            <div className="max-w-[1440px] mx-auto px-1 md:px-5 h-[60px] md:h-[88px] flex justify-between items-center">
               <div className="flex w-full items-center gap-8">
                 <Link to="" className="text-3xl uppercase cursor-pointer">
                   Tee Shop

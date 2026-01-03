@@ -19,7 +19,7 @@ const ProductSection = (props: ProductSectionProps) => {
   const sectionId = useId();
   const skeletonCount = props.itemPerRow * 2;
   return (
-    <section id={sectionId} className="w-full pb-[24px] overflow-x-hidden px-1">
+    <section id={sectionId} className="w-full pb-[24px] overflow-x-hidden">
       <div
         className="flex flex-col gap-4 justify-center items-center py-6 px-0
       md:py-8 "
@@ -39,20 +39,17 @@ const ProductSection = (props: ProductSectionProps) => {
         </div>
       </div>
 
-      <div className="flex flex-wrap px-0 md:px-8 lg:px-[65px]">
+      <div className="flex flex-wrap">
         {props.isLoading
           ? Array.from({ length: skeletonCount }).map((_, i) => (
               <div
                 key={i}
-                className="px-3 md:px-5 mb-6 md:mb-8 w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/4"
+                className="px-1 mb-6 md:mb-8 w-1/2 sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/5"
               >
                 <Card className="flex flex-col items-center p-4">
-                  <Skeleton className="h-6 w-3/4 mb-3 rounded-md" />
-                  <Skeleton
-                    className="w-full rounded-3xl mb-3"
-                    style={{ maxHeight: "400px" }}
-                  />
-                  <Skeleton className="h-5 w-1/2 rounded-md" />
+                  <Skeleton className="h-7 w-3/4 mb-3 rounded-md" />
+                  <Skeleton className="w-full rounded-3xl mb-3 h-[300px]" />
+                  <Skeleton className="h-8 w-1/2 rounded-md" />
                 </Card>
               </div>
             ))
@@ -60,10 +57,10 @@ const ProductSection = (props: ProductSectionProps) => {
               <div
                 key={index}
                 className="w-1/2 px-1
-                md:px-5 mb-6 md:mb-8 md:w-1/3 
+                mb-6 md:mb-8 md:w-1/3 
                 sm:w-1/2 
                 lg:w-1/3 
-                xl:w-1/4"
+                xl:w-1/5"
               >
                 <Card
                   className="
@@ -81,7 +78,7 @@ const ProductSection = (props: ProductSectionProps) => {
                   </Link>
                   {item.productImages[0]?.url ? (
                     <Image
-                      height={220}
+                      height={300}
                       src={item.productImages[0]?.url}
                       alt={`Product ${index}`}
                       className="object-cover rounded-3xl p-3"

@@ -350,7 +350,7 @@ const Checkout = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="bg-stone-100 min-h-screen py-8 sm:py-12 px-3 sm:px-8 md:px-[65px]"
+      className="max-w-[1440px] mx-auto bg-stone-100 min-h-screen py-8 sm:py-12 px-1 md:px-5 md:mt-8"
     >
       {/* Header */}
 
@@ -515,7 +515,7 @@ const Checkout = () => {
 
         {/* Order Summary Sidebar */}
         <div className="w-full lg:flex-[1]">
-          <Card className="p-4 sm:p-6 sticky top-4 md:top-20">
+          <Card className="p-4 sm:p-6 sticky top-4 md:top-40">
             <h2 className="text-2xl mb-4">Tóm tắt đơn hàng</h2>
 
             <div className="space-y-3 sm:space-y-4 mb-4 max-h-60 sm:max-h-80 overflow-y-auto">

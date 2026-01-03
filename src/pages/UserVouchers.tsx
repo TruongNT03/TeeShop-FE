@@ -223,7 +223,7 @@ const UserVouchers = () => {
   };
 
   return (
-    <div className="max-w-[1200px] mx-auto  px-4 py-8 pt-20">
+    <div className="max-w-[1440px] mx-auto  px-4 py-8 pt-20">
       {/* Header */}
       <div className="mb-12">
         <h1 className="text-2xl font-medium uppercase mb-2 border-b-[2px] border-black w-fit">

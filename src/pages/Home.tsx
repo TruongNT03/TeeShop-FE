@@ -59,8 +59,8 @@ const Home = () => {
       <Banner />
       <div
         className="
-                  max-w-[1280px] mx-auto px-1
-                  md:px-4
+                  max-w-[1440px] mx-auto px-1
+                  md:px-5
                   "
       >
         <ProductSection

@@ -45,7 +45,7 @@ import ProductCard from "@/components/ProductCard";
 import { useListProduct } from "@/queries/user/useListProduct";
 
 const LoadingSkeleton = () => (
-  <div className="max-w-[1280px] mx-auto py-12 px-4">
+  <div className="max-w-[1440px] mx-auto py-12 px-4">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
       <div>
         <Skeleton className="w-full h-[400px] md:h-[550px] rounded-lg" />
@@ -184,7 +184,7 @@ const ProductDetail = () => {
 
   if (productQuery.isError || !product) {
     return (
-      <div className="max-w-[1280px] mx-auto py-20 text-center">
+      <div className="max-w-[1440px] mx-auto py-20 text-center">
         <h2 className="text-2xl font-semibold">Không tìm thấy sản phẩm</h2>
         <Link to="/">
           <Button variant="link" className="text-primary">
@@ -202,7 +202,7 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-white pt-6">
-      <div className="max-w-[1280px] mx-auto px-4 py-8">
+      <div className="max-w-[1440px] mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">
           <Link to="/" className="hover:text-slate-900">

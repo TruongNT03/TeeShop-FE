@@ -123,7 +123,7 @@ const CartPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeIn" }}
-      className="px-3 sm:px-8 md:px-[65px] mx-auto py-8 sm:py-12 bg-stone-100 min-h-screen"
+      className="max-w-[1440px] px-1 md:px-5 sm:px-8 mx-auto py-8 sm:py-12 bg-stone-100 min-h-screen"
     >
       <div className="flex flex-col items-start text-2xl sm:text-3xl md:text-4xl gap-4 md:my-8 sm:my-12 my-3">
         <div className="uppercase w-fit border-black border-b-[2px]">
@@ -530,7 +530,7 @@ const CartPage = () => {
 
         {/* Summary Section */}
         <div className="w-full lg:flex-[1] relative">
-          <Card className="rounded-lg sticky top-4 md:top-20 bg-white">
+          <Card className="rounded-lg sticky top-4 md:top-40 bg-white">
             <CardHeader className="font-medium text-lg">
               Tóm tắt đơn hàng:
             </CardHeader>

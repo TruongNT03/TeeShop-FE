@@ -43,8 +43,8 @@ export const ProfileLayout = () => {
   }
 
   return (
-    <div className="bg-slate-50/60 min-h-screen pt-8 md:pt-20 px-3">
-      <div className="max-w-7xl mx-auto md:p-6">
+    <div className="bg-slate-50/60 min-h-screen pt-8 md:pt-20">
+      <div className="max-w-[1440px] mx-auto md:px-5 px-1">
         <div className="text-2xl uppercase font-medium border-b-[2px] border-black w-fit mb-3">
           Hồ sơ
         </div>

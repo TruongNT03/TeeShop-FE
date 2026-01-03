@@ -6,10 +6,7 @@ interface PolicyProps {
 
 const Policy = (props: PolicyProps) => {
   return (
-    <section
-      id="our-policies"
-      className="w-full px-4 md:px-8 lg:px-[65px] pb-4 md:pb-6 lg:pb-[24px]"
-    >
+    <section id="our-policies" className="w-full md:px-5 pb-4 md:pb-6">
       <div
         className="text-3xl md:text-4xl lg:text-5xl font-semibold text-shadow-lg cursor-pointer text-center mb-6 md:mb-8"
         onClick={() => {

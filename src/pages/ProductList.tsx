@@ -145,7 +145,7 @@ const ProductList = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen bg-stone-100 pt-6"
+      className="min-h-screen bg-stone-100 pt-6 md: mt-8"
     >
       <AnimatePresence>
         {isMobile && isFilterOpen && (
@@ -360,7 +360,7 @@ const ProductList = () => {
       </AnimatePresence>
       <div
         className="
-                  max-w-[1280px] mx-auto px-2 py-8
+                  max-w-[1440px] mx-auto px-2 py-8
                   md:px-4"
       >
         {/* Header */}
@@ -486,7 +486,7 @@ const ProductList = () => {
                 showFilters ? "block" : "hidden lg:block"
               }`}
             >
-              <Card className="p-6 shadow-none">
+              <Card className="p-6 shadow-none sticky top-40">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold flex items-center gap-2">
                     <Filter className="w-5 h-5" />
@@ -672,7 +672,7 @@ const ProductList = () => {
           {/* Products Grid */}
           <div className="flex-1">
             {isLoadingProducts ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-2">
                 {Array.from({ length: 10 }).map((_, i) => (
                   <Card key={i} className="p-4">
                     <Skeleton className="w-full h-64 mb-4" />
@@ -700,10 +700,10 @@ const ProductList = () => {
               <>
                 <div
                   className="
-                              grid grid-cols-2 gap-3
+                              grid grid-cols-2 gap-2
                               sm:grid-cols-2 
-                              md:gap-6
-                              xl:grid-cols-4
+                              md:gap-2
+                              xl:grid-cols-5
                               lg:grid-cols-3
                               md:grid-cols-3"
                 >

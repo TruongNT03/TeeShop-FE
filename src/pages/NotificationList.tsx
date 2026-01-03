@@ -72,7 +72,7 @@ const NotificationList = () => {
   };
 
   return (
-    <div className="container mx-auto md:p-6 p-0 max-w-4xl">
+    <div className="container mx-auto md:p-6 p-0">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         {/* <Button
