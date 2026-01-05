@@ -7,7 +7,7 @@ export const useAdminOrders = (
   search?: string,
   sortBy?: string,
   sortOrder?: "ASC" | "DESC",
-  status?: string
+  orderStatusFilter?: string
 ) => {
   return useQuery({
     queryKey: [
@@ -17,7 +17,7 @@ export const useAdminOrders = (
       search,
       sortBy,
       sortOrder,
-      status,
+      orderStatusFilter,
     ],
     queryFn: () =>
       adminOrderApi.getAllOrders(
@@ -26,7 +26,7 @@ export const useAdminOrders = (
         search,
         sortBy,
         sortOrder,
-        status
+        orderStatusFilter
       ),
     placeholderData: (previousData) => previousData,
   });
@@ -37,22 +37,5 @@ export const useAdminOrder = (id: string) => {
     queryKey: ["adminOrder", id],
     queryFn: () => adminOrderApi.getOrder(id),
     enabled: !!id,
-  });
-};
-
-export const useUpdateOrderStatus = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      id,
-      status,
-    }: {
-      id: string;
-      status: "pending" | "confirmed" | "shipping" | "completed";
-    }) => adminOrderApi.updateOrderStatus(id, status),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ["adminOrder", id] });
-      queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
-    },
   });
 };

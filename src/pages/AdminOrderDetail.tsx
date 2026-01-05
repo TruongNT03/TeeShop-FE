@@ -11,12 +11,12 @@ import {
   User,
   CheckCircle,
   Ticket,
+  CircleX,
+  X,
+  Ellipsis,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  useAdminOrder,
-  useUpdateOrderStatus,
-} from "@/queries/adminOrderQueries";
+import { useAdminOrder } from "@/queries/adminOrderQueries";
 import { formatPriceVND } from "@/utils/formatPriceVND";
 import { convertDateTime } from "@/utils/convertDateTime";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,10 +31,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import {
+  OrderStatus,
+  orderStatusStateMachine,
+} from "@/utils/orderStatusStateMachine";
+import { useAdminOrderStatus } from "@/queries/admin/useAdminUpdateOrderStatus";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAdminOrderDetail } from "@/queries/admin/useAdminOrderDetail";
+import { ADMIN_QUERY_KEY } from "@/queries/admin/key";
 
-const getStatusConfig = (status: string) => {
+const getStatusConfig = (status: OrderStatus) => {
   switch (status) {
-    case "shipping":
+    case OrderStatus.SHIPPING:
       return {
         icon: Truck,
         color: "text-blue-600",
@@ -42,7 +50,7 @@ const getStatusConfig = (status: string) => {
         border: "border-blue-200",
         text: "Shipping",
       };
-    case "confirmed":
+    case OrderStatus.CONFIRMED:
       return {
         icon: CheckCircle,
         color: "text-green-600",
@@ -50,7 +58,7 @@ const getStatusConfig = (status: string) => {
         border: "border-green-200",
         text: "Confirmed",
       };
-    case "completed":
+    case OrderStatus.COMPLETED:
       return {
         icon: CheckCircle,
         color: "text-purple-600",
@@ -58,10 +66,17 @@ const getStatusConfig = (status: string) => {
         border: "border-purple-200",
         text: "Completed",
       };
-    case "pending":
-    default:
+    case OrderStatus.CANCEL:
       return {
-        icon: Clock,
+        icon: X,
+        color: "text-red-600",
+        bg: "bg-red-100",
+        border: "border-red-200",
+        text: "Cancel",
+      };
+    case OrderStatus.PENDING:
+      return {
+        icon: Ellipsis,
         color: "text-amber-600",
         bg: "bg-amber-100",
         border: "border-amber-200",
@@ -73,12 +88,13 @@ const getStatusConfig = (status: string) => {
 const AdminOrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const adminOrderDetailQuery = useAdminOrderDetail(id || "");
+  const order = adminOrderDetailQuery.data;
 
-  const { data, isLoading } = useAdminOrder(id || "");
-  const updateStatusMutation = useUpdateOrderStatus();
-  const order = data?.data;
+  const adminUpdateOrderStatusMutation = useAdminOrderStatus();
 
-  if (isLoading) {
+  if (adminOrderDetailQuery.isLoading) {
     return (
       <div className="space-y-6 p-6">
         <Skeleton className="h-10 w-48" />
@@ -103,16 +119,21 @@ const AdminOrderDetail: React.FC = () => {
     );
   }
 
-  const handleStatusChange = (value: string) => {
-    if (!order) return;
-    updateStatusMutation.mutate(
+  const handleStatusChange = (value: OrderStatus) => {
+    if (!adminOrderDetailQuery.data) return;
+    adminUpdateOrderStatusMutation.mutate(
       {
-        id: order.id,
-        status: value as "pending" | "confirmed" | "shipping" | "completed",
+        id: adminOrderDetailQuery.data.id,
+        data: {
+          status: value,
+        },
       },
       {
         onSuccess: () => {
           toast.success("Order status updated successfully");
+          queryClient.invalidateQueries({
+            queryKey: [ADMIN_QUERY_KEY.ORDER.FIND_ONE],
+          });
         },
         onError: () => {
           toast.error("Failed to update order status");
@@ -121,7 +142,7 @@ const AdminOrderDetail: React.FC = () => {
     );
   };
 
-  const statusConfig = getStatusConfig(order.status);
+  const statusConfig = getStatusConfig(order.status as OrderStatus);
   const StatusIcon = statusConfig.icon;
 
   return (
@@ -137,24 +158,75 @@ const AdminOrderDetail: React.FC = () => {
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-slate-900">Order Detail</h1>
           <p className="text-sm text-slate-500 mt-1">
-            #{order.id.substring(0, 8).toUpperCase()}
+            #{adminOrderDetailQuery.data.id.substring(0, 8).toUpperCase()}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <Select
-            value={order.status}
+            value={adminOrderDetailQuery.data.status}
             onValueChange={handleStatusChange}
-            disabled={updateStatusMutation.isPending}
+            disabled={adminUpdateOrderStatusMutation.isPending}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="confirmed">Confirmed</SelectItem>
-              <SelectItem value="shipping">Shipping</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem
+                value="pending"
+                disabled={
+                  !orderStatusStateMachine(
+                    order.status as OrderStatus,
+                    OrderStatus.PENDING
+                  )
+                }
+              >
+                Pending
+              </SelectItem>
+              <SelectItem
+                value="confirmed"
+                disabled={
+                  !orderStatusStateMachine(
+                    order.status as OrderStatus,
+                    OrderStatus.CONFIRMED
+                  )
+                }
+              >
+                Confirmed
+              </SelectItem>
+              <SelectItem
+                value="shipping"
+                disabled={
+                  !orderStatusStateMachine(
+                    order.status as OrderStatus,
+                    OrderStatus.SHIPPING
+                  )
+                }
+              >
+                Shipping
+              </SelectItem>
+              <SelectItem
+                value="completed"
+                disabled={
+                  !orderStatusStateMachine(
+                    order.status as OrderStatus,
+                    OrderStatus.COMPLETED
+                  )
+                }
+              >
+                Completed
+              </SelectItem>
+              <SelectItem
+                value={OrderStatus.CANCEL}
+                disabled={
+                  !orderStatusStateMachine(
+                    order.status as OrderStatus,
+                    OrderStatus.CANCEL
+                  )
+                }
+              >
+                Cancel
+              </SelectItem>
             </SelectContent>
           </Select>
           <Badge

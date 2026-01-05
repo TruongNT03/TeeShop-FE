@@ -19,6 +19,7 @@ import {
   Check,
   Ellipsis,
   CheckCircle,
+  X,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import React from "react";
+import {
+  useAdminListOrder,
+  type AdminListOrderQuery,
+} from "@/queries/admin/useAdminListOrder";
 
 export enum AdminOrderSortField {
   STATUS = "status",
@@ -49,27 +54,16 @@ export enum SortOrder {
   ASC = "ASC",
 }
 
-type AdminOrderQuery = {
-  page: number;
-  pageSize: number;
-  search?: string;
-  sortBy?: string;
-  sortOrder?: "ASC" | "DESC";
-  status?: string;
-};
-
 const AdminOrder = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const statusFromUrl = searchParams.get("status");
+  const statusFromUrl = searchParams.get("orderStatusFilter");
 
-  const [query, setQuery] = useState<AdminOrderQuery>({
+  const [query, setQuery] = useState<AdminListOrderQuery>({
     page: 1,
     pageSize: 10,
     search: "",
-    sortBy: "createdAt",
-    sortOrder: "DESC",
-    status: statusFromUrl || "",
+    orderStatusFilter: statusFromUrl || undefined,
   });
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -78,17 +72,10 @@ const AdminOrder = () => {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [isSelectedAll, setIsSelectedAll] = useState(false);
 
-  const { data, isLoading } = useAdminOrders(
-    query.pageSize,
-    query.page,
-    query.search,
-    query.sortBy,
-    query.sortOrder,
-    query.status
-  );
+  const adminListOrderQuery = useAdminListOrder(query);
 
-  const orders = data?.data.data || [];
-  const pagination = data?.data.paginate || {
+  const orders = adminListOrderQuery.data?.data || [];
+  const pagination = adminListOrderQuery.data?.paginate || {
     page: 1,
     pageSize: 10,
     totalItem: 0,
@@ -103,21 +90,10 @@ const AdminOrder = () => {
     }));
   }, [debouncedSearchTerm]);
 
-  const handleSort = (field: AdminOrderSortField) => {
-    const isCurrentSort = query.sortBy === field;
-    setQuery((prevQuery) => ({
-      ...prevQuery,
-      sortBy: field,
-      sortOrder:
-        isCurrentSort && prevQuery.sortOrder === "DESC" ? "ASC" : "DESC",
-    }));
-  };
-
   const handleStatusFilter = (status: string) => {
     setQuery((prevQuery) => ({
       ...prevQuery,
-      status: status === "all" ? "" : status,
-      page: 1,
+      orderStatusFilter: status === "all" ? undefined : status,
     }));
   };
 
@@ -152,6 +128,13 @@ const AdminOrder = () => {
           <Badge variant="outline" className="border-cyan-400 text-cyan-400">
             <Truck className="w-3 h-3 mr-1" />
             Shipping
+          </Badge>
+        );
+      case "cancel":
+        return (
+          <Badge variant="outline" className="border-red-400 text-red-400">
+            <X className="w-3 h-3 mr-1" />
+            Cancel
           </Badge>
         );
       default:
@@ -282,7 +265,7 @@ const AdminOrder = () => {
           </div>
 
           <Select
-            value={query.status || "all"}
+            value={query.orderStatusFilter || "all"}
             onValueChange={handleStatusFilter}
           >
             <SelectTrigger className="w-[200px]">
@@ -291,7 +274,10 @@ const AdminOrder = () => {
             <SelectContent>
               <SelectItem value="all">Tất cả</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="confirmed">Confirmed</SelectItem>
               <SelectItem value="shipping">Shipping</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancel">Cancel</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -326,10 +312,7 @@ const AdminOrder = () => {
                       "flex items-center",
                       value.sortable ? "cursor-pointer" : ""
                     )}
-                    onClick={() =>
-                      value.sortable &&
-                      handleSort(value.key as AdminOrderSortField)
-                    }
+                    onClick={() => {}}
                   >
                     {value.title}{" "}
                     {value.sortable && (
@@ -343,7 +326,7 @@ const AdminOrder = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {adminListOrderQuery.isLoading ? (
               Array.from({ length: 5 }).map((_, index) => (
                 <TableRow key={index}>
                   <TableCell>
@@ -410,7 +393,7 @@ const AdminOrder = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    {index + 1 + (query.page - 1) * query.pageSize}
+                    {index + 1 + (query.page || 1 - 1) * query.pageSize}
                   </TableCell>
 
                   {tableHeaderTitles.map((tableHeaderTitle, idx) => (
