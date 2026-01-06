@@ -15,7 +15,7 @@ export const orderStatusStateMachine = (
       [OrderStatus.PENDING]: false,
       [OrderStatus.CONFIRMED]: true,
       [OrderStatus.SHIPPING]: true,
-      [OrderStatus.COMPLETED]: true,
+      [OrderStatus.COMPLETED]: false,
       [OrderStatus.CANCEL]: true,
     },
 
@@ -23,7 +23,7 @@ export const orderStatusStateMachine = (
       [OrderStatus.PENDING]: false,
       [OrderStatus.CONFIRMED]: false,
       [OrderStatus.SHIPPING]: true,
-      [OrderStatus.COMPLETED]: true,
+      [OrderStatus.COMPLETED]: false,
       [OrderStatus.CANCEL]: true,
     },
 
