@@ -217,7 +217,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Location Dropdown - Only for Admin */}
-          {isAdmin && (
+          {/* {isAdmin && (
             <Select
               value={selectedLocationId}
               onValueChange={setSelectedLocationId}
@@ -241,7 +241,7 @@ const AdminDashboard = () => {
                   ))}
               </SelectContent>
             </Select>
-          )}
+          )} */}
         </div>
       </div>
       <div className="grid gap-6 md:grid-cols-3">
