@@ -21,12 +21,10 @@ const transformDtoToFormData = (
   data: AdminProductDetailResponseDto
 ): Partial<ProductFormData> => {
   // Check if product has variants by checking if any productVariant has variantValues
-  const hasVariants = data.productVariants?.some(
-    (pv) => pv.variantValues && pv.variantValues.length > 0
-  ) ?? false;
-
-  console.log('Transform DTO - hasVariants determined:', hasVariants);
-  console.log('Transform DTO - productVariants:', data.productVariants);
+  const hasVariants =
+    data.productVariants?.some(
+      (pv) => pv.variantValues && pv.variantValues.length > 0
+    ) ?? false;
 
   if (!hasVariants) {
     const simpleVariant = data.productVariants?.[0];
@@ -102,9 +100,6 @@ const AdminProductEdit = () => {
   useEffect(() => {
     if (productData?.data) {
       const formData = transformDtoToFormData(productData.data);
-      console.log("Form data being set:", formData);
-      console.log("Product has variant:", productData.data.hasVariant);
-      console.log("Product variants:", formData.productVariants);
       form.reset(formData);
 
       if (editorRef.current) {
@@ -119,13 +114,6 @@ const AdminProductEdit = () => {
       productData.data.hasVariant &&
       variants.length > 0
     ) {
-      console.log("Setting variant options...");
-      console.log("Available variants:", variants);
-      console.log(
-        "Product variants from API:",
-        productData.data.productVariants
-      );
-
       const variantValueIdsInProduct = new Set(
         productData.data.productVariants.flatMap((pv) =>
           pv.variantValues.map(
@@ -165,7 +153,6 @@ const AdminProductEdit = () => {
                 selected: variantValueIdsInProduct.has(val.id),
               })) || [],
         }));
-      console.log("Variant options to set:", options);
       setSelectedVariantOptions(options);
     }
   }, [productData, variants]);

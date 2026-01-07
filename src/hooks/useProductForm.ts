@@ -8,6 +8,7 @@ import {
 import type { apiClient } from "@/services/apiClient";
 
 const productVariantSchema = z.object({
+  id: z.string().optional(),
   price: z.number().min(0, "Giá phải lớn hơn 0"),
   stock: z.number().int().min(0, "Tồn kho phải là số nguyên dương"),
   sku: z.string().min(1, "SKU là bắt buộc"),
@@ -89,6 +90,6 @@ export const useProductForm = ({
     categoriesLoading: categoriesResponse.isLoading,
     variants: variantsResponse.data?.data.data || [],
     variantsLoading: variantsResponse.isLoading,
-    variantFields, 
+    variantFields,
   };
 };
