@@ -274,7 +274,7 @@ export const ProfileOrderDetail: React.FC = () => {
                       </p>
                       <p>Mở ứng dụng ngân hàng và quét mã QR</p>
                       <p className="text-amber-600 font-medium">
-                        ⚠️ Vui lòng hoàn tất thanh toán để đơn hàng được xử lý
+                        Vui lòng hoàn tất thanh toán để đơn hàng được xử lý
                       </p>
                     </div>
                   </div>
