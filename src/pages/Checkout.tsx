@@ -668,7 +668,10 @@ const Checkout = () => {
 
       {/* Payment Confirmation Modal */}
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent
+          className="max-w-md"
+          onInteractOutside={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-2xl">
               {selectedPayment === "cod"
@@ -690,11 +693,10 @@ const Checkout = () => {
                   <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-xs sm:text-sm text-blue-900 mb-1">
-                      Cash on Delivery
+                      Thanh toán khi nhận hàng
                     </h3>
                     <p className="text-xs sm:text-sm text-blue-700">
-                      You will pay {formatPriceVND(total)} when you receive your
-                      order
+                      Bạn sẽ thanh toán {formatPriceVND(total)} khi nhận hàng
                     </p>
                   </div>
                 </div>
@@ -761,6 +763,9 @@ const Checkout = () => {
                 <>
                   <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
                     <div className="text-center space-y-3 sm:space-y-4">
+                      <div className="text-xs sm:text-sm text-gray-600">
+                        Hoặc bạn có thể quét QR sau ở trang đơn hàng của bạn.
+                      </div>
                       <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
                         <QrCode className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                         <h3 className="font-semibold text-sm sm:text-lg">
@@ -790,10 +795,16 @@ const Checkout = () => {
                   </Card>
 
                   {/* Check Payment Status Button */}
+
+                  <div className="text-xs sm:text-sm text-red-600">
+                    Lưu ý: Hãy hoàn tất thanh toán để đơn hàng được chuyển sang
+                    trạng thái tiếp theo. Bạn cũng sẽ không được hoàn trả
+                    voucher (nếu sử dụng) khi hủy đơn.
+                  </div>
                   <Button
                     className="w-full text-xs sm:text-sm"
                     onClick={handleCheckPaymentStatus}
-                    disabled={isCheckingPayment}
+                    disabled={isCheckingPayment || isCancellingOrder}
                   >
                     {isCheckingPayment ? (
                       <>
@@ -812,7 +823,7 @@ const Checkout = () => {
                     variant="destructive"
                     className="w-full text-xs sm:text-sm"
                     onClick={handleCancelOrder}
-                    disabled={isCancellingOrder}
+                    disabled={isCancellingOrder || isCheckingPayment}
                   >
                     {isCancellingOrder ? (
                       <>

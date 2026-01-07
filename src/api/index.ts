@@ -847,6 +847,8 @@ export interface OrderResponseDto {
   orderItems: OrderItemResponseDto[];
   amount: number;
   voucher: VoucherResponseDto;
+  qrUrl?: string;
+  qrStatus?: "not_yet" | "failed" | "success" | "pending" | "cancel";
   /** @format date-time */
   createdAt: string;
 }

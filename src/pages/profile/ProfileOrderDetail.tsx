@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import {
@@ -13,7 +13,9 @@ import {
   Star,
   X,
   Ticket,
+  QrCode,
 } from "lucide-react";
+import QRCode from "qrcode";
 import { cn } from "@/lib/utils";
 import { getOrdersQuery } from "@/queries/orderQueries";
 import { formatPriceVND } from "@/utils/formatPriceVND";
@@ -94,11 +96,32 @@ export const ProfileOrderDetail: React.FC = () => {
   } | null>(null);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [qrImageUrl, setQrImageUrl] = useState<string>("");
   const createReviewMutation = useCreateReview();
   const isMobile = useIsMobile();
 
   const { data, isLoading } = getOrdersQuery(100, 1);
   const order = data?.data?.data?.find((o) => o.id === id);
+
+  // Generate QR code image from qrUrl
+  useEffect(() => {
+    if (order?.qrUrl) {
+      QRCode.toDataURL(order.qrUrl, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      })
+        .then((url) => {
+          setQrImageUrl(url);
+        })
+        .catch((err) => {
+          console.error("Error generating QR code:", err);
+        });
+    }
+  }, [order?.qrUrl]);
 
   if (isLoading) {
     return (
@@ -210,6 +233,59 @@ export const ProfileOrderDetail: React.FC = () => {
         </Card>
       </motion.div>
       {isMobile && <div className="w-full h-[1px] bg-border"></div>}
+
+      {/* QR Code Payment Section - Only show if QR payment and status is pending */}
+      {order.qrUrl && order.qrStatus === "pending" && qrImageUrl && (
+        <>
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
+          >
+            <Card className={`${isMobile ? "border-none" : ""}`}>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <QrCode className="h-5 w-5 text-primary" />
+                  Thanh toán QR Code
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-4 sm:p-6 rounded-lg">
+                  <div className="text-center space-y-3 sm:space-y-4">
+                    <div className="text-xs sm:text-sm text-gray-600">
+                      Quét mã QR bên dưới để hoàn tất thanh toán
+                    </div>
+
+                    {/* QR Image */}
+                    <div className="bg-white p-3 sm:p-4 rounded-lg inline-block mx-auto">
+                      <img
+                        src={qrImageUrl}
+                        alt="QR Code"
+                        className="w-48 h-48 sm:w-64 sm:h-64 mx-auto"
+                      />
+                    </div>
+
+                    <div className="space-y-2 text-xs sm:text-sm text-gray-600">
+                      <p>
+                        Tổng thanh toán:{" "}
+                        <span className="font-semibold text-primary text-sm sm:text-base">
+                          {formatPriceVND(order.amount)}
+                        </span>
+                      </p>
+                      <p>Mở ứng dụng ngân hàng và quét mã QR</p>
+                      <p className="text-amber-600 font-medium">
+                        ⚠️ Vui lòng hoàn tất thanh toán để đơn hàng được xử lý
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          {isMobile && <div className="w-full h-[1px] bg-border"></div>}
+        </>
+      )}
+
       {/* Shipping Address */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
