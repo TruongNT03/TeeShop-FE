@@ -30,6 +30,11 @@ const baseProductSchema = z.object({
   discount: z.number().optional(),
   categoryIds: z.array(z.number()).min(1, "Phải chọn ít nhất 1 danh mục"),
   imageUrls: z.array(z.string().url()).optional(),
+  discountPrice: z
+    .number()
+    .min(0, "Giá giảm không được âm")
+    .optional()
+    .nullable(),
 });
 
 const simpleProductSchema = baseProductSchema.extend({
