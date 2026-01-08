@@ -74,14 +74,14 @@ const Home = () => {
         <Promo>
           <PromoItem
             className="flex-3"
-            title="Yên tâm mua sắm"
-            description="Nền tảng mua sắm thời trang tiện lợi, an toàn. Mua sắm với sự yên tâm tuyệt đối."
+            title="MUA SẮM AN TÂM TUYỆT ĐỐI"
+            description="Nền tảng thương mại điện tử hiện đại, bảo mật cao, thanh toán an toàn. Mỗi đơn hàng đều được kiểm soát chặt chẽ để bạn luôn yên tâm khi mua sắm."
             redirectUrl="#"
           />
           <PromoItem
             className="flex-2"
-            title="Yên tâm mua sắm"
-            description="Nền tảng mua sắm thời trang tiện lợi, an toàn. Mua sắm với sự yên tâm tuyệt đối."
+            title="TRẢI NGHIỆM MUA SẮM DỄ DÀNG"
+            description="Khám phá thời trang theo cách nhanh chóng, tiện lợi và thông minh. Chỉ vài thao tác, sản phẩm yêu thích đã sẵn sàng đến tay bạn."
             redirectUrl="#"
           />
         </Promo>
