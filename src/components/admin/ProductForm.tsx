@@ -504,6 +504,29 @@ export const ProductForm = ({
               <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
+                  name="discount"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          Giảm giá sản phẩm
+                        </FormLabel>
+                      </div>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          placeholder="100"
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                ></FormField>
+                <FormField
+                  control={form.control}
                   name="hasVariant"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -550,31 +573,7 @@ export const ProductForm = ({
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={form.control}
-                      name="discountPrice"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Giá giảm (VNĐ)</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="number"
-                              placeholder="Nhập giá đã giảm"
-                              value={field.value ?? ""}
-                              onChange={(e) =>
-                                field.onChange(
-                                  e.target.value === ""
-                                    ? null
-                                    : e.target.valueAsNumber
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+
                     <FormField
                       control={form.control}
                       name="stock"

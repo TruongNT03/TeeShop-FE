@@ -115,7 +115,9 @@ const Checkout = () => {
     () =>
       checkoutItems.reduce(
         (acc: number, item: any) =>
-          acc + (item.productVariant?.price || 0) * item.quantity,
+          acc +
+          ((item.productVariant?.price || 0) - (item.product.discount || 0)) *
+            item.quantity,
         0
       ),
     [checkoutItems]
@@ -560,7 +562,12 @@ const Checkout = () => {
                           </div>
                         )}
                         <div className="text-xs sm:text-sm">
-                          {item.quantity} × {formatPriceVND(productPrice)}
+                          {item.quantity} ×{" "}
+                          {item.product.discount
+                            ? formatPriceVND(
+                                productPrice - item.product.discount
+                              )
+                            : formatPriceVND(productPrice)}
                         </div>
                       </div>
                     </div>
