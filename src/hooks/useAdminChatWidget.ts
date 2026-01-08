@@ -74,17 +74,15 @@ export const useAdminChatWidget = () => {
     });
 
     socket.on("connect", () => {
-      console.log("✅ Admin chat connected to socket");
+      console.log("Admin chat connected to socket");
     });
 
     socket.on("disconnect", () => {
-      console.log("❌ Admin chat disconnected from socket");
+      console.log("Admin chat disconnected from socket");
     });
 
     // Listen for new messages
     socket.on(import.meta.env.VITE_CHAT_EVENT, (data: MessageResponseDto) => {
-      console.log("📩 Received message:", data);
-
       // If message belongs to current conversation, refetch messages
       if (data.conversationId === selectedConversationId) {
         refetchMessages();
@@ -101,20 +99,20 @@ export const useAdminChatWidget = () => {
           (c) => c.id === data.conversationId
         );
         const senderName = conversation?.user?.name || "Người dùng";
-        toast.info(`Tin nhắn mới từ ${senderName}`, {
-          description:
-            data.content.length > 50
-              ? data.content.substring(0, 50) + "..."
-              : data.content,
-          duration: 4000,
-        });
+        // toast.info(`Tin nhắn mới từ ${senderName}`, {
+        //   description:
+        //     data.content.length > 50
+        //       ? data.content.substring(0, 50) + "..."
+        //       : data.content,
+        //   duration: 4000,
+        // });
       }
 
       // Always refetch conversations to update latest message
       refetchConversations();
     }); // Listen for new conversation
     socket.on("newConversation", () => {
-      console.log("🆕 New conversation created");
+      console.log("New conversation created");
       toast.success("Có cuộc trò chuyện mới!", {
         description: "Một khách hàng vừa bắt đầu cuộc trò chuyện",
         duration: 4000,

@@ -119,7 +119,7 @@ const ChatbotWidget = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="w-[380px] h-[600px] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col"
+          className="w-[330px] h-[500px] md:w-[380px] md:h-[600px] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-5 py-2 flex items-center justify-between rounded-t-lg">

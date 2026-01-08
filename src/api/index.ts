@@ -122,6 +122,8 @@ export interface NotificationResponseDto {
   title: string;
   content: string;
   triggerBy: string;
+  type: "voucher" | "product" | "order" | "message";
+  duration: "one_off" | "forever";
   navigateTo: string;
   isRead: boolean;
   meta: object;
@@ -845,6 +847,8 @@ export interface OrderResponseDto {
   orderItems: OrderItemResponseDto[];
   amount: number;
   voucher: VoucherResponseDto;
+  qrUrl?: string;
+  qrStatus?: "not_yet" | "failed" | "success" | "pending" | "cancel";
   /** @format date-time */
   createdAt: string;
 }
@@ -1693,7 +1697,7 @@ export class Api<
          * @example 10
          */
         pageSize: number;
-        categoriesIds?: string[];
+        categoriesIds?: number[];
         search?: string;
         sortBy?: "name" | "description" | "status" | "createdAt" | "updatedAt";
         sortOrder?: "DESC" | "ASC";

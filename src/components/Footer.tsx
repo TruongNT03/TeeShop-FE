@@ -6,7 +6,7 @@ const Footer = () => {
   const { footerColumns } = useFooter();
   return (
     <div className="w-full bg-background">
-      <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-8 lg:py-[28px] text-foreground">
+      <div className="max-w-[1440px] mx-auto px-1 md:px-5 py-6 md:py-8 text-foreground">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8 pb-12 md:pb-24 lg:pb-[200px]">
           {footerColumns.map((footerColumn, index) => (
             <FooterColumn

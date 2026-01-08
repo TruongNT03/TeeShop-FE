@@ -48,7 +48,7 @@ export const useLogin = () => {
         ];
         const isAdmin = user.roles?.some((role) => adminRoles.includes(role));
         if (isAdmin) {
-          return navigate("/admin");
+          return (window.location.href = "/admin");
         }
         navigate("/");
       },

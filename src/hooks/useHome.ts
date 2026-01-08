@@ -9,7 +9,7 @@ export const useHome = () => {
     typeof apiClient.api.productControllerFindAll
   >[0] = {
     page: 1,
-    pageSize: 12,
+    pageSize: 10,
     sortBy: "createdAt",
     sortOrder: "DESC",
   };
@@ -21,7 +21,7 @@ export const useHome = () => {
     typeof apiClient.api.productControllerFindAll
   >[0] = {
     page: 1,
-    pageSize: 8,
+    pageSize: 10,
     sortBy: "price",
     sortOrder: "DESC",
   };

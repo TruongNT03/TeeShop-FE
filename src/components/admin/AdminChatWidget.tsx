@@ -7,9 +7,10 @@ import { motion } from "motion/react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useAdminChatContext } from "@/contexts/AdminChatContext";
 
 const AdminChatWidget = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen } = useAdminChatContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {

@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
-import { User, Package, Lock, MapPin } from "lucide-react";
+import { User, Package, Lock, MapPin, Bell } from "lucide-react";
 import { Link, Outlet, useLocation, Navigate } from "react-router-dom";
 import { useProfile } from "@/hooks/useProfile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const menuItems = [
   {
@@ -24,11 +25,17 @@ const menuItems = [
     label: "Địa chỉ nhận hàng",
     icon: MapPin,
   },
+  {
+    path: "/profile/notifications",
+    label: "Thông báo",
+    icon: Bell,
+  },
 ];
 
 export const ProfileLayout = () => {
   const location = useLocation();
   const { profile } = useProfile();
+  const isMobile = useIsMobile();
 
   // Redirect /profile to /profile/info
   if (location.pathname === "/profile") {
@@ -36,12 +43,18 @@ export const ProfileLayout = () => {
   }
 
   return (
-    <div className="bg-slate-50/60 min-h-screen pt-20">
-      <div className="max-w-7xl mx-auto p-6">
+    <div className="bg-slate-50/60 min-h-screen pt-8 md:pt-20">
+      <div className="max-w-[1440px] mx-auto md:px-5 px-1">
+        <div className="text-2xl uppercase font-medium border-b-[2px] border-black w-fit mb-3">
+          Hồ sơ
+        </div>
+        <div className="mb-3 text-slate-500">
+          Theo dõi, chỉnh sửa thông tin cá nhân của bạn
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <aside className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow border-[1px] border-border p-4 sticky top-6">
+            <div className="bg-white rounded-lg border-[1px] border-border p-4 sticky top-6">
               {/* User Profile Section */}
               <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-200">
                 <div className="h-12 w-12 rounded-md overflow-hidden bg-slate-100">
@@ -102,7 +115,7 @@ export const ProfileLayout = () => {
 
           {/* Main Content */}
           <main className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow border-[1px] border-border p-6">
+            <div className="bg-white rounded-lg border-[1px] border-border p-6">
               <Outlet />
             </div>
           </main>

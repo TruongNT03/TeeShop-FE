@@ -285,7 +285,7 @@ export const ProductForm = ({
   };
 
   const generateVariantRows = () => {
-    variantFields.remove();
+    // variantFields.remove();
     const selectedOptions = selectedVariantOptions
       .map((opt) => ({
         ...opt,

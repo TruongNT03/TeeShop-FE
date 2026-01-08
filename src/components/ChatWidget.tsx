@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useChatContext } from "@/contexts/ChatContext";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
+import { Badge } from "./ui/badge";
 
 const ChatWidget = () => {
   const { activeChat, openChat, closeChat } = useChatContext();
@@ -36,6 +37,8 @@ const ChatWidget = () => {
     isCreateConversationPending,
     isSendingMessage,
     setIsSendingMessage,
+    hasNewMessage,
+    setHasNewMessage,
   } = useChatWidget();
 
   const isLoadingMoreRef = useRef(false);
@@ -100,10 +103,21 @@ const ChatWidget = () => {
           transition={{ duration: 0.2 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => openChat("admin")}
-          className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/80 flex justify-center items-center text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+          onClick={() => {
+            setHasNewMessage(false);
+            openChat("admin");
+          }}
+          className={`relative w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/80 flex justify-center items-center text-white shadow-lg hover:shadow-xl transition-shadow cursor-pointer ${
+            hasNewMessage ? "animate-caret-blink duration-1000" : ""
+          }`}
         >
           <MessageSquareText className="w-7 h-7" />
+          {hasNewMessage && (
+            <Badge
+              className="absolute top-3 left-0 p-0 w-3 h-3 rounded-full"
+              variant="destructive"
+            ></Badge>
+          )}
         </motion.button>
       )}
 
@@ -115,7 +129,7 @@ const ChatWidget = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="w-[380px] h-[600px] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col"
+          className="w-[330px] h-[500px] md:w-[380px] md:h-[600px] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-primary to-primary/90 px-5 py-2 flex items-center justify-between">

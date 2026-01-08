@@ -16,6 +16,8 @@ export const useChatWidget = () => {
   const [message, setMessage] = useState<string>("");
   const [newMessages, setNewMessages] = useState<MessageResponseDto[]>([]);
   const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false);
+  const [hasNewMessage, setHasNewMessage] = useState<boolean>(false);
+
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -52,6 +54,7 @@ export const useChatWidget = () => {
     });
 
     socket.on(import.meta.env.VITE_CHAT_EVENT, (data: MessageResponseDto) => {
+      setHasNewMessage(true);
       setNewMessages((prev) => {
         // Check if message already exists to prevent duplicates
         if (prev.some((msg) => msg.id === data.id)) {
@@ -115,5 +118,7 @@ export const useChatWidget = () => {
     messagesContainerRef,
     isSendingMessage,
     setIsSendingMessage,
+    hasNewMessage,
+    setHasNewMessage,
   };
 };

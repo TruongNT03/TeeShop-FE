@@ -25,11 +25,14 @@ export const useNotificationSocket = () => {
     });
 
     socket.on("notification", (data: any) => {
-      console.log("New notification received:", data);
-
       // Show toast notification
       toast.info(data.title || "New Notification", {
         description: data.content || "You have a new notification",
+        action: {
+          label: "Đóng",
+
+          onClick: () => {},
+        },
       });
 
       // Invalidate notifications queries to refetch

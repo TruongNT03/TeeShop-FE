@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import {
@@ -13,7 +13,9 @@ import {
   Star,
   X,
   Ticket,
+  QrCode,
 } from "lucide-react";
+import QRCode from "qrcode";
 import { cn } from "@/lib/utils";
 import { getOrdersQuery } from "@/queries/orderQueries";
 import { formatPriceVND } from "@/utils/formatPriceVND";
@@ -34,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCreateReview } from "@/queries/reviewQueries";
 import { Spinner } from "@/components/ui/spinner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const getStatusConfig = (
   status: "pending" | "shipping" | "confirmed" | "completed" | "cancel"
@@ -93,10 +96,32 @@ export const ProfileOrderDetail: React.FC = () => {
   } | null>(null);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [qrImageUrl, setQrImageUrl] = useState<string>("");
   const createReviewMutation = useCreateReview();
+  const isMobile = useIsMobile();
 
   const { data, isLoading } = getOrdersQuery(100, 1);
   const order = data?.data?.data?.find((o) => o.id === id);
+
+  // Generate QR code image from qrUrl
+  useEffect(() => {
+    if (order?.qrUrl) {
+      QRCode.toDataURL(order.qrUrl, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      })
+        .then((url) => {
+          setQrImageUrl(url);
+        })
+        .catch((err) => {
+          console.error("Error generating QR code:", err);
+        });
+    }
+  }, [order?.qrUrl]);
 
   if (isLoading) {
     return (
@@ -185,7 +210,7 @@ export const ProfileOrderDetail: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card>
+        <Card className={`${isMobile ? "border-none" : ""}`}>
           <CardHeader>
             <CardTitle className="text-lg">Thông tin đơn hàng</CardTitle>
           </CardHeader>
@@ -207,6 +232,59 @@ export const ProfileOrderDetail: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div>
+      {isMobile && <div className="w-full h-[1px] bg-border"></div>}
+
+      {/* QR Code Payment Section - Only show if QR payment and status is pending */}
+      {order.qrUrl && order.qrStatus === "pending" && qrImageUrl && (
+        <>
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
+          >
+            <Card className={`${isMobile ? "border-none" : ""}`}>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <QrCode className="h-5 w-5 text-primary" />
+                  Thanh toán QR Code
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-4 sm:p-6 rounded-lg">
+                  <div className="text-center space-y-3 sm:space-y-4">
+                    <div className="text-xs sm:text-sm text-gray-600">
+                      Quét mã QR bên dưới để hoàn tất thanh toán
+                    </div>
+
+                    {/* QR Image */}
+                    <div className="bg-white p-3 sm:p-4 rounded-lg inline-block mx-auto">
+                      <img
+                        src={qrImageUrl}
+                        alt="QR Code"
+                        className="w-48 h-48 sm:w-64 sm:h-64 mx-auto"
+                      />
+                    </div>
+
+                    <div className="space-y-2 text-xs sm:text-sm text-gray-600">
+                      <p>
+                        Tổng thanh toán:{" "}
+                        <span className="font-semibold text-primary text-sm sm:text-base">
+                          {formatPriceVND(order.amount)}
+                        </span>
+                      </p>
+                      <p>Mở ứng dụng ngân hàng và quét mã QR</p>
+                      <p className="text-amber-600 font-medium">
+                        Vui lòng hoàn tất thanh toán để đơn hàng được xử lý
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          {isMobile && <div className="w-full h-[1px] bg-border"></div>}
+        </>
+      )}
 
       {/* Shipping Address */}
       <motion.div
@@ -214,7 +292,7 @@ export const ProfileOrderDetail: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <Card>
+        <Card className={`${isMobile ? "border-none" : ""}`}>
           <CardHeader>
             <CardTitle className="text-lg">Địa chỉ giao hàng</CardTitle>
           </CardHeader>
@@ -240,14 +318,14 @@ export const ProfileOrderDetail: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div>
-
+      {isMobile && <div className="w-full h-[1px] bg-border"></div>}
       {/* Order Items */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <Card>
+        <Card className={`${isMobile ? "border-none" : ""}`}>
           <CardHeader>
             <CardTitle className="text-lg">
               Sản phẩm ({order.orderItems.length})
@@ -258,7 +336,9 @@ export const ProfileOrderDetail: React.FC = () => {
               {order.orderItems.map((item, index) => (
                 <div key={item.id}>
                   {index > 0 && <Separator className="my-4" />}
-                  <div className="flex gap-4 hover:bg-slate-50 p-2 rounded-lg transition-colors">
+                  <div
+                    className={`flex justify-between items-end gap-10 md:gap-4 hover:bg-slate-50 mb-5 md:p-2 rounded-lg transition-colors`}
+                  >
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
                       {item.product.productImages?.[0]?.url && (
                         <img
@@ -268,31 +348,36 @@ export const ProfileOrderDetail: React.FC = () => {
                         />
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4
-                        className="font-medium text-slate-900 truncate hover:text-primary cursor-pointer"
-                        onClick={() => navigate(`/product/${item.product.id}`)}
-                      >
-                        {item.product.name}
-                      </h4>
-                      {item.productVariant.variantValues.length > 0 && (
-                        <p className="text-sm text-slate-500 mt-1">
-                          {item.productVariant.variantValues
-                            .map((vv) => `${vv.variant}: ${vv.value}`)
-                            .join(" / ")}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-4 mt-2">
-                        <p className="text-sm text-slate-600">
-                          Số lượng:{" "}
-                          <span className="font-medium">{item.quantity}</span>
-                        </p>
-                        <span className="text-slate-400">•</span>
-                        <p className="font-medium text-slate-900">
-                          {formatPriceVND(item.productVariant.price)}
-                        </p>
+                    {!isMobile && (
+                      <div className="flex-1 min-w-0">
+                        <h4
+                          className="font-medium text-slate-900 truncate hover:text-primary cursor-pointer"
+                          onClick={() =>
+                            navigate(`/product/${item.product.id}`)
+                          }
+                        >
+                          {item.product.name}
+                        </h4>
+                        {item.productVariant.variantValues.length > 0 && (
+                          <p className="text-sm text-slate-500 mt-1">
+                            {item.productVariant.variantValues
+                              .map((vv) => `${vv.variant}: ${vv.value}`)
+                              .join(" / ")}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-4 mt-2">
+                          <p className="text-sm text-slate-600">
+                            Số lượng:{" "}
+                            <span className="font-medium">{item.quantity}</span>
+                          </p>
+                          <span className="text-slate-400">•</span>
+                          <p className="font-medium text-slate-900">
+                            {formatPriceVND(item.productVariant.price)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    )}
+
                     <div className="text-right flex flex-col items-end gap-2">
                       <p className="font-semibold text-slate-900">
                         {formatPriceVND(
@@ -320,6 +405,33 @@ export const ProfileOrderDetail: React.FC = () => {
                       )}
                     </div>
                   </div>
+                  {isMobile && (
+                    <div className="flex-1 min-w-0">
+                      <h4
+                        className="font-medium text-slate-900 truncate hover:text-primary cursor-pointer"
+                        onClick={() => navigate(`/product/${item.product.id}`)}
+                      >
+                        {item.product.name}
+                      </h4>
+                      {item.productVariant.variantValues.length > 0 && (
+                        <p className="text-sm text-slate-500 mt-1">
+                          {item.productVariant.variantValues
+                            .map((vv) => `${vv.variant}: ${vv.value}`)
+                            .join(" / ")}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-4 mt-2">
+                        <p className="text-sm text-slate-600">
+                          Số lượng:{" "}
+                          <span className="font-medium">{item.quantity}</span>
+                        </p>
+                        <span className="text-slate-400">•</span>
+                        <p className="font-medium text-slate-900">
+                          {formatPriceVND(item.productVariant.price)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -358,7 +470,7 @@ export const ProfileOrderDetail: React.FC = () => {
                 <span>Miễn phí</span>
               </div>
               <Separator className="my-3" />
-              <div className="flex justify-between text-lg font-bold text-slate-900">
+              <div className="flex justify-between text-lg font-medium text-slate-900">
                 <span>Tổng cộng</span>
                 <span className="text-primary">
                   {formatPriceVND(order.amount)}

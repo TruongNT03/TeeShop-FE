@@ -24,7 +24,9 @@ const PromoItem = (props: PromoItemProps) => {
           className="relative overflow-hidden text-lato uppercase bg-primary-foreground text-primary text-xs md:text-sm lg:text-[14px] rounded-none p-4 md:p-5 lg:p-6 
         transition-all duration-500 ease-out group hover:text-primary-foreground"
         >
-          <span className="relative z-10">Buy now</span>
+          <Link className="relative z-10" to="product">
+            Buy now
+          </Link>
           <span
             className="absolute inset-0 w-[200%] bg-primary origin-bottom-left 
           -translate-x-full translate-y-full skew-x-[-20deg]

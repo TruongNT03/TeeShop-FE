@@ -472,7 +472,7 @@ const AdminChatbotConfig = () => {
                   <TableCell className="pl-8 py-3">
                     {index + 1 + (query.page - 1) * query.pageSize}
                   </TableCell>
-                  <TableCell className="font-medium max-w-[300px] py-3">
+                  <TableCell className="font-medium max-w-[300px] py-3 truncate">
                     {qa.question}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground max-w-[400px] truncate">

@@ -223,12 +223,12 @@ const AdminSideBar = () => {
               </SidebarMenuItem>
 
               {/* Configuration */}
-              <Link to="admin/configuration">
+              {/* <Link to="admin/configuration">
                 <SidebarMenuButton className="group">
                   <Wrench />
                   <span>Configuration</span>
                 </SidebarMenuButton>
-              </Link>
+              </Link> */}
 
               {/* Chatbot */}
               <Link to="/admin/chatbot">

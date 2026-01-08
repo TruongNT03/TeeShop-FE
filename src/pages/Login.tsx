@@ -30,6 +30,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { RoleType, type UserRequestPayload } from "@/types/userRequestPayload";
 import { jwtDecode } from "jwt-decode";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { z } from "zod";
 
 const Login = () => {
   const {
@@ -43,6 +45,7 @@ const Login = () => {
   } = useLogin();
   const { saveToken } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // Listen for messages from popup
@@ -91,14 +94,16 @@ const Login = () => {
 
   return (
     <div className="min-h-screen w-full bg-background relative overflow-hidden flex">
-      <motion.div
-        className="flex-1 bg-primary z-20 flex justify-center items-center"
-        initial={{ x: "100%" }}
-        animate={{ x: 0 }}
-        transition={{ duration: 0.7, ease: "easeIn" }}
-      >
-        <img src="login-icon.png" alt="" className="max-w-[350px]" />
-      </motion.div>
+      {!isMobile && (
+        <motion.div
+          className="flex-1 bg-primary z-20 flex justify-center items-center"
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.7, ease: "easeIn" }}
+        >
+          <img src="login-icon.png" alt="" className="max-w-[350px]" />
+        </motion.div>
+      )}
       <motion.div
         initial={{ x: "-100%", opacity: 0 }}
         animate={{ x: 0, opacity: 100 }}

@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Clock, Info, AlertTriangle, CheckCircle, ArrowLeft } from "lucide-react";
+import {
+  Bell,
+  Clock,
+  Info,
+  AlertTriangle,
+  CheckCircle,
+  ArrowLeft,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -31,7 +38,7 @@ const NotificationList = () => {
   const handleNotificationClick = (notification: any) => {
     if (notification.meta?.orderId) {
       const orderId = notification.meta.orderId;
-      
+
       if (profile?.roles?.includes("admin")) {
         navigate(`/admin/order/${orderId}`);
       } else {
@@ -65,87 +72,85 @@ const NotificationList = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container mx-auto md:p-6 p-0">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
-        <Button
+        {/* <Button
           variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
         >
           <ArrowLeft className="h-5 w-5" />
-        </Button>
+        </Button> */}
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-slate-900">Notifications</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Thông báo</h1>
           <p className="text-sm text-slate-500 mt-1">
-            View all your notifications
+            Tất cả thông báo của bạn
           </p>
         </div>
       </div>
 
       {/* Notifications List */}
-      <Card>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="p-6 space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex gap-4">
-                  <Skeleton className="h-12 w-12 rounded-full" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                </div>
-              ))}
+      {/* <Card>
+        <CardContent className="p-0"> */}
+      {isLoading ? (
+        <div className="p-6 space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex gap-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
             </div>
-          ) : notifications.length > 0 ? (
-            <div className="divide-y divide-slate-100">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    "p-6 hover:bg-slate-50 transition-colors cursor-pointer flex gap-4 items-start",
-                    !notification.isRead && "bg-slate-50/50"
+          ))}
+        </div>
+      ) : notifications.length > 0 ? (
+        <div className="divide-y divide-border">
+          {notifications.map((notification) => (
+            <div
+              key={notification.id}
+              className={cn(
+                "py-5 hover:bg-slate-50 transition-colors cursor-pointer flex gap-4 items-start",
+                !notification.isRead && "bg-slate-50/50"
+              )}
+              onClick={() => handleNotificationClick(notification)}
+            >
+              <div className="mt-1 flex-shrink-0">
+                {getIcon(getNotificationType(notification))}
+              </div>
+              <div className="flex-1 space-y-2">
+                <div className="flex items-start justify-between gap-4">
+                  <p
+                    className={cn(
+                      "text-base font-medium leading-none",
+                      !notification.isRead ? "text-slate-900" : "text-slate-600"
+                    )}
+                  >
+                    {notification.title}
+                  </p>
+                  {!notification.isRead && (
+                    <div className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0 mt-1" />
                   )}
-                  onClick={() => handleNotificationClick(notification)}
-                >
-                  <div className="mt-1 flex-shrink-0">
-                    {getIcon(getNotificationType(notification))}
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-start justify-between gap-4">
-                      <p
-                        className={cn(
-                          "text-base font-medium leading-none",
-                          !notification.isRead ? "text-slate-900" : "text-slate-600"
-                        )}
-                      >
-                        {notification.title}
-                      </p>
-                      {!notification.isRead && (
-                        <div className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0 mt-1" />
-                      )}
-                    </div>
-                    <p className="text-sm text-slate-500">
-                      {notification.content}
-                    </p>
-                    <div className="flex items-center gap-1 text-xs text-slate-400">
-                      <Clock className="h-3 w-3" />
-                      {formatTime(notification.createdAt)}
-                    </div>
-                  </div>
                 </div>
-              ))}
+                <p className="text-sm text-slate-500">{notification.content}</p>
+                <div className="flex items-center gap-1 text-xs text-slate-400">
+                  <Clock className="h-3 w-3" />
+                  {formatTime(notification.createdAt)}
+                </div>
+              </div>
             </div>
-          ) : (
-            <div className="p-12 text-center text-slate-500">
-              <Bell className="h-12 w-12 mx-auto mb-4 opacity-20" />
-              <p className="text-base font-medium">No notifications</p>
-              <p className="text-sm mt-1">You're all caught up!</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="p-12 text-center text-slate-500">
+          <Bell className="h-12 w-12 mx-auto mb-4 opacity-20" />
+          <p className="text-base font-medium">No notifications</p>
+          <p className="text-sm mt-1">You're all caught up!</p>
+        </div>
+      )}
+      {/* </CardContent> */}
+      {/* </Card> */}
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -160,21 +165,26 @@ const NotificationList = () => {
                   )}
                 />
               </PaginationItem>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(page)}
+                      isActive={currentPage === page}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              )}
               <PaginationItem>
                 <PaginationNext
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
                   className={cn(
-                    currentPage === totalPages && "pointer-events-none opacity-50"
+                    currentPage === totalPages &&
+                      "pointer-events-none opacity-50"
                   )}
                 />
               </PaginationItem>

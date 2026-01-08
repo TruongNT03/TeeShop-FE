@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 import {
   Bell,
   Check,
@@ -6,6 +6,8 @@ import {
   Info,
   AlertTriangle,
   CheckCircle,
+  MessageCircleMore,
+  Package,
 } from "lucide-react";
 import {
   Tooltip,
@@ -25,11 +27,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/services/apiClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { NotificationResponseDto } from "@/api";
+import { useChatContext } from "@/contexts/ChatContext";
+import { useAdminChatContext } from "@/contexts/AdminChatContext";
+import { Badge } from "./ui/badge";
 
 const Notification = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
   const queryClient = useQueryClient();
+  const { openChat } = useChatContext();
+  const { setIsOpen } = useAdminChatContext();
 
   // Determine notification path based on current location
   const isAdminContext = window.location.pathname.startsWith("/admin");
@@ -82,40 +90,47 @@ const Notification = () => {
   const notifications = data?.data?.data || [];
   const unreadCount = unreadData?.data?.totalUnread || 0;
 
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = (notification: NotificationResponseDto) => {
     // Mark as read if not already read
     if (!notification.isRead) {
       markReadMutation.mutate(notification.id);
     }
 
-    // Check if notification has orderId in meta
-    if (notification.meta?.orderId) {
-      const orderId = notification.meta.orderId;
+    switch (notification.type) {
+      case "order": {
+        // Check if notification has orderId in meta
+        if ((notification.meta as any)?.orderId as any) {
+          const orderId = (notification.meta as any).orderId;
 
-      // Navigate to appropriate order detail page based on user role
-      if (profile?.roles?.includes("admin")) {
-        navigate(`/admin/order/${orderId}`);
-      } else {
-        navigate(`/profile/orders/${orderId}`);
+          // Navigate to appropriate order detail page based on user role
+          if (profile?.roles?.includes("admin")) {
+            navigate(`/admin/order/${orderId}`);
+          } else {
+            navigate(`/profile/orders/${orderId}`);
+          }
+        }
+        break;
+      }
+      case "message": {
+        if (isAdminContext) {
+          setIsOpen(true);
+        } else {
+          openChat("admin");
+        }
+        break;
       }
     }
   };
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "success":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "warning":
-        return <AlertTriangle className="h-4 w-4 text-amber-500" />;
-      case "info":
+  const getNotificationIcon = (notification: NotificationResponseDto) => {
+    switch (notification.type) {
+      case "message":
+        return <MessageCircleMore className="text-white" />;
+      case "order":
+        return <Package className="text-amber-300" />;
       default:
-        return <Info className="h-4 w-4 text-blue-500" />;
+        return <Info />;
     }
-  };
-
-  const getNotificationType = (notification: any) => {
-    // You can determine type from meta or other fields
-    return notification.meta?.type || "info";
   };
 
   const formatTime = (dateString: string) => {
@@ -135,73 +150,72 @@ const Notification = () => {
         >
           <Bell className="w-5 group-hover:text-primary transition-colors" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-semibold">
+            <Badge className="absolute -top-2 -right-2 p-0 w-5 h-5 rounded-full">
               {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
+            </Badge>
           )}
         </Link>
       </TooltipTrigger>
-      <TooltipContent className="bg-white border border-slate-200 shadow-lg rounded-lg p-2 text-sm max-h-[500px] overflow-y-auto">
-        <div className="flex flex-col min-w-[280px] gap-1">
+      <TooltipContent className="bg-white border border-slate-200 shadow-lg rounded-lg p-2 text-sm max-h-[500px] w-[500px] overflow-y-auto truncate">
+        <div className="flex flex-col gap-1">
           {isLoading ? (
             <div className="px-3 py-4 text-center text-slate-500 text-xs">
               Đang tải...
             </div>
           ) : notifications.length > 0 ? (
-            notifications.slice(0, 5).map((notification) => (
-              <div
-                key={notification.id}
-                className={cn(
-                  "px-3 py-2 rounded-md hover:bg-slate-100 transition-colors cursor-pointer",
-                  !notification.isRead && "bg-slate-50"
-                )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleNotificationClick(notification);
-                }}
+            <>
+              <Button
+                className="w-fit text-black ml-auto"
+                variant="ghost"
+                onClick={() => markAllReadMutation.mutate()}
               >
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0">
-                    <div
-                      className={cn(
-                        "w-10 h-10 rounded-lg flex items-center justify-center",
-                        getNotificationType(notification) === "success" &&
-                          "bg-green-100",
-                        getNotificationType(notification) === "warning" &&
-                          "bg-amber-100",
-                        getNotificationType(notification) === "info" &&
-                          "bg-blue-100"
-                      )}
-                    >
-                      {getIcon(getNotificationType(notification))}
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p
-                      className={cn(
-                        "text-xs font-medium truncate",
-                        !notification.isRead
-                          ? "text-slate-900"
-                          : "text-slate-600"
-                      )}
-                    >
-                      {notification.title}
-                    </p>
-                    <p className="text-xs text-slate-500 line-clamp-2 mt-0.5">
-                      {notification.content}
-                    </p>
-                    <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-1">
-                      <Clock className="h-3 w-3" />
-                      {formatTime(notification.createdAt)}
-                    </div>
-                  </div>
-                  {!notification.isRead && (
-                    <div className="h-2 w-2 rounded-full bg-blue-500 mt-1 flex-shrink-0" />
+                Đánh dấu là đã đọc
+              </Button>
+              {notifications.slice(0, 5).map((notification) => (
+                <div
+                  key={notification.id}
+                  className={cn(
+                    "px-3 py-2 rounded-md hover:bg-slate-100 transition-colors cursor-pointer ",
+                    !notification.isRead && "bg-slate-50"
                   )}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleNotificationClick(notification);
+                  }}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary">
+                        {getNotificationIcon(notification)}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={cn(
+                          "text-xs font-medium truncate",
+                          !notification.isRead
+                            ? "text-slate-900"
+                            : "text-slate-600"
+                        )}
+                      >
+                        {notification.title}
+                      </p>
+                      <div className="w-full text-wrap text-xs text-slate-500 mt-0.5 max-h-8 truncate">
+                        {notification.content}
+                      </div>
+                      <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-1">
+                        <Clock className="h-3 w-3" />
+                        {formatTime(notification.createdAt)}
+                      </div>
+                    </div>
+                    {!notification.isRead && (
+                      <div className="h-2 w-2 rounded-full bg-blue-500 mt-1 flex-shrink-0" />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </>
           ) : (
             <div className="px-3 py-4 text-center text-slate-500">
               <Bell className="h-6 w-6 mx-auto mb-1 opacity-20" />
