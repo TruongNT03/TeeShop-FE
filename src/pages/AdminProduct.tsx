@@ -317,7 +317,7 @@ const AdminProduct = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Search className="scale-75 absolute top-[18%] left-2 text-slate-400" />
+            <Search className="scale-75 absolute top-[18%] left-2 text-muted-foreground" />
           </div>
 
           <Popover open={filterOpen} onOpenChange={setFilterOpen}>

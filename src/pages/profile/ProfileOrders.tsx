@@ -66,7 +66,7 @@ const getStatusConfig = (
 };
 
 const OrderSkeleton = () => (
-  <div className="rounded-lg border bg-white p-4 shadow-sm">
+  <div className="rounded-lg border bg-white dark:bg-card p-4 shadow-sm">
     <div className="flex items-start justify-between">
       <div className="flex-1">
         <div className="flex items-center gap-3">
@@ -100,11 +100,11 @@ export const ProfileOrders: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-slate-900">Đơn hàng của tôi</h1>
+        <h1 className="text-2xl font-bold text-foreground">Đơn hàng của tôi</h1>
         {!isLoading && (
-          <div className="text-sm text-slate-500">
+          <div className="text-sm text-muted-foreground">
             Tổng:{" "}
-            <span className="font-semibold text-slate-900">
+            <span className="font-semibold text-foreground">
               {data?.data?.paginate?.totalItem || 0}
             </span>{" "}
             đơn hàng
@@ -133,33 +133,33 @@ export const ProfileOrders: React.FC = () => {
                   duration: 0.3,
                 }}
                 className={cn(
-                  "rounded-lg border bg-white p-4 shadow-sm hover:shadow-lg",
+                  "rounded-lg border bg-white dark:bg-card p-4 shadow-sm hover:shadow-lg",
                   statusConfig.border
                 )}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <Package className="h-5 w-5 text-slate-400" />
+                      <Package className="h-5 w-5 text-muted-foreground" />
                       <div>
-                        <p className="font-semibold text-slate-900">
+                        <p className="font-semibold text-foreground">
                           #{order.id.substring(0, 8).toUpperCase()}
                         </p>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                           {convertDateTime(order.createdAt)}
                         </p>
                       </div>
                     </div>
 
                     <div className="mt-3 flex items-center gap-4 text-sm">
-                      <span className="text-slate-600">
+                      <span className="text-muted-foreground">
                         <span className="font-medium">
                           {order.orderItems.length}
                         </span>{" "}
                         sản phẩm
                       </span>
-                      <span className="text-slate-400">•</span>
-                      <span className="font-semibold text-slate-900">
+                      <span className="text-muted-foreground">•</span>
+                      <span className="font-semibold text-foreground">
                         {formatPriceVND(order.amount)}
                       </span>
                     </div>
@@ -191,11 +191,11 @@ export const ProfileOrders: React.FC = () => {
 
           {orders.length === 0 && !isLoading && (
             <div className="text-center py-12">
-              <Package className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-900">
+              <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-foreground">
                 Chưa có đơn hàng nào
               </h3>
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Bắt đầu mua sắm để tạo đơn hàng đầu tiên của bạn!
               </p>
             </div>

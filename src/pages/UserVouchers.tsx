@@ -59,7 +59,7 @@ const VoucherCard = ({
     : 0;
 
   return (
-    <Card className="border border-gray-200 hover:border-primary transition-colors duration-200 overflow-hidden">
+    <Card className="border border-border hover:border-primary transition-colors duration-200 overflow-hidden">
       <div className="flex h-full">
         {/* Left - Discount */}
         <div className="w-24 bg-primary text-white flex flex-col items-center justify-center p-3 relative">
@@ -100,7 +100,7 @@ const VoucherCard = ({
         </div>
 
         {/* Right - Content */}
-        <div className="flex-1 p-3 flex flex-col justify-between bg-white">
+        <div className="flex-1 p-3 flex flex-col justify-between bg-white dark:bg-card">
           <div>
             <div className="flex items-start justify-between gap-2 mb-2">
               <h3 className="font-semibold text-sm line-clamp-1">
@@ -117,13 +117,13 @@ const VoucherCard = ({
             </div>
 
             <div className="space-y-1 text-xs mb-2">
-              <div className="flex items-center gap-1.5 text-gray-600">
+              <div className="flex items-center gap-1.5 text-muted-foreground">
                 <Ticket className="w-3 h-3" />
                 <span className="font-mono font-medium">{voucher.code}</span>
               </div>
 
               {voucher.minOrderValue > 0 && (
-                <div className="text-gray-600">
+                <div className="text-muted-foreground">
                   Đơn tối thiểu:{" "}
                   <span className="font-medium text-primary">
                     {formatPriceVND(voucher.minOrderValue)}
@@ -134,7 +134,7 @@ const VoucherCard = ({
           </div>
 
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-3 text-xs text-gray-600">
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 {timeLeft}
@@ -164,7 +164,7 @@ const VoucherCard = ({
                 variant="outline"
                 className={`text-xs h-6 ${
                   voucher.isUsed
-                    ? "border-gray-400 text-gray-600"
+                    ? "border-border text-muted-foreground"
                     : "border-primary text-primary"
                 }`}
               >
@@ -226,15 +226,15 @@ const UserVouchers = () => {
     <div className="max-w-[1440px] mx-auto  px-4 py-8 pt-20">
       {/* Header */}
       <div className="mb-12">
-        <h1 className="text-2xl font-medium uppercase mb-2 border-b-[2px] border-black w-fit">
+        <h1 className="text-2xl font-medium uppercase mb-2 border-b-[2px] border-black dark:border-border w-fit">
           Voucher
         </h1>
-        <p className="text-gray-600">Lấy và quản lý mã giảm giá của bạn</p>
+        <p className="text-muted-foreground">Lấy và quản lý mã giảm giá của bạn</p>
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="available" className="w-full">
-        <TabsList className="inline-flex h-10 items-center justify-start rounded-lg bg-gray-100 p-1 mb-8">
+        <TabsList className="inline-flex h-10 items-center justify-start rounded-lg bg-gray-100 dark:bg-input/20 p-1 mb-8">
           <TabsTrigger
             value="available"
             className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-1.5 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm"
@@ -252,7 +252,7 @@ const UserVouchers = () => {
         <TabsContent value="available" className="mt-0">
           {isLoading ? (
             <div className="text-center py-20">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-primary"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-gray-300 dark:border-input/40 border-t-primary"></div>
             </div>
           ) : (
             <>
@@ -267,8 +267,8 @@ const UserVouchers = () => {
               </div>
               {availableVouchers.length === 0 && (
                 <div className="text-center py-20">
-                  <Ticket className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600">Chưa có voucher khả dụng</p>
+                  <Ticket className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">Chưa có voucher khả dụng</p>
                 </div>
               )}
             </>
@@ -278,7 +278,7 @@ const UserVouchers = () => {
         <TabsContent value="claimed" className="mt-0">
           {isLoadingPersonal ? (
             <div className="text-center py-20">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-primary"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-gray-300 dark:border-input/40 border-t-primary"></div>
             </div>
           ) : (
             <>
@@ -289,8 +289,8 @@ const UserVouchers = () => {
               </div>
               {claimedVouchers.length === 0 && (
                 <div className="text-center py-20">
-                  <Ticket className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600">Bạn chưa lấy voucher nào</p>
+                  <Ticket className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">Bạn chưa lấy voucher nào</p>
                 </div>
               )}
             </>

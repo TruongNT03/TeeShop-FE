@@ -221,7 +221,7 @@ const AdminCreateVoucher = () => {
                         onClick={() =>
                           setIsTypeDropdownOpen(!isTypeDropdownOpen)
                         }
-                        className="bg-white px-4 py-2 cursor-pointer font-medium border rounded-lg inline-flex items-center gap-2 hover:border-slate-400 hover:shadow-sm transition-all duration-200"
+                        className="bg-white dark:bg-card px-4 py-2 cursor-pointer font-medium border rounded-lg inline-flex items-center gap-2 hover:border-slate-400 dark:hover:border-input/40 hover:shadow-sm transition-all duration-200"
                       >
                         <span className="text-sm">
                           {voucherType === "percent"
@@ -241,7 +241,7 @@ const AdminCreateVoucher = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -10, scale: 0.95 }}
                             transition={{ duration: 0.2, ease: "easeOut" }}
-                            className="absolute top-full left-0 mt-2 min-w-[180px] bg-white border rounded-lg shadow-xl z-50 overflow-hidden"
+                            className="absolute top-full left-0 mt-2 min-w-[180px] bg-white dark:bg-popover border border-border rounded-lg shadow-xl z-50 overflow-hidden"
                           >
                             <button
                               type="button"
@@ -437,7 +437,7 @@ const AdminCreateVoucher = () => {
                     {watch("code") || "VOUCHER_CODE"}
                   </div>
                   {watch("campaignName") && (
-                    <div className="text-center mt-2 text-sm font-semibold text-gray-700">
+                    <div className="text-center mt-2 text-sm font-semibold text-foreground">
                       {watch("campaignName")}
                     </div>
                   )}

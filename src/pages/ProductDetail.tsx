@@ -201,15 +201,15 @@ const ProductDetail = () => {
     : product.totalStock;
 
   return (
-    <div className="min-h-screen bg-white pt-6">
+    <div className="min-h-screen bg-background pt-6">
       <div className="max-w-[1440px] mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">
-          <Link to="/" className="hover:text-slate-900">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
+          <Link to="/" className="hover:text-foreground">
             Trang chủ
           </Link>
           <span>/</span>
-          <span className="text-slate-900">
+          <span className="text-foreground">
             {capitalizeWords(product.name)}
           </span>
         </div>
@@ -218,7 +218,7 @@ const ProductDetail = () => {
           {/* Image Gallery */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="aspect-square bg-slate-50 rounded-xl overflow-hidden">
+            <div className="aspect-square bg-slate-50 dark:bg-card rounded-xl overflow-hidden">
               {selectedImageUrl ? (
                 <img
                   src={selectedImageUrl}
@@ -227,7 +227,7 @@ const ProductDetail = () => {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Package className="w-24 h-24 text-slate-300" />
+                  <Package className="w-24 h-24 text-muted-foreground" />
                 </div>
               )}
             </div>
@@ -241,8 +241,8 @@ const ProductDetail = () => {
                     className={cn(
                       "aspect-square rounded-lg overflow-hidden border-2 transition-all",
                       selectedImageUrl === image.url
-                        ? "border-slate-900"
-                        : "border-slate-200 hover:border-slate-300"
+                        ? "border-slate-900 dark:border-border"
+                        : "border-slate-200 hover:border-slate-300 dark:hover:border-input/40"
                     )}
                     onClick={() => setSelectedImageUrl(image.url)}
                   >
@@ -261,7 +261,7 @@ const ProductDetail = () => {
           <div className="space-y-8">
             {/* Title */}
             <div>
-              <h1 className="text-3xl font-medium text-slate-900 mb-4 uppercase">
+              <h1 className="text-3xl font-medium text-foreground mb-4 uppercase">
                 {product.name}
               </h1>
               <div className="flex items-center gap-3">
@@ -278,7 +278,7 @@ const ProductDetail = () => {
                     />
                   ))}
                 </div>
-                <span className="text-slate-600">
+                <span className="text-muted-foreground">
                   {(product.averageRating || 0).toFixed(1)} (
                   {product.totalRating || 0} đánh giá)
                 </span>
@@ -286,12 +286,12 @@ const ProductDetail = () => {
             </div>
 
             {/* Price */}
-            <div className="py-6 border-y border-slate-200">
-              <div className="text-3xl font-semibold text-slate-900 mb-2">
+            <div className="py-6 border-y border-slate-200 dark:border-border">
+              <div className="text-3xl font-semibold text-foreground mb-2">
                 {formatPriceVND(currentPrice)}
               </div>
               {currentStock > 0 ? (
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground">
                   Còn {currentStock} sản phẩm
                 </p>
               ) : (
@@ -302,7 +302,7 @@ const ProductDetail = () => {
             {/* Variants */}
             {variantOptions.map((option) => (
               <div key={option.variant}>
-                <div className="text-sm font-medium text-black mb-3">
+                <div className="text-sm font-medium text-foreground mb-3">
                   {option.variant}: {selectedOptions[option.variant]}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -332,7 +332,7 @@ const ProductDetail = () => {
 
             {/* Quantity */}
             <div>
-              <div className="text-sm font-medium text-black mb-3">
+              <div className="text-sm font-medium text-foreground mb-3">
                 Số lượng
               </div>
               <div className="inline-flex border border-primary rounded-md overflow-hidden">
@@ -343,7 +343,7 @@ const ProductDetail = () => {
                 >
                   <Minus className="w-4 h-4" />
                 </button>
-                <div className="px-6 py-2 border-x border-slate-300 min-w-[60px] text-center">
+                <div className="px-6 py-2 border-x border-slate-300 dark:border-input/40 min-w-[60px] text-center">
                   {quantity}
                 </div>
                 <button
@@ -381,10 +381,10 @@ const ProductDetail = () => {
             </button>
 
             {/* Benefits */}
-            <div className="space-y-8 pt-6 border-t border-slate-200 text-black uppercase">
+            <div className="space-y-8 pt-6 border-t border-slate-200 dark:border-border text-foreground uppercase">
               <div className="flex items-center gap-3 text-sm">
                 <Truck className="" />
-                <div className="w-[1px] bg-black h-[20px]"></div>
+                <div className="w-[1px] bg-border h-[20px]"></div>
                 <span className="">
                   Miễn phí vận chuyển cho đơn từ 500.000đ
                 </span>
@@ -404,7 +404,7 @@ const ProductDetail = () => {
         </div>
 
         {/* Description */}
-        <div className="mt-16 border-t border-slate-200 pt-16">
+        <div className="mt-16 border-t border-slate-200 dark:border-border pt-16">
           <div className="w-fit text-2xl uppercase font-medium border-b-[2px] border-black pb-1">
             Mô tả sản phẩm
           </div>
@@ -425,7 +425,7 @@ const ProductDetail = () => {
               <span className="text-lg font-semibold">
                 {(product.averageRating || 0).toFixed(1)}
               </span>
-              <span className="text-slate-600">
+              <span className="text-muted-foreground">
                 ({product.totalRating || 0} đánh giá)
               </span>
             </div>
@@ -434,7 +434,7 @@ const ProductDetail = () => {
           {/* Filter Controls */}
           <div className="flex items-center gap-4 mb-6 flex-wrap">
             <div className="flex flex-col justify-start items-start md:items-center md:flex-row gap-2">
-              <span className="text-sm font-medium text-slate-700">
+              <span className="text-sm font-medium text-foreground">
                 Lọc theo:
               </span>
               <div className="flex gap-2 flex-wrap">
@@ -497,7 +497,7 @@ const ProductDetail = () => {
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-slate-50 rounded-xl p-6 border border-slate-200"
+                  className="bg-slate-50 dark:bg-card rounded-xl p-6 border border-slate-200 dark:border-border"
                 >
                   <div className="flex gap-4">
                     <Skeleton className="w-12 h-12 rounded-full" />
@@ -523,7 +523,7 @@ const ProductDetail = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="bg-slate-50 rounded-xl p-6 border border-border hover:shadow-md transition-shadow"
+                      className="bg-slate-50 dark:bg-card rounded-xl p-6 border border-border hover:shadow-md transition-shadow"
                     >
                       <div className="flex gap-4">
                         <Avatar className="w-12 h-12 ring-0 rounded-lg">
@@ -535,7 +535,7 @@ const ProductDetail = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-col justify-start items-start md:flex-row md:items-center md:justify-between mb-2">
                             <div className="flex flex-col items-start md:flex-row md:items-center gap-1 md:gap-3">
-                              <span className="font-medium text-slate-900">
+                              <span className="font-medium text-foreground">
                                 {review.user.name || "Anonymous"}
                               </span>
                               <div className="flex gap-0.5 mb-3 md:mb-0">
@@ -546,13 +546,13 @@ const ProductDetail = () => {
                                       "h-4 w-4",
                                       i < review.rating
                                         ? "fill-amber-400 text-amber-400"
-                                        : "fill-slate-300 text-slate-300"
+                                        : "fill-slate-300 text-muted-foreground"
                                     )}
                                   />
                                 ))}
                               </div>
                             </div>
-                            <span className="text-sm text-slate-500 flex-shrink-0">
+                            <span className="text-sm text-muted-foreground flex-shrink-0">
                               {new Date(review.createdAt).toLocaleDateString(
                                 "vi-VN",
                                 {
@@ -563,7 +563,7 @@ const ProductDetail = () => {
                               )}
                             </span>
                           </div>
-                          <p className="text-slate-700 leading-relaxed mb-4 whitespace-pre-line">
+                          <p className="text-muted-foreground leading-relaxed mb-4 whitespace-pre-line">
                             {review.comment}
                           </p>
                           {review.images && review.images.length > 0 && (
@@ -576,7 +576,7 @@ const ProductDetail = () => {
                                   <img
                                     src={img}
                                     alt={`Review ${idx + 1}`}
-                                    className="w-24 h-24 object-cover rounded-lg border-2 border-slate-200 group-hover:border-slate-400 transition-all group-hover:scale-105"
+                                    className="w-24 h-24 object-cover rounded-lg border-2 border-slate-200 dark:border-border group-hover:border-slate-400 dark:group-hover:border-input/40 transition-all group-hover:scale-105"
                                   />
                                 </div>
                               ))}
@@ -600,7 +600,7 @@ const ProductDetail = () => {
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  <span className="text-sm text-slate-600">
+                  <span className="text-sm text-muted-foreground">
                     Trang {reviewPage} / {reviewsQuery.data.paginate.totalPage}
                   </span>
                   <Button
@@ -623,7 +623,7 @@ const ProductDetail = () => {
           ) : (
             <div className="text-center py-12">
               <Star className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-500">Chưa có đánh giá nào</p>
+              <p className="text-muted-foreground">Chưa có đánh giá nào</p>
             </div>
           )}
         </div>

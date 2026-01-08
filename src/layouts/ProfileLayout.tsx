@@ -43,20 +43,20 @@ export const ProfileLayout = () => {
   }
 
   return (
-    <div className="bg-slate-50/60 min-h-screen pt-8 md:pt-20">
+    <div className="bg-background min-h-screen pt-8 md:pt-20">
       <div className="max-w-[1440px] mx-auto md:px-5 px-1">
         <div className="text-2xl uppercase font-medium border-b-[2px] border-black w-fit mb-3">
           Hồ sơ
         </div>
-        <div className="mb-3 text-slate-500">
+        <div className="mb-3 text-muted-foreground">
           Theo dõi, chỉnh sửa thông tin cá nhân của bạn
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <aside className="lg:col-span-1">
-            <div className="bg-white rounded-lg border-[1px] border-border p-4 sticky top-6">
+            <div className="bg-white dark:bg-card rounded-lg border-[1px] border-border p-4 sticky top-6">
               {/* User Profile Section */}
-              <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-200">
+              <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-200 dark:border-border">
                 <div className="h-12 w-12 rounded-md overflow-hidden bg-slate-100">
                   {profile?.avatar ? (
                     <img
@@ -72,17 +72,17 @@ export const ProfileLayout = () => {
                     />
                   ) : null}
                   <div
-                    className="h-full w-full flex items-center justify-center text-lg font-semibold text-slate-400 bg-gradient-to-br from-slate-100 to-slate-200"
+                    className="h-full w-full flex items-center justify-center text-lg font-semibold text-muted-foreground bg-gradient-to-br from-slate-100 to-slate-200 dark:from-input dark:to-border"
                     style={{ display: profile?.avatar ? "none" : "flex" }}
                   >
                     {profile?.name?.[0]?.toUpperCase() ?? "U"}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-slate-900 truncate">
+                  <p className="font-semibold text-foreground truncate">
                     {profile?.name ?? "User"}
                   </p>
-                  <p className="text-xs text-slate-500 truncate">
+                  <p className="text-xs text-muted-foreground truncate">
                     {profile?.email ?? ""}
                   </p>
                 </div>
@@ -101,7 +101,7 @@ export const ProfileLayout = () => {
                         "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                         isActive
                           ? "bg-primary text-white"
-                          : "text-slate-700 hover:bg-slate-100"
+                          : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-input/20"
                       )}
                     >
                       <Icon className="h-5 w-5" />
@@ -115,7 +115,7 @@ export const ProfileLayout = () => {
 
           {/* Main Content */}
           <main className="lg:col-span-3">
-            <div className="bg-white rounded-lg border-[1px] border-border p-6">
+            <div className="bg-white dark:bg-card rounded-lg border-[1px] border-border p-6">
               <Outlet />
             </div>
           </main>

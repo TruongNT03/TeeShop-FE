@@ -350,7 +350,7 @@ const Checkout = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="max-w-[1440px] mx-auto bg-stone-100 min-h-screen py-8 sm:py-12 px-1 md:px-5 md:mt-8"
+      className="max-w-[1440px] mx-auto bg-background min-h-screen py-8 sm:py-12 px-1 md:px-5 md:mt-8"
     >
       {/* Header */}
 
@@ -463,7 +463,7 @@ const Checkout = () => {
                 className={`border rounded-lg p-3 sm:p-4 cursor-pointer transition ${
                   selectedPayment === "cod"
                     ? "border-primary bg-primary/5"
-                    : "border-gray-200 hover:border-gray-300"
+                    : "border-border hover:border-input/40"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -473,7 +473,7 @@ const Checkout = () => {
                       <div className="font-medium text-sm sm:text-base">
                         Thanh toán khi nhận hàng
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-500">
+                      <div className="text-xs sm:text-sm text-muted-foreground">
                         Thanh toán khi bạn nhận được đơn hàng
                       </div>
                     </div>
@@ -489,7 +489,7 @@ const Checkout = () => {
                 className={`border rounded-lg p-3 sm:p-4 cursor-pointer transition ${
                   selectedPayment === "qr"
                     ? "border-primary bg-primary/5"
-                    : "border-gray-200 hover:border-gray-300"
+                    : "border-border hover:border-input/40"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -499,7 +499,7 @@ const Checkout = () => {
                       <div className="font-medium text-sm sm:text-base">
                         Thanh toán qua QR Code
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-500">
+                      <div className="text-xs sm:text-sm text-muted-foreground">
                         Thanh toán qua mã QR (VNPay, Momo, ZaloPay)
                       </div>
                     </div>
@@ -577,7 +577,7 @@ const Checkout = () => {
 
             <div className="space-y-2 text-xs sm:text-sm mb-3 sm:mb-4">
               <div className="flex justify-between">
-                <span className="text-gray-600">Tạm tính</span>
+                <span className="text-muted-foreground">Tạm tính</span>
                 <span className="font-medium">{formatPriceVND(subtotal)}</span>
               </div>
             </div>
@@ -602,7 +602,7 @@ const Checkout = () => {
                                 )}`}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-600 line-clamp-1">
+                        <p className="text-xs text-muted-foreground line-clamp-1">
                           {selectedVoucher.campaignName}
                         </p>
                         <p className="text-xs sm:text-sm text-green-700 font-semibold mt-1">
@@ -613,7 +613,7 @@ const Checkout = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-gray-500 hover:text-red-600 flex-shrink-0"
+                      className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-muted-foreground hover:text-red-600 flex-shrink-0"
                       onClick={handleRemoveVoucher}
                     >
                       <X className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -704,11 +704,11 @@ const Checkout = () => {
 
               <div className="space-y-2 text-xs sm:text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Order Total:</span>
+                  <span className="text-muted-foreground">Order Total:</span>
                   <span className="font-semibold">{formatPriceVND(total)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Items:</span>
+                  <span className="text-muted-foreground">Items:</span>
                   <span>{checkoutItems.length}</span>
                 </div>
               </div>
@@ -763,7 +763,7 @@ const Checkout = () => {
                 <>
                   <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
                     <div className="text-center space-y-3 sm:space-y-4">
-                      <div className="text-xs sm:text-sm text-gray-600">
+                      <div className="text-xs sm:text-sm text-muted-foreground">
                         Hoặc bạn có thể quét QR sau ở trang đơn hàng của bạn.
                       </div>
                       <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
@@ -774,7 +774,7 @@ const Checkout = () => {
                       </div>
 
                       {/* QR Image */}
-                      <div className="bg-white p-2 sm:p-4 rounded-lg inline-block mx-auto">
+                      <div className="bg-white dark:bg-card p-2 sm:p-4 rounded-lg inline-block mx-auto">
                         <img
                           src={qrImageUrl}
                           alt="QR Code"
@@ -782,7 +782,7 @@ const Checkout = () => {
                         />
                       </div>
 
-                      <div className="space-y-2 text-xs sm:text-sm text-gray-600">
+                      <div className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                         <p>
                           Tổng thanh toán:{" "}
                           <span className="font-semibold text-primary text-sm sm:text-base">
@@ -859,13 +859,13 @@ const Checkout = () => {
 
                   <div className="space-y-2 text-xs sm:text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Order Total:</span>
+                      <span className="text-muted-foreground">Order Total:</span>
                       <span className="font-semibold">
                         {formatPriceVND(total)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Items:</span>
+                      <span className="text-muted-foreground">Items:</span>
                       <span>{checkoutItems.length}</span>
                     </div>
                   </div>
@@ -907,7 +907,7 @@ const Checkout = () => {
                       <h3 className="font-semibold text-base sm:text-xl mb-1 sm:mb-2">
                         Đang tạo mã QR
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-600">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         Vui lòng đợi trong giây lát...
                       </p>
                     </div>
@@ -947,7 +947,7 @@ const Checkout = () => {
                   className={`border rounded-lg p-3 sm:p-4 cursor-pointer transition hover:border-primary ${
                     selectedAddressId === addr.id
                       ? "border-primary bg-primary/10"
-                      : "border-gray-200"
+                      : "border-border"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -955,7 +955,7 @@ const Checkout = () => {
                       <p className="font-medium text-xs sm:text-sm">
                         {addr.name} - {addr.phoneNumber}
                       </p>
-                      <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                         {addr.detail}
                       </p>
                       {addr.isDefault && (
@@ -970,8 +970,8 @@ const Checkout = () => {
                   </div>
                 </div>
               ))
-            ) : (
-              <div className="text-center py-12 text-gray-500">
+              ) : (
+              <div className="text-center py-12 text-muted-foreground">
                 <MapPin className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
                 <p className="font-medium text-sm">Chưa có địa chỉ nào</p>
                 <p className="text-xs sm:text-sm mt-1">
@@ -1028,7 +1028,7 @@ const Checkout = () => {
                     } ${
                       selectedVoucher?.id === voucher.id
                         ? "border-primary bg-primary/10"
-                        : "border-gray-200"
+                        : "border-border"
                     }`}
                   >
                     <div className="flex items-start gap-2 sm:gap-3">
@@ -1066,10 +1066,10 @@ const Checkout = () => {
                                   : `-${formatPriceVND(voucher.discountValue)}`}
                               </span>
                             </div>
-                            <p className="text-xs sm:text-sm font-semibold text-gray-700 mt-1">
+                            <p className="text-xs sm:text-sm font-semibold text-foreground mt-1">
                               {voucher.campaignName}
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                               {voucher.description}
                             </p>
                           </div>
@@ -1077,7 +1077,7 @@ const Checkout = () => {
                             <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
                           )}
                         </div>
-                        <div className="flex items-center justify-between text-xs text-gray-500 mt-2 pt-2 border-t gap-1">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground mt-2 pt-2 border-t gap-1">
                           <span>
                             Đơn tối thiểu:{" "}
                             {formatPriceVND(voucher.minOrderValue)}
@@ -1105,7 +1105,7 @@ const Checkout = () => {
                 );
               })
             ) : (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-muted-foreground">
                 <Ticket className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
                 <p className="font-medium text-sm">Chưa có voucher nào</p>
                 <p className="text-xs sm:text-sm mt-1">

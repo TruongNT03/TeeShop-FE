@@ -17,10 +17,7 @@ const UserLayout = () => {
         </ChatProvider>
       </AdminChatProvider>
       <main
-        className="
-                    bg-stone-100 pt-[60px]
-                      md:pt-[88px]
-                      "
+        className="bg-background pt-[60px] md:pt-[88px]"
       >
         <Outlet />
       </main>

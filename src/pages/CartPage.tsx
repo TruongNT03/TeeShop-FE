@@ -123,7 +123,7 @@ const CartPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeIn" }}
-      className="max-w-[1440px] px-1 md:px-5 sm:px-8 mx-auto py-8 sm:py-12 bg-stone-100 min-h-screen"
+      className="max-w-[1440px] px-1 md:px-5 sm:px-8 mx-auto py-8 sm:py-12 bg-background min-h-screen"
     >
       <div className="flex flex-col items-start text-2xl sm:text-3xl md:text-4xl gap-4 md:my-8 sm:my-12 my-3">
         <div className="uppercase w-fit border-black border-b-[2px]">
@@ -139,7 +139,7 @@ const CartPage = () => {
           <Card className="hidden md:block overflow-x-auto px-5 pb-24">
             <table className="w-full">
               <thead className="">
-                <tr className="bg-white rounded-2xl border-border">
+                <tr className="bg-white dark:bg-card rounded-2xl border-border">
                   <th className="py-4 pl-4 sm:pl-5 text-left rounded-l-sm w-12 border-b-1">
                     <Checkbox
                       checked={isAllSelected}
@@ -165,7 +165,7 @@ const CartPage = () => {
               </thead>
               <tbody>
                 {listCartItems.map((cartItem) => (
-                  <tr key={cartItem.id} className="bg-white">
+                  <tr key={cartItem.id} className="bg-white dark:bg-card">
                     <td className="p-4 sm:p-5 max-w-[40px] rounded-l-sm border-b-1">
                       <Checkbox
                         disabled={
@@ -382,7 +382,7 @@ const CartPage = () => {
 
           {/* Mobile View - Cards */}
           <div className="md:hidden space-y-4">
-            <div className="bg-white p-4 rounded-lg mb-4 border border-border">
+            <div className="bg-white dark:bg-card p-4 rounded-lg mb-4 border border-border">
               <div className="flex items-center gap-3 ">
                 <Checkbox
                   checked={isAllSelected}
@@ -393,7 +393,7 @@ const CartPage = () => {
               </div>
             </div>
             {listCartItems.map((cartItem) => (
-              <Card key={cartItem.id} className="rounded-lg bg-white">
+              <Card key={cartItem.id} className="rounded-lg bg-white dark:bg-card">
                 <CardContent className="">
                   <div className="flex justify-between">
                     <Checkbox
@@ -497,15 +497,15 @@ const CartPage = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-2 border-t pt-3 text-sm">
+                    <div className="space-y-2 border-t pt-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Đơn giá:</span>
+                      <span className="text-muted-foreground">Đơn giá:</span>
                       <span className="font-medium">
                         {formatPriceVND(cartItem.productVariant.price)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Số lượng:</span>
+                      <span className="text-muted-foreground">Số lượng:</span>
                       <Counter
                         initValue={cartItem.quantity}
                         onChange={(newQuantity) =>
@@ -514,7 +514,7 @@ const CartPage = () => {
                       />
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Thành tiền:</span>
+                      <span className="text-muted-foreground">Thành tiền:</span>
                       <span className="font-medium text-base">
                         {formatPriceVND(
                           cartItem.productVariant.price * cartItem.quantity
@@ -530,20 +530,20 @@ const CartPage = () => {
 
         {/* Summary Section */}
         <div className="w-full lg:flex-[1] relative">
-          <Card className="rounded-lg sticky top-4 md:top-40 bg-white">
+          <Card className="rounded-lg sticky top-4 md:top-40 bg-white dark:bg-card">
             <CardHeader className="font-medium text-lg">
               Tóm tắt đơn hàng:
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4 mb-6">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Tổng tiền:</span>
+                  <span className="text-muted-foreground">Tổng tiền:</span>
                   <span className="font-semibold">
                     {formatPriceVND(totalAmount)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Tổng số lượng:</span>
+                  <span className="text-muted-foreground">Tổng số lượng:</span>
                   <span className="font-semibold">{totalQuantity}</span>
                 </div>
               </div>

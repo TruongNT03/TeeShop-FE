@@ -138,11 +138,11 @@ export const ProfileInfo: React.FC = () => {
     }
   };
 
-  if (isLoading) {
+    if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="animate-pulse h-28 bg-slate-100 rounded-lg" />
-        <div className="animate-pulse h-40 bg-slate-100 rounded-lg" />
+        <div className="animate-pulse h-28 bg-slate-100 dark:bg-card rounded-lg" />
+        <div className="animate-pulse h-40 bg-slate-100 dark:bg-card rounded-lg" />
       </div>
     );
   }
@@ -170,17 +170,17 @@ export const ProfileInfo: React.FC = () => {
     return (
       <div className="text-center">
         <h2 className="text-lg font-medium">No profile found</h2>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-muted-foreground">
           Create your profile to get started.
         </p>
       </div>
     );
   }
 
-  return (
+    return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-slate-900">Thông tin cá nhân</h1>
+        <h1 className="text-2xl font-bold text-foreground">Thông tin cá nhân</h1>
         {!isEditing ? (
           <Button onClick={() => setIsEditing(true)}>Chỉnh sửa</Button>
         ) : (
@@ -215,9 +215,9 @@ export const ProfileInfo: React.FC = () => {
         className="space-y-6"
       >
         {/* Avatar Section */}
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-6 pb-6 border-b">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 pb-6 border-b">
           <div className="relative">
-            <div className="h-32 w-32 rounded-xl overflow-hidden bg-slate-100">
+            <div className="h-32 w-32 rounded-xl overflow-hidden bg-slate-100 dark:bg-card">
               {(isEditing ? editedData.avatar : profile.avatar) ? (
                 <img
                   src={isEditing ? editedData.avatar : formData.avatar}
@@ -225,7 +225,7 @@ export const ProfileInfo: React.FC = () => {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="h-full w-full flex items-center justify-center text-4xl font-semibold text-slate-400 bg-gradient-to-br from-slate-100 to-slate-200">
+                <div className="h-full w-full flex items-center justify-center text-4xl font-semibold text-muted-foreground bg-gradient-to-br from-slate-100 to-slate-200 dark:from-input dark:to-border">
                   {(isEditing
                     ? editedData.name
                     : formData.name)?.[0]?.toUpperCase() ?? "U"}
@@ -249,10 +249,10 @@ export const ProfileInfo: React.FC = () => {
           </div>
           <div className="flex-1 space-y-3">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-foreground">
                 {formData.name || "Chưa cập nhật"}
               </h2>
-              <p className="text-sm text-slate-500 mt-1">{user.email}</p>
+              <p className="text-sm text-muted-foreground mt-1">{user.email}</p>
             </div>
             {isEditing && (
               <div>
@@ -283,7 +283,7 @@ export const ProfileInfo: React.FC = () => {
                     </>
                   )}
                 </Button>
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-muted-foreground mt-2">
                   Định dạng: JPG, PNG. Kích thước tối đa: 2MB
                 </p>
               </div>
@@ -305,7 +305,7 @@ export const ProfileInfo: React.FC = () => {
                 placeholder="Nhập họ và tên"
               />
             ) : (
-              <p className="text-sm text-slate-900 py-2">
+              <p className="text-sm text-foreground py-2">
                 {formData.name || "Chưa cập nhật"}
               </p>
             )}
@@ -323,7 +323,7 @@ export const ProfileInfo: React.FC = () => {
                 placeholder="Nhập số điện thoại"
               />
             ) : (
-              <p className="text-sm text-slate-900 py-2">
+              <p className="text-sm text-foreground py-2">
                 {formData.phoneNumber || "Chưa cập nhật"}
               </p>
             )}
@@ -348,7 +348,7 @@ export const ProfileInfo: React.FC = () => {
                 <option value="other">Khác</option>
               </select>
             ) : (
-              <p className="text-sm text-slate-900 py-2">
+              <p className="text-sm text-foreground py-2">
                 {formData.gender === "male"
                   ? "Nam"
                   : formData.gender === "female"
@@ -360,12 +360,12 @@ export const ProfileInfo: React.FC = () => {
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <p className="text-sm text-slate-500 py-2">{user.email}</p>
+            <p className="text-sm text-muted-foreground py-2">{user.email}</p>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="createdAt">Ngày tham gia</Label>
-            <p className="text-sm text-slate-500 py-2">
+            <p className="text-sm text-muted-foreground py-2">
               {new Date(user.createdAt).toLocaleDateString("vi-VN")}
             </p>
           </div>

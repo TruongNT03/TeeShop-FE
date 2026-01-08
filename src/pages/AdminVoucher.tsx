@@ -62,13 +62,14 @@ const AdminVoucher = () => {
 
   const getTypeColor = (type: "fixed" | "percent") => {
     return type === "percent"
-      ? "bg-blue-100 text-blue-800"
-      : "bg-green-100 text-green-800";
+      ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+      : "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
   };
 
   const getStatusColor = (expiryAt: string) => {
-    if (new Date(expiryAt) < new Date()) return "bg-red-100 text-red-800";
-    return "bg-green-100 text-green-800";
+    if (new Date(expiryAt) < new Date())
+      return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
+    return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
   };
 
   const getStatusText = (expiryAt: string) => {
@@ -101,7 +102,7 @@ const AdminVoucher = () => {
         </Card>
         <Card className="flex-1 p-4 shadow-none">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-100 rounded-lg">
+            <div className="p-3 bg-green-100 rounded-lg dark:bg-green-900/20">
               <Tag className="w-5 h-5 text-green-600" />
             </div>
             <div>
@@ -121,7 +122,7 @@ const AdminVoucher = () => {
         </Card>
         <Card className="flex-1 p-4 shadow-none">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-100 rounded-lg">
+            <div className="p-3 bg-blue-100 rounded-lg dark:bg-blue-900/20">
               <Tag className="w-5 h-5 text-blue-600" />
             </div>
             <div>
@@ -138,7 +139,7 @@ const AdminVoucher = () => {
         </Card>
         <Card className="flex-1 p-4 shadow-none">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-orange-100 rounded-lg">
+            <div className="p-3 bg-orange-100 rounded-lg dark:bg-orange-900/20">
               <Tag className="w-5 h-5 text-orange-600" />
             </div>
             <div>
@@ -201,7 +202,7 @@ const AdminVoucher = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute top-full left-0 mt-2 min-w-[180px] bg-white border rounded-lg shadow-xl z-50 overflow-hidden"
+                  className="absolute top-full left-0 mt-2 min-w-[180px] bg-white border rounded-lg shadow-xl z-50 overflow-hidden dark:bg-popover dark:border-border"
                 >
                   <button
                     type="button"

@@ -81,10 +81,8 @@ export const ProfileChangePassword: React.FC = () => {
           <Lock className="h-8 w-8 text-primary" />
         </div>
         <div>
-          <h1 className="md:text-2xl font-bold text-slate-900">Đổi mật khẩu</h1>
-          <p className="text-xs md:text-sm text-slate-500">
-            Cập nhật mật khẩu của bạn để bảo mật tài khoản
-          </p>
+          <h1 className="md:text-2xl font-bold text-foreground">Đổi mật khẩu</h1>
+          <p className="text-xs md:text-sm text-muted-foreground">Cập nhật mật khẩu của bạn để bảo mật tài khoản</p>
         </div>
       </div>
 
@@ -114,7 +112,7 @@ export const ProfileChangePassword: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showCurrentPassword ? (
                 <EyeOff className="h-4 w-4" />
@@ -142,7 +140,7 @@ export const ProfileChangePassword: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowNewPassword(!showNewPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showNewPassword ? (
                 <EyeOff className="h-4 w-4" />

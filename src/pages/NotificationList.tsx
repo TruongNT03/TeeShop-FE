@@ -83,10 +83,8 @@ const NotificationList = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button> */}
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-slate-900">Thông báo</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Tất cả thông báo của bạn
-          </p>
+          <h1 className="text-2xl font-bold text-foreground">Thông báo</h1>
+          <p className="text-sm text-muted-foreground mt-1">Tất cả thông báo của bạn</p>
         </div>
       </div>
 
@@ -111,8 +109,8 @@ const NotificationList = () => {
             <div
               key={notification.id}
               className={cn(
-                "py-5 hover:bg-slate-50 transition-colors cursor-pointer flex gap-4 items-start",
-                !notification.isRead && "bg-slate-50/50"
+                "py-5 hover:bg-slate-50 dark:hover:bg-input/20 transition-colors cursor-pointer flex gap-4 items-start",
+                !notification.isRead && "bg-slate-50/50 dark:bg-popover/40"
               )}
               onClick={() => handleNotificationClick(notification)}
             >
@@ -124,7 +122,7 @@ const NotificationList = () => {
                   <p
                     className={cn(
                       "text-base font-medium leading-none",
-                      !notification.isRead ? "text-slate-900" : "text-slate-600"
+                      !notification.isRead ? "text-foreground" : "text-muted-foreground"
                     )}
                   >
                     {notification.title}
@@ -133,8 +131,8 @@ const NotificationList = () => {
                     <div className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0 mt-1" />
                   )}
                 </div>
-                <p className="text-sm text-slate-500">{notification.content}</p>
-                <div className="flex items-center gap-1 text-xs text-slate-400">
+                <p className="text-sm text-muted-foreground">{notification.content}</p>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />
                   {formatTime(notification.createdAt)}
                 </div>
@@ -143,7 +141,7 @@ const NotificationList = () => {
           ))}
         </div>
       ) : (
-        <div className="p-12 text-center text-slate-500">
+        <div className="p-12 text-center text-muted-foreground">
           <Bell className="h-12 w-12 mx-auto mb-4 opacity-20" />
           <p className="text-base font-medium">No notifications</p>
           <p className="text-sm mt-1">You're all caught up!</p>

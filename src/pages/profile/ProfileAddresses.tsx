@@ -156,10 +156,10 @@ export const ProfileAddresses: React.FC = () => {
             <MapPin className="h-8 w-8 text-primary" />
           </div>
           <div>
-            <h1 className="md:text-2xl font-bold text-slate-900">
+            <h1 className="md:text-2xl font-bold text-foreground">
               Địa chỉ nhận hàng
             </h1>
-            <p className="text-xs md:text-sm text-slate-500">
+            <p className="text-xs md:text-sm text-muted-foreground">
               Quản lý địa chỉ giao hàng của bạn
             </p>
           </div>
@@ -188,11 +188,11 @@ export const ProfileAddresses: React.FC = () => {
                   duration: 0.3,
                 }}
                 className={cn(
-                  "rounded-lg border-2 p-5",
-                  isDefault
-                    ? "border-primary bg-primary/10 shadow-primary/20"
-                    : "border-slate-200 bg-white shadow-sm hover:shadow-md hover:border-slate-300"
-                )}
+                    "rounded-lg border-2 p-5",
+                    isDefault
+                      ? "border-primary bg-primary/10 shadow-primary/20"
+                      : "border-slate-200 dark:border-border bg-white dark:bg-card shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-input/40"
+                  )}
               >
                 {isDefault && (
                   <div className="flex items-center gap-2 mb-4 pb-3 border-b border-primary/20">
@@ -205,15 +205,15 @@ export const ProfileAddresses: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="mb-3">
-                      <p className="font-semibold text-slate-900 text-base">
+                      <p className="font-semibold text-foreground text-base">
                         {address.name}
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground">
                         SĐT: {address.phoneNumber}
                       </p>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground">
                         Địa chỉ: {address.detail}
                       </p>
                     </div>
@@ -253,11 +253,11 @@ export const ProfileAddresses: React.FC = () => {
 
       {addresses.length === 0 && (
         <div className="text-center py-12">
-          <MapPin className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-slate-900">
+          <MapPin className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-foreground">
             Chưa có địa chỉ nào
           </h3>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             Thêm địa chỉ giao hàng để thanh toán nhanh hơn!
           </p>
         </div>

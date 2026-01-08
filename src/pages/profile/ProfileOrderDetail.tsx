@@ -137,7 +137,7 @@ export const ProfileOrderDetail: React.FC = () => {
     return (
       <div className="text-center py-12">
         <Package className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-slate-900">
+        <h3 className="text-lg font-medium text-foreground">
           Không tìm thấy đơn hàng
         </h3>
         <button
@@ -186,15 +186,15 @@ export const ProfileOrderDetail: React.FC = () => {
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate("/profile/orders")}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-slate-100 dark:hover:bg-input/20 rounded-lg transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-foreground">
             Chi tiết đơn hàng
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             #{order.id.substring(0, 8).toUpperCase()}
           </p>
         </div>
@@ -217,13 +217,13 @@ export const ProfileOrderDetail: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-slate-500">Ngày đặt hàng</p>
+                <p className="text-sm text-muted-foreground">Ngày đặt hàng</p>
                 <p className="font-medium">
                   {convertDateTime(order.createdAt)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-slate-500">Tổng tiền</p>
+                <p className="text-sm text-muted-foreground">Tổng tiền</p>
                 <p className="font-medium text-lg">
                   {formatPriceVND(order.amount)}
                 </p>
@@ -252,12 +252,12 @@ export const ProfileOrderDetail: React.FC = () => {
               <CardContent>
                 <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-4 sm:p-6 rounded-lg">
                   <div className="text-center space-y-3 sm:space-y-4">
-                    <div className="text-xs sm:text-sm text-gray-600">
+                    <div className="text-xs sm:text-sm text-muted-foreground">
                       Quét mã QR bên dưới để hoàn tất thanh toán
                     </div>
 
                     {/* QR Image */}
-                    <div className="bg-white p-3 sm:p-4 rounded-lg inline-block mx-auto">
+                    <div className="bg-white dark:bg-card p-3 sm:p-4 rounded-lg inline-block mx-auto">
                       <img
                         src={qrImageUrl}
                         alt="QR Code"
@@ -265,7 +265,7 @@ export const ProfileOrderDetail: React.FC = () => {
                       />
                     </div>
 
-                    <div className="space-y-2 text-xs sm:text-sm text-gray-600">
+                    <div className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                       <p>
                         Tổng thanh toán:{" "}
                         <span className="font-semibold text-primary text-sm sm:text-base">
@@ -297,22 +297,22 @@ export const ProfileOrderDetail: React.FC = () => {
             <CardTitle className="text-lg">Địa chỉ giao hàng</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-start gap-3">
-              <User className="h-5 w-5 text-slate-400 mt-0.5" />
+              <div className="flex items-start gap-3">
+              <User className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="font-medium">{order.address.name}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Phone className="h-5 w-5 text-slate-400 mt-0.5" />
+              <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
-                <p className="text-slate-700">{order.address.phoneNumber}</p>
+                <p className="text-muted-foreground">{order.address.phoneNumber}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
+              <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
-                <p className="text-slate-700">{order.address.detail}</p>
+                <p className="text-muted-foreground">{order.address.detail}</p>
               </div>
             </div>
           </CardContent>
@@ -337,9 +337,9 @@ export const ProfileOrderDetail: React.FC = () => {
                 <div key={item.id}>
                   {index > 0 && <Separator className="my-4" />}
                   <div
-                    className={`flex justify-between items-end gap-10 md:gap-4 hover:bg-slate-50 mb-5 md:p-2 rounded-lg transition-colors`}
+                    className={`flex justify-between items-end gap-10 md:gap-4 hover:bg-slate-50 dark:hover:bg-input/40 mb-5 md:p-2 rounded-lg transition-colors`}
                   >
-                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-slate-100 dark:bg-card flex-shrink-0">
                       {item.product.productImages?.[0]?.url && (
                         <img
                           src={item.product.productImages[0].url}
@@ -351,7 +351,7 @@ export const ProfileOrderDetail: React.FC = () => {
                     {!isMobile && (
                       <div className="flex-1 min-w-0">
                         <h4
-                          className="font-medium text-slate-900 truncate hover:text-primary cursor-pointer"
+                          className="font-medium text-foreground truncate hover:text-primary cursor-pointer"
                           onClick={() =>
                             navigate(`/product/${item.product.id}`)
                           }
@@ -359,19 +359,19 @@ export const ProfileOrderDetail: React.FC = () => {
                           {item.product.name}
                         </h4>
                         {item.productVariant.variantValues.length > 0 && (
-                          <p className="text-sm text-slate-500 mt-1">
+                          <p className="text-sm text-muted-foreground mt-1">
                             {item.productVariant.variantValues
                               .map((vv) => `${vv.variant}: ${vv.value}`)
                               .join(" / ")}
                           </p>
                         )}
                         <div className="flex items-center gap-4 mt-2">
-                          <p className="text-sm text-slate-600">
+                          <p className="text-sm text-muted-foreground">
                             Số lượng:{" "}
                             <span className="font-medium">{item.quantity}</span>
                           </p>
-                          <span className="text-slate-400">•</span>
-                          <p className="font-medium text-slate-900">
+                          <span className="text-muted-foreground">•</span>
+                          <p className="font-medium text-foreground">
                             {formatPriceVND(item.productVariant.price)}
                           </p>
                         </div>
@@ -379,7 +379,7 @@ export const ProfileOrderDetail: React.FC = () => {
                     )}
 
                     <div className="text-right flex flex-col items-end gap-2">
-                      <p className="font-semibold text-slate-900">
+                      <p className="font-semibold text-foreground">
                         {formatPriceVND(
                           item.productVariant.price * item.quantity
                         )}
@@ -408,25 +408,25 @@ export const ProfileOrderDetail: React.FC = () => {
                   {isMobile && (
                     <div className="flex-1 min-w-0">
                       <h4
-                        className="font-medium text-slate-900 truncate hover:text-primary cursor-pointer"
+                        className="font-medium text-foreground truncate hover:text-primary cursor-pointer"
                         onClick={() => navigate(`/product/${item.product.id}`)}
                       >
                         {item.product.name}
                       </h4>
                       {item.productVariant.variantValues.length > 0 && (
-                        <p className="text-sm text-slate-500 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {item.productVariant.variantValues
                             .map((vv) => `${vv.variant}: ${vv.value}`)
                             .join(" / ")}
                         </p>
                       )}
                       <div className="flex items-center gap-4 mt-2">
-                        <p className="text-sm text-slate-600">
-                          Số lượng:{" "}
+                        <p className="text-sm text-muted-foreground">
+                          Số lượng: {" "}
                           <span className="font-medium">{item.quantity}</span>
                         </p>
-                        <span className="text-slate-400">•</span>
-                        <p className="font-medium text-slate-900">
+                        <span className="text-muted-foreground">•</span>
+                        <p className="font-medium text-foreground">
                           {formatPriceVND(item.productVariant.price)}
                         </p>
                       </div>
@@ -440,7 +440,7 @@ export const ProfileOrderDetail: React.FC = () => {
 
             {/* Order Summary */}
             <div className="space-y-2">
-              <div className="flex justify-between text-slate-600">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Tạm tính</span>
                 <span>{formatPriceVND(order.amount)}</span>
               </div>
@@ -465,12 +465,12 @@ export const ProfileOrderDetail: React.FC = () => {
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-slate-600">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Phí vận chuyển</span>
                 <span>Miễn phí</span>
               </div>
               <Separator className="my-3" />
-              <div className="flex justify-between text-lg font-medium text-slate-900">
+              <div className="flex justify-between text-lg font-medium text-foreground">
                 <span>Tổng cộng</span>
                 <span className="text-primary">
                   {formatPriceVND(order.amount)}

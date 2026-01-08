@@ -54,7 +54,7 @@ const Home = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeIn" }}
-      className="w-full bg-stone-100 overflow-x-hidden"
+      className="w-full bg-background overflow-x-hidden"
     >
       <Banner />
       <div

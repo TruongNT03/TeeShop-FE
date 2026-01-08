@@ -145,7 +145,7 @@ const ProductList = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="min-h-screen bg-stone-100 pt-6 md: mt-8"
+      className="min-h-screen bg-background pt-6 md: mt-8"
     >
       <AnimatePresence>
         {isMobile && isFilterOpen && (
@@ -165,7 +165,7 @@ const ProductList = () => {
                 duration: 0.3,
                 ease: "easeInOut",
               }}
-              className="fixed w-[75%] h-screen top-0 bg-white z-[200] right-0"
+              className="fixed w-[75%] h-screen top-0 bg-white dark:bg-card z-[200] right-0"
             >
               <div className="flex items-center justify-between">
                 <X
@@ -268,7 +268,7 @@ const ProductList = () => {
                           }
                           className="w-full"
                         />
-                        <div className="flex items-center justify-between text-sm text-slate-600">
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
                           <span>{formatPriceVND(priceRange[0])}</span>
                           <span>-</span>
                           <span>{formatPriceVND(priceRange[1])}</span>
@@ -372,21 +372,21 @@ const ProductList = () => {
           "
           >
             <div>
-              <h1 className="w-fit text-2xl font-medium uppercase text-slate-900 mb-2 border-black border-b-[2px]">
+              <h1 className="w-fit text-2xl font-medium uppercase text-foreground mb-2 border-black border-b-[2px]">
                 Sản Phẩm
               </h1>
-              <p className="text-slate-600">
+              <p className="text-muted-foreground">
                 Tìm thấy {sortedProducts.length} sản phẩm
               </p>
             </div>
 
             {/* Sort & Filter Toggle */}
-            <div className="flex items-center gap-4 text-black flex-col\">
+            <div className="flex items-center gap-4 text-foreground flex-col\">
               {/* Custom Sort Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setShowSortDropdown(!showSortDropdown)}
-                  className="w-[200px] bg-white px-4 py-2 cursor-pointer font-medium border rounded-lg flex items-center justify-between hover:border-slate-400 hover:shadow-sm transition-all duration-200"
+                  className="w-[200px] bg-white dark:bg-card px-4 py-2 cursor-pointer font-medium border rounded-lg flex items-center justify-between hover:border-slate-400 dark:hover:border-input/40 hover:shadow-sm transition-all duration-200"
                 >
                   <span className="text-sm">
                     {sortBy === "newest" && "Mới nhất"}
@@ -410,7 +410,7 @@ const ProductList = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full left-0 mt-2 w-full bg-white border rounded-lg shadow-xl z-20 overflow-hidden"
+                      className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-popover border border-border rounded-lg shadow-xl z-20 overflow-hidden"
                     >
                       {[
                         { value: "newest", label: "Mới nhất" },
@@ -460,10 +460,10 @@ const ProductList = () => {
               placeholder="Tìm kiếm sản phẩm..."
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
-              className="w-full bg-white px-4 py-3 pl-10 border rounded-lg outline-none"
+              className="w-full bg-white dark:bg-input/30 px-4 py-3 pl-10 border rounded-lg outline-none"
             />
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -580,7 +580,7 @@ const ProductList = () => {
                           }
                           className="w-full"
                         />
-                        <div className="flex items-center justify-between text-sm text-slate-600">
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
                           <span>{formatPriceVND(priceRange[0])}</span>
                           <span>-</span>
                           <span>{formatPriceVND(priceRange[1])}</span>
@@ -683,12 +683,12 @@ const ProductList = () => {
               </div>
             ) : sortedProducts.length === 0 ? (
               <Card className="p-12 text-center shadow-none">
-                <div className="text-slate-400 mb-4">
+                <div className="text-muted-foreground mb-4">
                   <Filter className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-xl font-semibold text-slate-600 mb-2">
+                  <h3 className="text-xl font-semibold text-muted-foreground mb-2">
                     Không tìm thấy sản phẩm
                   </h3>
-                  <p className="text-slate-500">
+                  <p className="text-muted-foreground">
                     Thử điều chỉnh bộ lọc hoặc xóa một số tiêu chí
                   </p>
                 </div>
