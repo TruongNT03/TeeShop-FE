@@ -504,6 +504,34 @@ export const ProductForm = ({
               <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
+                  name="discountPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel >
+                        Giá khuyến mãi chung (VNĐ)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+
+                          placeholder="Nhập giá giảm (để trống nếu không giảm giá)"
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === ""
+                                ? null
+                                : e.target.valueAsNumber
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="hasVariant"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -543,31 +571,6 @@ export const ProductForm = ({
                               placeholder="100000"
                               onChange={(e) =>
                                 field.onChange(e.target.valueAsNumber)
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="discountPrice"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Giá giảm (VNĐ)</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="number"
-                              placeholder="Nhập giá đã giảm"
-                              value={field.value ?? ""}
-                              onChange={(e) =>
-                                field.onChange(
-                                  e.target.value === ""
-                                    ? null
-                                    : e.target.valueAsNumber
-                                )
                               }
                             />
                           </FormControl>
@@ -733,7 +736,6 @@ export const ProductForm = ({
                             <TableHead>Biến thể</TableHead>
                             <TableHead>Giá</TableHead>
 
-                            <TableHead>Giá giảm</TableHead>
                             <TableHead>Tồn kho</TableHead>
                             <TableHead>SKU</TableHead>
                             <TableHead>
@@ -759,28 +761,6 @@ export const ProductForm = ({
                                       className="w-28"
                                       onChange={(e) =>
                                         field.onChange(e.target.valueAsNumber)
-                                      }
-                                    />
-                                  )}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <FormField
-                                  control={form.control}
-                                  name={`productVariants.${index}.discountPrice`}
-                                  render={({ field }) => (
-                                    <Input
-                                      {...field}
-                                      type="number"
-                                      placeholder="0"
-                                      className="w-28"
-                                      value={field.value ?? ""}
-                                      onChange={(e) =>
-                                        field.onChange(
-                                          e.target.value === ""
-                                            ? null
-                                            : e.target.valueAsNumber
-                                        )
                                       }
                                     />
                                   )}
