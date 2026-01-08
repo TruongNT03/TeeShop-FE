@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import type { NotificationResponseDto } from "@/api";
 import { useChatContext } from "@/contexts/ChatContext";
 import { useAdminChatContext } from "@/contexts/AdminChatContext";
+import { Badge } from "./ui/badge";
 
 const Notification = () => {
   const navigate = useNavigate();
@@ -149,9 +150,9 @@ const Notification = () => {
         >
           <Bell className="w-5 group-hover:text-primary transition-colors" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-semibold">
+            <Badge className="absolute -top-2 -right-2 p-0 w-5 h-5 rounded-full">
               {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
+            </Badge>
           )}
         </Link>
       </TooltipTrigger>

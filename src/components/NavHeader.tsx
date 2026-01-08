@@ -219,7 +219,19 @@ const NavHeader = () => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Link to="/cart">
-                        <ShoppingCart className="cursor-pointer hover:text-primary" />
+                        <div className="relative">
+                          <ShoppingCart className="cursor-pointer hover:text-primary" />
+                          {cartSummaryData.totalItems > 0 && (
+                            <Badge
+                              className="absolute -top-2 -right-2 rounded-full p-0 w-5 h-5"
+                              variant="default"
+                            >
+                              {cartSummaryData.totalItems > 5
+                                ? "5+"
+                                : cartSummaryData.totalItems}
+                            </Badge>
+                          )}
+                        </div>
                       </Link>
                     </TooltipTrigger>
                     <TooltipContent className="bg-white border border-slate-200 shadow-lg rounded-lg p-2 text-sm max-h-[500px] overflow-y-auto">
