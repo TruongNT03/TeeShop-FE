@@ -552,6 +552,31 @@ export const ProductForm = ({
                     />
                     <FormField
                       control={form.control}
+                      name="discountPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Giá giảm (VNĐ)</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              placeholder="Nhập giá đã giảm"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value === ""
+                                    ? null
+                                    : e.target.valueAsNumber
+                                )
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
                       name="stock"
                       render={({ field }) => (
                         <FormItem>
@@ -707,6 +732,8 @@ export const ProductForm = ({
                           <TableRow>
                             <TableHead>Biến thể</TableHead>
                             <TableHead>Giá</TableHead>
+
+                            <TableHead>Giá giảm</TableHead>
                             <TableHead>Tồn kho</TableHead>
                             <TableHead>SKU</TableHead>
                             <TableHead>
@@ -732,6 +759,28 @@ export const ProductForm = ({
                                       className="w-28"
                                       onChange={(e) =>
                                         field.onChange(e.target.valueAsNumber)
+                                      }
+                                    />
+                                  )}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <FormField
+                                  control={form.control}
+                                  name={`productVariants.${index}.discountPrice`}
+                                  render={({ field }) => (
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      placeholder="0"
+                                      className="w-28"
+                                      value={field.value ?? ""}
+                                      onChange={(e) =>
+                                        field.onChange(
+                                          e.target.value === ""
+                                            ? null
+                                            : e.target.valueAsNumber
+                                        )
                                       }
                                     />
                                   )}

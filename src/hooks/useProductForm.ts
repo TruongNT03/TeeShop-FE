@@ -10,6 +10,7 @@ import type { apiClient } from "@/services/apiClient";
 const productVariantSchema = z.object({
   id: z.string().optional(),
   price: z.number().min(0, "Giá phải lớn hơn 0"),
+  discountPrice: z.number().min(0, "Giá giảm không được âm").optional().nullable(),
   stock: z.number().int().min(0, "Tồn kho phải là số nguyên dương"),
   sku: z.string().min(1, "SKU là bắt buộc"),
   variantValueIds: z
@@ -29,6 +30,7 @@ const baseProductSchema = z.object({
 const simpleProductSchema = baseProductSchema.extend({
   hasVariant: z.literal(false),
   price: z.number().min(0, "Giá phải lớn hơn 0"),
+  discountPrice: z.number().min(0).optional().nullable(),
   stock: z.number().int().min(0, "Tồn kho phải là số nguyên dương"),
   sku: z.string().min(1, "SKU là bắt buộc"),
   productVariants: z.array(productVariantSchema).max(0).optional(),
