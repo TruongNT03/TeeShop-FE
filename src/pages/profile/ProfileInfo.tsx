@@ -23,8 +23,6 @@ export const ProfileInfo: React.FC = () => {
 
   const user = profile;
 
-  console.log(profile);
-
   const [isEditing, setIsEditing] = useState(false);
 
   // Use user data directly, not from state

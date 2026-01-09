@@ -12,6 +12,7 @@ import {
   Ticket,
   ChevronsLeftRight,
   MapPin,
+  KeyRound,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -43,6 +44,43 @@ import {
   type RoleType,
 } from "@/types/userRequestPayload";
 import { Badge } from "../ui/badge";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Input } from "../ui/input";
+import { message } from "antd";
+import { useChangePassword } from "@/queries/useChangePassword";
+import type { AxiosError } from "axios";
+import { useState } from "react";
+
+const changePasswordSchema = z
+  .object({
+    password: z.string(),
+    newPassword: z
+      .string()
+      .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
+      .regex(/[a-z]/, "Phải chứa ít nhất 1 chữ thường")
+      .regex(/[A-Z]/, "Phải chứa ít nhất 1 chữ hoa")
+      .regex(/[0-9]/, "Phải chứa ít nhất 1 chữ số")
+      .regex(/[^a-zA-Z0-9]/, "Phải chứa ít nhất 1 ký tự đặc biệt"),
+
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.confirmPassword === data.newPassword, {
+    message: "Mật khẩu xác nhận không khớp",
+    path: ["confirmPassword"],
+  });
+
+export type ChangePasswordForm = z.infer<typeof changePasswordSchema>;
 
 const AdminSideBar = () => {
   const navigate = useNavigate();
@@ -53,6 +91,36 @@ const AdminSideBar = () => {
     roles = jwtDecode<UserRequestPayload>(accessToken).roles || [];
   }
   const { state } = useSidebar();
+  const changePasswordMutation = useChangePassword();
+  const [changePasswordOpen, setChangePasswordOpen] = useState<boolean>(false);
+
+  const changePasswordForm = useForm<ChangePasswordForm>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
+
+  const onChangePassword = changePasswordForm.handleSubmit((formData) => {
+    changePasswordMutation.mutate(
+      { password: formData.password, newPassword: formData.newPassword },
+      {
+        onSuccess: (response) => {
+          toast.success("Đổi mật khẩu thành công!");
+          localStorage.setItem("accessToken", response.accessToken);
+          localStorage.setItem("refreshToken", response.refreshToken);
+
+          changePasswordForm.reset();
+          setChangePasswordOpen(false);
+        },
+        onError: (error) => {
+          const axiosError = error as AxiosError<any>;
+          toast(axiosError.response?.data?.message);
+        },
+      }
+    );
+  });
 
   const handleLogout = () => {
     logoutMutate(undefined, {
@@ -293,6 +361,69 @@ const AdminSideBar = () => {
               <Bell className="w-4 h-4" />
               <span>Notification</span>
             </Button> */}
+
+            <Dialog
+              open={changePasswordOpen}
+              onOpenChange={setChangePasswordOpen}
+            >
+              <DialogTrigger asChild>
+                <Button variant="ghost" className="w-full justify-start">
+                  <KeyRound />
+                  <span>Đổi mật khẩu</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <Form {...changePasswordForm}>
+                  <form onSubmit={onChangePassword}>
+                    <FormLabel className="text-xl uppercase font-medium">
+                      Đổi mật khẩu
+                    </FormLabel>
+                    <FormField
+                      name="password"
+                      control={changePasswordForm.control}
+                      render={({ field }) => (
+                        <FormItem className="my-5">
+                          <FormLabel>Mật khẩu cũ</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="newPassword"
+                      control={changePasswordForm.control}
+                      render={({ field }) => (
+                        <FormItem className="my-5">
+                          <FormLabel>Mật khẩu mới</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="confirmPassword"
+                      control={changePasswordForm.control}
+                      render={({ field }) => (
+                        <FormItem className="my-5">
+                          <FormLabel>Xác nhận mật mật khẩu mới</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="password" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full">
+                      Xác nhận
+                    </Button>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
 
             <Button
               variant="ghost"
