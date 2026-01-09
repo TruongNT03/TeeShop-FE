@@ -29,6 +29,24 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
+const roleTranslations: Record<string, string> = {
+  Admin: "Quản trị viên",
+  User: "Người dùng",
+  "Product Manager": "Quản lý Sản phẩm",
+  "Order Manager": "Quản lý Đơn hàng",
+  Technician: "Kỹ thuật viên",
+};
+
+const moduleTranslations: Record<string, string> = {
+  Product: "Sản phẩm",
+  User: "Người dùng",
+  Category: "Danh mục",
+  Order: "Đơn hàng",
+  Voucher: "Voucher",
+  Chatbot: "Chatbot",
+  Location: "Địa điểm",
+};
+
 const ROLES = [
   "Admin",
   "User",
@@ -146,11 +164,11 @@ const AdminRolePermission = () => {
 
       await updateMutation.mutateAsync(permissionsToUpdate);
       await queryClient.invalidateQueries({ queryKey: ["userPermissions"] });
-      toast.success("Permissions updated successfully!");
+      toast.success("Cập nhật quyền hạn thành công!");
       setIsEditMode(false);
       setEditedPermissions({});
     } catch (error) {
-      toast.error("Failed to update permissions");
+      toast.error("Cập nhật quyền hạn thất bại!");
     }
   };
 
@@ -172,10 +190,10 @@ const AdminRolePermission = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-medium uppercase">
-            Role & Permission Management
+            Quản lý Vai trò & Quyền hạn
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            View and manage permissions for each role and module.
+            Xem và quản lý quyền hạn cho từng vai trò và module.
           </p>
         </div>
 
@@ -183,7 +201,7 @@ const AdminRolePermission = () => {
           {!isEditMode ? (
             <Button onClick={handleEditClick} variant="default">
               <Edit className="h-4 w-4 mr-2" />
-              Edit Permissions
+              Chỉnh sửa Quyền hạn
             </Button>
           ) : (
             <>
@@ -197,11 +215,11 @@ const AdminRolePermission = () => {
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                Save Changes
+                Lưu Thay đổi
               </Button>
               <Button onClick={handleCancelEdit} variant="outline">
                 <X className="h-4 w-4 mr-2" />
-                Cancel
+                Hủy
               </Button>
             </>
           )}
@@ -217,10 +235,10 @@ const AdminRolePermission = () => {
           className="w-full"
         >
           <TabsList>
-            <TabsTrigger value="all">All Roles</TabsTrigger>
+            <TabsTrigger value="all">Tất cả Vai trò</TabsTrigger>
             {ROLES.map((role) => (
               <TabsTrigger key={role} value={role}>
-                {role}
+                {roleTranslations[role] || role}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -233,10 +251,10 @@ const AdminRolePermission = () => {
           className="w-full"
         >
           <TabsList>
-            <TabsTrigger value="all">All Modules</TabsTrigger>
+            <TabsTrigger value="all">Tất cả Module</TabsTrigger>
             {MODULES.map((module) => (
               <TabsTrigger key={module} value={module}>
-                {module}
+                {moduleTranslations[module] || module}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -248,12 +266,12 @@ const AdminRolePermission = () => {
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead className="pl-8 py-5">Role</TableHead>
+              <TableHead className="pl-8 py-5">Vai trò</TableHead>
               <TableHead className="py-5">Module</TableHead>
-              <TableHead className="py-5 text-center">Create</TableHead>
-              <TableHead className="py-5 text-center">Read</TableHead>
-              <TableHead className="py-5 text-center">Update</TableHead>
-              <TableHead className="py-5 text-center">Delete</TableHead>
+              <TableHead className="py-5 text-center">Tạo</TableHead>
+              <TableHead className="py-5 text-center">Đọc</TableHead>
+              <TableHead className="py-5 text-center">Cập nhật</TableHead>
+              <TableHead className="py-5 text-center">Xóa</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -283,7 +301,7 @@ const AdminRolePermission = () => {
             ) : permissions.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-48 text-center text-lg">
-                  No permissions found.
+                  Không tìm thấy quyền hạn nào.
                 </TableCell>
               </TableRow>
             ) : (
@@ -383,7 +401,7 @@ const AdminRolePermission = () => {
 
         <div className="w-full py-3 flex justify-between items-center px-5">
           <div className="text-sm text-muted-foreground">
-            Total: <b>{pagination.totalItem}</b> permissions
+            Tổng: <b>{pagination.totalItem}</b> quyền hạn
           </div>
 
           <PaginationControl

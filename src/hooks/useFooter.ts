@@ -1,31 +1,31 @@
 export const useFooter = () => {
   const footerColumns = [
     {
-      title: "Company Info",
+      title: "Thông tin công ty",
       items: [
-        { title: "About Us", to: "/about" },
-        { title: "Latest Posts", to: "/posts" },
-        { title: "Contact Us", to: "/contact" },
-        { title: "Shop", to: "/shop" },
+        { title: "Về chúng tôi", to: "/about" },
+        { title: "Bài viết mới nhất", to: "/posts" },
+        { title: "Liên hệ", to: "/contact" },
+        { title: "Cửa hàng", to: "/shop" },
       ],
     },
     {
-      title: "Help Links",
+      title: "Hỗ trợ",
       items: [
-        { title: "Tracking", to: "/tracking" },
-        { title: "Order Status", to: "/order-status" },
-        { title: "Delivery", to: "/delivery" },
-        { title: "Shipping Info", to: "/shipping" },
-        { title: "FAQ", to: "/faq" },
+        { title: "Theo dõi đơn hàng", to: "/tracking" },
+        { title: "Trạng thái đơn hàng", to: "/order-status" },
+        { title: "Giao hàng", to: "/delivery" },
+        { title: "Thông tin vận chuyển", to: "/shipping" },
+        { title: "Câu hỏi thường gặp", to: "/faq" },
       ],
     },
     {
-      title: "Useful Links",
+      title: "Liên kết hữu ích",
       items: [
-        { title: "Special Offers", to: "/offers" },
-        { title: "Gift Cards", to: "/gift-cards" },
-        { title: "Advertising", to: "/advertising" },
-        { title: "Terms of Use", to: "/terms" },
+        { title: "Ưu đãi đặc biệt", to: "/offers" },
+        { title: "Thẻ quà tặng", to: "/gift-cards" },
+        { title: "Quảng cáo", to: "/advertising" },
+        { title: "Điều khoản sử dụng", to: "/terms" },
       ],
     },
   ];
