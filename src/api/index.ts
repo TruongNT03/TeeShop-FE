@@ -214,6 +214,7 @@ export interface CreateProductDto {
   hasVariant: boolean;
   /** @example 1000 */
   price?: number;
+  discount?: number;
   /** @example 50 */
   stock?: number;
   /** @example "AOTHUN-001" */
@@ -255,6 +256,7 @@ export interface AdminProductResponseDto {
   /** @example "Chất liệu cao cấp" */
   description: string;
   status: "unpublished" | "published";
+  discount?: number;
   hasVariant: boolean;
   productVariants: AdminProductVariantResponseDto[];
   /** @example ["https://example.com"] */
@@ -318,6 +320,7 @@ export interface AdminProductDetailResponseDto {
   /** @example "Chất liệu cao cấp" */
   description: string;
   hasVariant: boolean;
+  discount?: number;
   status: "unpublished" | "published";
   categories: CategoryResponseDto[];
   productImages: ProductImageDetailResponseDto[];
@@ -355,6 +358,7 @@ export interface UpdateProductDto {
   price?: number;
   /** @example 50 */
   stock?: number;
+  discount?: number;
   /** @example "AOTHUN-001" */
   sku?: string;
   /** @example ["https://example.com"] */
@@ -515,6 +519,7 @@ export interface AdminOrderDetailAddressResponseDto {
 export interface OrderItemProductResponseDto {
   id: string;
   name: string;
+  discount?: number;
   description: string;
   productImages: ProductImageDetailResponseDto[];
 }
@@ -742,6 +747,7 @@ export interface ProductResponseDto {
   name: string;
   description: string;
   price: number;
+  discount: number;
   productImages: ProductImageDetailResponseDto[];
 }
 
@@ -760,6 +766,7 @@ export interface ProductVariantResponseDto {
 export interface CartItemResponseDto {
   id: string;
   product: ProductResponseDto;
+  discount?: number;
   productVariant: ProductVariantResponseDto;
   quantity: number;
 }
@@ -793,6 +800,7 @@ export interface ProductDetailResponseDto {
   name: string;
   description: string;
   price: number;
+  discount: number;
   totalRating: number;
   averageRating: number;
   totalStock: number;

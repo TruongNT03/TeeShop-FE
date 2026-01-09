@@ -327,7 +327,26 @@ const CartPage = () => {
                       </div>
                     </td>
                     <td className="align-middle text-center text-sm border-b-1">
-                      <div>{formatPriceVND(cartItem.productVariant.price)}</div>
+                      <div className="flex flex-col">
+                        <div
+                          className={`${
+                            cartItem.product?.discount
+                              ? "text-red-500 line-through"
+                              : ""
+                          }`}
+                        >
+                          {formatPriceVND(cartItem.productVariant.price)}
+                        </div>
+                        {cartItem.product.discount && (
+                          <div>
+                            {formatPriceVND(
+                              (cartItem.productVariant.price *
+                                (100 - cartItem.product.discount)) /
+                                100
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="align-middle text-center border-b-1">
                       <div className="flex justify-center">
@@ -342,9 +361,16 @@ const CartPage = () => {
                       </div>
                     </td>
                     <td className="align-middle text-center text-sm border-b-1">
-                      {formatPriceVND(
-                        cartItem.productVariant.price * cartItem.quantity
-                      )}
+                      {cartItem.product.discount
+                        ? formatPriceVND(
+                            ((cartItem.productVariant.price *
+                              (100 - cartItem.product.discount)) /
+                              100) *
+                              cartItem.quantity
+                          )
+                        : formatPriceVND(
+                            cartItem.productVariant.price * cartItem.quantity
+                          )}
                     </td>
                     <td className="text-center align-middle rounded-r-sm border-b-1">
                       <div className="flex justify-center">
@@ -501,7 +527,12 @@ const CartPage = () => {
                     <div className="flex justify-between">
                       <span className="text-gray-600">Đơn giá:</span>
                       <span className="font-medium">
-                        {formatPriceVND(cartItem.productVariant.price)}
+                        {cartItem.product.discount
+                          ? formatPriceVND(
+                              cartItem.productVariant.price -
+                                cartItem.product.discount
+                            )
+                          : formatPriceVND(cartItem.productVariant.price)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">

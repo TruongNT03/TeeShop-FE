@@ -504,6 +504,33 @@ export const ProductForm = ({
               <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
+                  name="discount"
+                  render={({ field }) => (
+                    <FormItem className="rounded-lg border p-4">
+                      <FormLabel className="text-base">
+                        <div>Giảm giá sản phẩm</div>
+                      </FormLabel>
+                      <FormDescription>
+                        Phần trăm giảm giá sản phẩm 0-100% (kích thích hứng thú
+                        mua hàng của khách hàng)
+                      </FormDescription>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="w-full"
+                          type="number"
+                          placeholder="100"
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                ></FormField>
+                <FormField
+                  control={form.control}
                   name="hasVariant"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -522,6 +549,7 @@ export const ProductForm = ({
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -550,6 +578,7 @@ export const ProductForm = ({
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
                       name="stock"
@@ -707,6 +736,7 @@ export const ProductForm = ({
                           <TableRow>
                             <TableHead>Biến thể</TableHead>
                             <TableHead>Giá</TableHead>
+
                             <TableHead>Tồn kho</TableHead>
                             <TableHead>SKU</TableHead>
                             <TableHead>

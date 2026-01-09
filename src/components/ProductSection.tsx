@@ -64,7 +64,7 @@ const ProductSection = (props: ProductSectionProps) => {
               >
                 <Card
                   className="
-                                shadow-none gap-1 py-3
+                                shadow-none gap-1 py-3 relative
                                 md:gap-6 md:py-6"
                 >
                   <Link to={`/product/${item.id}`}>
@@ -76,6 +76,12 @@ const ProductSection = (props: ProductSectionProps) => {
                       {capitalizeWords(item.name)}
                     </CardTitle>
                   </Link>
+
+                  {item.discount && (
+                    <div className="absolute text-red-500 font-bold -rotate-45 top-24 z-10">
+                      Khuyến mại
+                    </div>
+                  )}
                   {item.productImages[0]?.url ? (
                     <Image
                       height={300}
@@ -103,9 +109,24 @@ const ProductSection = (props: ProductSectionProps) => {
                                   md:pb-3 px-2"
                   >
                     {item.price ? (
-                      <span className="text-base font-medium">
-                        {formatPriceVND(item.price)}
-                      </span>
+                      <div className="flex flex-col">
+                        <span
+                          className={`text-base font-medium ${
+                            item.discount ? "line-through text-red-500" : ""
+                          }`}
+                        >
+                          {formatPriceVND(item.price)}
+                        </span>
+                        {
+                          <span className="h-2 text-base font-medium">
+                            {item.discount
+                              ? formatPriceVND(
+                                  (item.price * item.discount) / 100
+                                )
+                              : ""}
+                          </span>
+                        }
+                      </div>
                     ) : (
                       <span className="text-sm text-slate-500">Liên hệ</span>
                     )}

@@ -20,21 +20,26 @@ import { useNavigate, useParams } from "react-router-dom";
 const transformDtoToFormData = (
   data: AdminProductDetailResponseDto
 ): Partial<ProductFormData> => {
-  // Check if product has variants by checking if any productVariant has variantValues
   const hasVariants =
     data.productVariants?.some(
       (pv) => pv.variantValues && pv.variantValues.length > 0
     ) ?? false;
 
+  const commonData = {
+    name: data.name,
+    description: data.description,
+    status: data.status,
+    discount: data.discount,
+    categoryIds: data.categories.map((c: { id: number }) => c.id),
+    imageUrls: data.productImages.map((img) => img.url),
+    discountPrice: (data as any).discountPrice ?? null,
+  };
+
   if (!hasVariants) {
     const simpleVariant = data.productVariants?.[0];
     return {
-      name: data.name,
-      description: data.description,
-      status: data.status,
+      ...commonData,
       hasVariant: false,
-      categoryIds: data.categories.map((c: { id: number }) => c.id),
-      imageUrls: data.productImages.map((img) => img.url),
       price: simpleVariant?.price ?? 0,
       stock: simpleVariant?.stock ?? 0,
       sku: simpleVariant?.sku ?? "",
@@ -42,15 +47,8 @@ const transformDtoToFormData = (
     };
   } else {
     return {
-      name: data.name,
-      description: data.description,
-      status: data.status,
+      ...commonData,
       hasVariant: true,
-      categoryIds: data.categories.map((c: { id: number }) => c.id),
-      imageUrls: data.productImages.map((img) => img.url),
-      price: undefined,
-      stock: undefined,
-      sku: undefined,
       productVariants: data.productVariants.map((v) => ({
         ...v,
         variantValueIds: v.variantValues.map(
@@ -174,7 +172,7 @@ const AdminProductEdit = () => {
       }) || [];
 
     const finalData = {
-      ...data,
+      ...data, // spread data sẽ bao gồm cả discountPrice từ form
       description,
       imageUrls: transformedImageUrls,
     };

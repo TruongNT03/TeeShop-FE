@@ -263,9 +263,27 @@ const NavHeader = () => {
                                       <div className="font-medium text-sm line-clamp-1 uppercase">
                                         {cartItem.product.name}
                                       </div>
-                                      <div className="text-xs text-slate-600 font-medium">
-                                        {formatPriceVND(
-                                          cartItem.productVariant.price
+                                      <div className="flex gap-2">
+                                        <div
+                                          className={`text-xs font-medium ${
+                                            !!cartItem.product.discount
+                                              ? "text-red-500 line-through"
+                                              : "text-slate-600"
+                                          }`}
+                                        >
+                                          {formatPriceVND(
+                                            cartItem.productVariant.price
+                                          )}
+                                        </div>
+                                        {cartItem.product.discount && (
+                                          <div className="text-xs text-slate-600 font-medium">
+                                            {formatPriceVND(
+                                              (cartItem.productVariant.price *
+                                                (100 -
+                                                  cartItem.product.discount)) /
+                                                100
+                                            )}
+                                          </div>
                                         )}
                                       </div>
                                       <div className="flex items-center gap-2 text-xs text-slate-500">
