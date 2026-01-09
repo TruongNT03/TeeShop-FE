@@ -121,7 +121,7 @@ const ProductSection = (props: ProductSectionProps) => {
                           <span className="h-2 text-base font-medium">
                             {item.discount
                               ? formatPriceVND(
-                                  (item.price * item.discount) / 100
+                                  (item.price * (100 - item.discount)) / 100
                                 )
                               : ""}
                           </span>
