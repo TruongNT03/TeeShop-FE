@@ -20,7 +20,7 @@ const Footer = () => {
         <div className="w-full h-[1px] bg-border my-6 md:my-8 lg:my-[24px]"></div>
         <div className="flex flex-col md:flex-row justify-between gap-6 md:gap-4">
           <div className="text-xs md:text-sm text-center md:text-left">
-            <div>© 2024 TeeShop</div>
+            <div>© 2020 NorthStar eCommerce</div>
             <div>Chính sách bảo mật Điều khoản và Điều kiện</div>
           </div>
           <div className="flex gap-3 md:gap-4 justify-center md:justify-end flex-wrap">

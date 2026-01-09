@@ -145,7 +145,7 @@ const AdminProduct = () => {
   const tableHeaderTitles = [
     {
       key: "name",
-      title: "Tên sản phẩm",
+      title: "Name",
       sortable: true,
       render: (value: string): React.ReactNode => (
         <TableCell>{value}</TableCell>
@@ -163,7 +163,7 @@ const AdminProduct = () => {
     // },
     {
       key: "status",
-      title: "Trạng thái",
+      title: "Status",
       sortable: true,
       render: (value: ProductStatus): React.ReactNode => (
         <TableCell>
@@ -172,14 +172,14 @@ const AdminProduct = () => {
               variant="outline"
               className="border-green-500 text-green-500"
             >
-              Đang bán
+              Published
             </Badge>
           ) : (
             <Badge
               variant="destructive"
               className="border-destructive bg-transparent text-destructive"
             >
-              Ngừng bán
+              Unpublished
             </Badge>
           )}
         </TableCell>
@@ -187,7 +187,7 @@ const AdminProduct = () => {
     },
     {
       key: "categories",
-      title: "Danh mục",
+      title: "Categories",
       sortable: false,
       render: (value: string[]): React.ReactNode => (
         <TableCell>
@@ -214,7 +214,7 @@ const AdminProduct = () => {
     },
     {
       key: "createdAt",
-      title: "Ngày tạo",
+      title: "Created At",
       sortable: true,
       render: (value: string): React.ReactNode => (
         <TableCell>{convertDateTime(value)}</TableCell>
@@ -222,7 +222,7 @@ const AdminProduct = () => {
     },
     {
       key: "updatedAt",
-      title: "Ngày cập nhật",
+      title: "Updated At",
       sortable: true,
       render: (value: string): React.ReactNode => (
         <TableCell>{convertDateTime(value)}</TableCell>
@@ -230,7 +230,7 @@ const AdminProduct = () => {
     },
     {
       key: "action",
-      title: "Hành động",
+      title: "Action",
       sortable: false,
       render: (product: AdminProductResponseDto): React.ReactNode => (
         <TableCell>
@@ -297,7 +297,7 @@ const AdminProduct = () => {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-medium uppercase">Quản lý Sản phẩm</h1>
+        <h1 className="text-2xl font-medium uppercase">Product Master</h1>
       </div>
       {/* Total */}
       {/* <div className="flex justify-between gap-8">
@@ -375,7 +375,7 @@ const AdminProduct = () => {
           <Link to="/admin/product/create">
             <Button variant="default" disabled={!canCreate("Product")}>
               <Plus />
-              Thêm sản phẩm
+              Create Product
             </Button>
           </Link>
         </div>
@@ -402,7 +402,7 @@ const AdminProduct = () => {
                 />
               </TableHead>
               <TableHead>
-                <div>STT</div>
+                <div>No.</div>
               </TableHead>
               {tableHeaderTitles.map((value, index) => (
                 <TableHead key={index} className="py-5">

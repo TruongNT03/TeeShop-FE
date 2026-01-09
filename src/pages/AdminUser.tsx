@@ -180,14 +180,6 @@ const AdminUser = () => {
   };
 
   const getRoleBadges = (roles: string[]) => {
-    const roleTranslations: { [key: string]: string } = {
-      admin: "Admin",
-      "Product Manager": "Quản lý Sản phẩm",
-      "Order Manager": "Quản lý Đơn hàng",
-      Technician: "Kỹ thuật viên",
-      user: "Người dùng",
-    };
-
     return (
       <div className="flex flex-wrap gap-1">
         {roles.map((role, index) => (
@@ -200,7 +192,7 @@ const AdminUser = () => {
                 : "border-green-500 text-green-500"
             }
           >
-            {roleTranslations[role] || role}
+            {role}
           </Badge>
         ))}
       </div>
@@ -210,10 +202,10 @@ const AdminUser = () => {
   const tableHeaderTitles = [
     {
       key: "name",
-      title: "Tên",
+      title: "Name",
       sortable: false,
       render: (value: string): React.ReactNode => (
-        <TableCell className="font-medium">{value || "Chưa cập nhật"}</TableCell>
+        <TableCell className="font-medium">{value || "N/A"}</TableCell>
       ),
     },
     {
@@ -226,15 +218,15 @@ const AdminUser = () => {
     },
     {
       key: "phoneNumber",
-      title: "Số điện thoại",
+      title: "Phone Number",
       sortable: false,
       render: (value: string): React.ReactNode => (
-        <TableCell>{value || "Chưa cập nhật"}</TableCell>
+        <TableCell>{value || "N/A"}</TableCell>
       ),
     },
     {
       key: "gender",
-      title: "Giới tính",
+      title: "Gender",
       sortable: false,
       render: (value: string): React.ReactNode => (
         <TableCell>{getGenderBadge(value)}</TableCell>
@@ -242,7 +234,7 @@ const AdminUser = () => {
     },
     {
       key: "roles",
-      title: "Vai trò",
+      title: "Roles",
       sortable: false,
       render: (value: string[]): React.ReactNode => (
         <TableCell>{getRoleBadges(value)}</TableCell>
@@ -250,7 +242,7 @@ const AdminUser = () => {
     },
     {
       key: "createdAt",
-      title: "Ngày tạo",
+      title: "Created At",
       sortable: true,
       render: (value: string): React.ReactNode => (
         <TableCell>{convertDateTime(value)}</TableCell>
@@ -280,7 +272,7 @@ const AdminUser = () => {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-medium uppercase">Quản lý Người dùng</h1>
+        <h1 className="text-2xl font-medium uppercase">User Management</h1>
       </div>
 
       {/* Tabs */}
@@ -289,8 +281,8 @@ const AdminUser = () => {
         onValueChange={(value) => setActiveTab(value as "users" | "admins")}
       >
         <TabsList>
-          <TabsTrigger value="users">Người dùng</TabsTrigger>
-          <TabsTrigger value="admins">Quản trị viên</TabsTrigger>
+          <TabsTrigger value="users">User</TabsTrigger>
+          <TabsTrigger value="admins">Admin</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="space-y-6">
@@ -347,7 +339,7 @@ const AdminUser = () => {
                 <DialogTrigger asChild>
                   <Button variant="default" disabled={!canCreate("User")}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Tạo Admin
+                    Create Admin
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px]">
@@ -484,9 +476,9 @@ const AdminUser = () => {
                           <PopoverContent className="w-full p-0">
                             <div className="p-2 space-y-2">
                               {[
-                                "Quản lý Sản phẩm",
-                                "Quản lý Đơn hàng",
-                                "Kỹ thuật viên",
+                                "Product Manager",
+                                "Order Manager",
+                                "Technician",
                               ].map((role) => (
                                 <div
                                   key={role}
@@ -611,7 +603,7 @@ const UserTable: React.FC<UserTableProps> = ({
               />
             </TableHead>
             <TableHead>
-              <div>STT</div>
+              <div>No.</div>
             </TableHead>
             {tableHeaderTitles.map((value, index) => (
               <TableHead key={index} className="py-5">

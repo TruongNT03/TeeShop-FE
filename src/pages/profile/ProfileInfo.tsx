@@ -148,16 +148,16 @@ export const ProfileInfo: React.FC = () => {
   if (isError) {
     return (
       <div>
-        <h2 className="text-lg font-medium text-slate-800">Lỗi</h2>
+        <h2 className="text-lg font-medium text-slate-800">Error</h2>
         <p className="mt-2 text-sm text-red-600">
-          {(error as any)?.message ?? "Lấy thông tin cá nhân thất bại"}
+          {(error as any)?.message ?? "Failed to fetch profile"}
         </p>
         <div className="mt-4">
           <button
             onClick={() => refetch()}
             className="px-4 py-2 rounded-md border"
           >
-            Thử lại
+            Retry
           </button>
         </div>
       </div>
@@ -167,9 +167,9 @@ export const ProfileInfo: React.FC = () => {
   if (!user) {
     return (
       <div className="text-center">
-        <h2 className="text-lg font-medium">Không tìm thấy thông tin</h2>
+        <h2 className="text-lg font-medium">No profile found</h2>
         <p className="mt-2 text-sm text-slate-600">
-          Tạo hồ sơ của bạn để bắt đầu.
+          Create your profile to get started.
         </p>
       </div>
     );

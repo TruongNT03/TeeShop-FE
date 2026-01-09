@@ -215,7 +215,7 @@ const Checkout = () => {
   // Handle place order
   const handlePlaceOrder = () => {
     if (cartItemIds.length === 0) {
-      toast.error("Giỏ hàng của bạn đang trống");
+      toast.error("Your cart is empty");
       return;
     }
 
@@ -231,7 +231,7 @@ const Checkout = () => {
   // Handle confirm order (after modal confirmation for COD, or direct for QR)
   const handleConfirmOrder = () => {
     if (!selectedAddressId) {
-toast.error("Vui lòng chọn địa chỉ giao hàng");
+      toast.error("Please select a delivery address");
       return;
     }
 
@@ -261,7 +261,7 @@ toast.error("Vui lòng chọn địa chỉ giao hàng");
                 setPaymentId(paymentResponse.data.id);
                 setPaymentStatus("pending");
               } else {
-                toast.error("Không thể lấy mã QR");
+                toast.error("Failed to get QR code");
                 setShowPaymentModal(false);
               }
             } catch (error) {
@@ -422,10 +422,10 @@ toast.error("Vui lòng chọn địa chỉ giao hàng");
                     <MapPin className="w-5 h-5 text-amber-600 mt-0.5" />
                     <div>
                       <p className="font-medium text-amber-900 text-sm">
-                        Chưa chọn địa chỉ
+                        No address selected
                       </p>
                       <p className="text-sm text-amber-700">
-                        Vui lòng chọn hoặc thêm địa chỉ giao hàng
+                        Please select or add a delivery address
                       </p>
                     </div>
                   </div>
@@ -524,7 +524,7 @@ toast.error("Vui lòng chọn địa chỉ giao hàng");
                 </div>
               ) : checkoutItems.length > 0 ? (
                 checkoutItems.map((item) => {
-                  const productName = item.product?.name || "Sản phẩm không xác định";
+                  const productName = item.product?.name || "Unknown Product";
                   const productPrice = item.productVariant?.price || 0;
                   const variantText =
                     item.productVariant?.variantValues
@@ -581,7 +581,7 @@ toast.error("Vui lòng chọn địa chỉ giao hàng");
                 })
               ) : (
                 <div className="text-center text-gray-500 py-4 text-sm">
-                  Không có sản phẩm trong giỏ hàng
+                  No items in cart
                 </div>
               )}
             </div>
@@ -717,11 +717,11 @@ toast.error("Vui lòng chọn địa chỉ giao hàng");
 
               <div className="space-y-2 text-xs sm:text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Tổng đơn hàng:</span>
+                  <span className="text-gray-600">Order Total:</span>
                   <span className="font-semibold">{formatPriceVND(total)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Sản phẩm:</span>
+                  <span className="text-gray-600">Items:</span>
                   <span>{checkoutItems.length}</span>
                 </div>
               </div>
@@ -735,7 +735,7 @@ toast.error("Vui lòng chọn địa chỉ giao hàng");
                   onClick={() => setShowPaymentModal(false)}
                   disabled={isCreatingOrder}
                 >
-                  Hủy
+                  Cancel
                 </Button>
                 <Button
                   className="flex-1 text-xs sm:text-sm"
@@ -745,10 +745,10 @@ toast.error("Vui lòng chọn địa chỉ giao hàng");
                   {isCreatingOrder ? (
                     <>
                       <Loader className="w-3 h-3 sm:w-4 sm:h-4 animate-spin mr-1 sm:mr-2" />
-                      Đang xử lý...
+                      Processing...
                     </>
                   ) : (
-                    "Xác nhận"
+                    "Confirm Order"
                   )}
                 </Button>
               </div>
@@ -878,7 +878,7 @@ toast.error("Vui lòng chọn địa chỉ giao hàng");
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Sản phẩm:</span>
+                      <span className="text-gray-600">Items:</span>
                       <span>{checkoutItems.length}</span>
                     </div>
                   </div>
