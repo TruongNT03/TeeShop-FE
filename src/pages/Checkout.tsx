@@ -255,8 +255,6 @@ const Checkout = () => {
                   orderId: createdOrderId,
                 });
 
-              console.log("Payment Response:", paymentResponse);
-
               if (paymentResponse.data) {
                 // Set QR code string to generate image
                 setQrCodeString(paymentResponse.data.qrImageUrl);
@@ -325,8 +323,6 @@ const Checkout = () => {
     try {
       const statusResponse =
         await apiClient.api.paymentControllerCheckPaymentStatus(paymentId);
-
-      console.log("Payment Status:", statusResponse.data);
 
       if (statusResponse.data.status === "success") {
         setPaymentStatus("success");
