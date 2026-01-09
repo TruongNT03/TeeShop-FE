@@ -162,7 +162,7 @@ const NavHeader = () => {
           >
             <div className="max-w-[14400px] mx-auto px-4 h-full flex items-center uppercase">
               <div className="hover:underline cursor-pointer flex-1 text-center">
-                Free Shipping & Returns On All US Orders
+                Miễn phí vận chuyển & Đổi trả cho tất cả đơn hàng
               </div>
               <X
                 onClick={() => setIsHiddenHeaderNotification(true)}
@@ -211,7 +211,7 @@ const NavHeader = () => {
                 <div className="flex gap-[20px] ml-8">
                   {profile?.name ? (
                     <div className="flex items-center font-medium w-fit text-nowrap text-base">
-                      {`Hello, ${profile?.name}`}
+                      {`Xin chào, ${profile?.name}`}
                     </div>
                   ) : null}
 

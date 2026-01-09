@@ -106,35 +106,35 @@ const AdminOrder = () => {
             className="border-yellow-500 text-yellow-500"
           >
             <Ellipsis className="w-3 h-3 mr-1" />
-            Pending
+            Chờ xử lý
           </Badge>
         );
       case "confirmed":
         return (
           <Badge variant="outline" className="border-blue-500 text-blue-500">
             <CheckCircle className="w-3 h-3 mr-1" />
-            Confirmed
+            Đã xác nhận
           </Badge>
         );
       case "completed":
         return (
           <Badge variant="outline" className="border-green-500 text-green-500">
             <Check className="w-3 h-3 mr-1" />
-            Completed
+            Hoàn thành
           </Badge>
         );
       case "shipping":
         return (
           <Badge variant="outline" className="border-cyan-400 text-cyan-400">
             <Truck className="w-3 h-3 mr-1" />
-            Shipping
+            Đang giao
           </Badge>
         );
       case "cancel":
         return (
           <Badge variant="outline" className="border-red-400 text-red-400">
             <X className="w-3 h-3 mr-1" />
-            Cancel
+            Đã hủy
           </Badge>
         );
       default:
@@ -156,7 +156,7 @@ const AdminOrder = () => {
   const tableHeaderTitles = [
     {
       key: "userEmail",
-      title: "User Email",
+      title: "Email người dùng",
       sortable: false,
       render: (value: string): React.ReactNode => (
         <TableCell>{value}</TableCell>
@@ -164,7 +164,7 @@ const AdminOrder = () => {
     },
     {
       key: "status",
-      title: "Status",
+      title: "Trạng thái",
       sortable: true,
       render: (value: string): React.ReactNode => (
         <TableCell>{getStatusBadge(value)}</TableCell>
@@ -172,7 +172,7 @@ const AdminOrder = () => {
     },
     {
       key: "amount",
-      title: "Amount",
+      title: "Tổng tiền",
       sortable: true,
       render: (value: number): React.ReactNode => (
         <TableCell className="font-semibold">{formatCurrency(value)}</TableCell>
@@ -180,7 +180,7 @@ const AdminOrder = () => {
     },
     {
       key: "createdAt",
-      title: "Created At",
+      title: "Ngày tạo",
       sortable: true,
       render: (value: string): React.ReactNode => (
         <TableCell>{convertDateTime(value)}</TableCell>
@@ -188,7 +188,7 @@ const AdminOrder = () => {
     },
     {
       key: "updatedAt",
-      title: "Updated At",
+      title: "Ngày cập nhật",
       sortable: true,
       render: (value: string): React.ReactNode => (
         <TableCell>{convertDateTime(value)}</TableCell>
@@ -212,7 +212,7 @@ const AdminOrder = () => {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-medium uppercase">Order Management</h1>
+        <h1 className="text-2xl font-medium uppercase">Quản lý Đơn hàng</h1>
       </div>
 
       {/* Statistics Cards */}
@@ -220,7 +220,7 @@ const AdminOrder = () => {
         <Card className="flex-1 p-6 shadow-none">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Total Orders</p>
+              <p className="text-sm text-muted-foreground">Tổng đơn hàng</p>
               <p className="text-3xl font-bold mt-2">{totalOrders}</p>
             </div>
             <Package className="w-12 h-12 text-primary opacity-20" />
@@ -229,7 +229,7 @@ const AdminOrder = () => {
         <Card className="flex-1 p-6 shadow-none">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Pending</p>
+              <p className="text-sm text-muted-foreground">Chờ xử lý</p>
               <p className="text-3xl font-bold mt-2 text-yellow-500">
                 {pendingOrders}
               </p>
@@ -240,7 +240,7 @@ const AdminOrder = () => {
         <Card className="flex-1 p-6 shadow-none">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Shipping</p>
+              <p className="text-sm text-muted-foreground">Đang giao</p>
               <p className="text-3xl font-bold mt-2 text-blue-500">
                 {shippingOrders}
               </p>
@@ -273,11 +273,11 @@ const AdminOrder = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="confirmed">Confirmed</SelectItem>
-              <SelectItem value="shipping">Shipping</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="cancel">Cancel</SelectItem>
+              <SelectItem value="pending">Chờ xử lý</SelectItem>
+              <SelectItem value="confirmed">Đã xác nhận</SelectItem>
+              <SelectItem value="shipping">Đang giao</SelectItem>
+              <SelectItem value="completed">Hoàn thành</SelectItem>
+              <SelectItem value="cancel">Đã hủy</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -303,7 +303,7 @@ const AdminOrder = () => {
                 />
               </TableHead>
               <TableHead>
-                <div>No.</div>
+                <div>STT</div>
               </TableHead>
               {tableHeaderTitles.map((value, index) => (
                 <TableHead key={index} className="py-3">

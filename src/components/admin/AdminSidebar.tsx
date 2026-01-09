@@ -159,7 +159,7 @@ const AdminSideBar = () => {
       {/* Content */}
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Applications</SidebarGroupLabel>
+          <SidebarGroupLabel>Ứng dụng</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {/* Dashboard */}
@@ -167,7 +167,7 @@ const AdminSideBar = () => {
                 <div onClick={() => navigate("/admin")}>
                   <SidebarMenuButton>
                     <LayoutDashboard />
-                    <span>Dashboard</span>
+                    <span>Bảng điều khiển</span>
                   </SidebarMenuButton>
                 </div>
               </SidebarMenuItem>
@@ -178,7 +178,7 @@ const AdminSideBar = () => {
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton className="group">
                       <UserRound />
-                      <span>User</span>
+                      <span>Người dùng</span>
                       <ChevronDown className="ml-auto transition-transform duration-300 group-data-[state=open]:rotate-180" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
@@ -188,7 +188,7 @@ const AdminSideBar = () => {
                       <SidebarMenuSubItem>
                         <div onClick={() => navigate("/admin/user")}>
                           <SidebarMenuSubButton>
-                            Management
+                            Quản lý
                           </SidebarMenuSubButton>
                         </div>
                       </SidebarMenuSubItem>
@@ -198,7 +198,7 @@ const AdminSideBar = () => {
                             onClick={() => navigate("/admin/role-permission")}
                           >
                             <SidebarMenuSubButton>
-                              Role & Permission
+                              Vai trò & Quyền
                             </SidebarMenuSubButton>
                           </div>
                         </PermissionGuard>
@@ -214,7 +214,7 @@ const AdminSideBar = () => {
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton className="group">
                       <Layers />
-                      <span>Product</span>
+                      <span>Sản phẩm</span>
                       <ChevronDown className="ml-auto transition-transform duration-300 group-data-[state=open]:rotate-180" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
@@ -224,7 +224,7 @@ const AdminSideBar = () => {
                       <SidebarMenuSubItem>
                         <div onClick={() => navigate("/admin/product")}>
                           <SidebarMenuSubButton>
-                            Management
+                            Quản lý
                           </SidebarMenuSubButton>
                         </div>
                       </SidebarMenuSubItem>
@@ -235,7 +235,7 @@ const AdminSideBar = () => {
                         <SidebarMenuSubItem>
                           <div onClick={() => navigate("/admin/category")}>
                             <SidebarMenuSubButton>
-                              Category
+                              Danh mục
                             </SidebarMenuSubButton>
                           </div>
                         </SidebarMenuSubItem>
@@ -251,7 +251,7 @@ const AdminSideBar = () => {
                 <div onClick={() => navigate("/admin/order")}>
                   <SidebarMenuButton>
                     <CreditCard />
-                    <span>Order</span>
+                    <span>Đơn hàng</span>
                   </SidebarMenuButton>
                 </div>
               </SidebarMenuItem>
@@ -261,7 +261,7 @@ const AdminSideBar = () => {
                 <div onClick={() => navigate("/admin/location")}>
                   <SidebarMenuButton>
                     <MapPin />
-                    <span>Location</span>
+                    <span>Địa điểm</span>
                   </SidebarMenuButton>
                 </div>
               </SidebarMenuItem>
@@ -271,7 +271,7 @@ const AdminSideBar = () => {
                 <div onClick={() => navigate("/admin/notifications")}>
                   <SidebarMenuButton>
                     <Bell />
-                    <span>Notifications</span>
+                    <span>Thông báo</span>
                   </SidebarMenuButton>
                 </div>
               </SidebarMenuItem>
@@ -321,7 +321,7 @@ const AdminSideBar = () => {
               </div>
               {state !== "collapsed" && (
                 <div className="flex flex-col items-start justify-start overflow-hidden ml-3">
-                  <div className="truncate">{profile?.name || "Admin"}</div>
+                  <div className="truncate">{profile?.name || "Quản trị viên"}</div>
                   <div className="font-normal text-xs truncate w-full text-muted-foreground">
                     {profile?.email || "admin@example.com"}
                   </div>
@@ -339,7 +339,7 @@ const AdminSideBar = () => {
               </div>
               <div className="flex flex-col overflow-hidden">
                 <div className="font-semibold truncate">
-                  {profile?.name || "Admin"}
+                  {profile?.name || "Quản trị viên"}
                 </div>
                 <div className="text-sm text-muted-foreground truncate">
                   {profile?.email || "admin@example.com"}
@@ -431,7 +431,7 @@ const AdminSideBar = () => {
               onClick={handleLogout}
             >
               <LogOut />
-              <span>Logout</span>
+              <span>Đăng xuất</span>
             </Button>
           </PopoverContent>
         </Popover>
