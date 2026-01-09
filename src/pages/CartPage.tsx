@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { PaginationControl } from "@/components/ui/pagination";
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -98,6 +99,9 @@ const CartPage = () => {
   const {
     listCartItems,
     isCartItemSuccess,
+    isCartLoading,
+    pagination,
+    handlePageChange,
     selectedCartItemIds,
     handleCheckedChange,
     checkoutSummaryCalculator,
@@ -404,6 +408,15 @@ const CartPage = () => {
                 ))}
               </tbody>
             </table>
+            {pagination.totalPage > 1 && (
+              <div className="flex justify-center mt-6">
+                <PaginationControl
+                  currentPage={pagination.page}
+                  totalPage={pagination.totalPage}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
           </Card>
 
           {/* Mobile View - Cards */}
@@ -556,6 +569,15 @@ const CartPage = () => {
                 </CardContent>
               </Card>
             ))}
+            {pagination.totalPage > 1 && (
+              <div className="flex justify-center mt-6">
+                <PaginationControl
+                  currentPage={pagination.page}
+                  totalPage={pagination.totalPage}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
           </div>
         </div>
 
