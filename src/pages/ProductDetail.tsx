@@ -196,9 +196,7 @@ const ProductDetail = () => {
   }
 
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;
-  const currentStock = selectedVariant
-    ? selectedVariant.stock
-    : product.totalStock;
+  const currentStock = selectedVariant ? selectedVariant.stock : 0;
 
   return (
     <div className="min-h-screen bg-white pt-6">

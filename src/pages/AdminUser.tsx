@@ -144,14 +144,6 @@ const AdminUser = () => {
     createMutation.mutate(data as any);
   };
 
-  // Debug: Log user data to check structure
-  useEffect(() => {
-    if (users.length > 0) {
-      console.log("First user data:", users[0]);
-      console.log("User keys:", Object.keys(users[0]));
-    }
-  }, [users]);
-
   useEffect(() => {
     setQuery((prevQuery) => ({
       ...prevQuery,

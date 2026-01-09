@@ -375,18 +375,18 @@ export const ProfileOrderDetail: React.FC = () => {
                           <div className="flex gap-2">
                             <p
                               className={`font-medium ${
-                                item.product?.discount
+                                item.currentDiscount
                                   ? "text-red-500 line-through"
                                   : ""
                               }`}
                             >
-                              {formatPriceVND(item.productVariant.price)}
+                              {formatPriceVND(item.currentPrice)}
                             </p>
-                            {item.product.discount && (
+                            {item.currentDiscount && (
                               <p className="font-medium text-slate-900">
                                 {formatPriceVND(
-                                  (item.productVariant.price *
-                                    (100 - item.product.discount)) /
+                                  (item.currentPrice *
+                                    (100 - item.currentDiscount)) /
                                     100
                                 )}
                               </p>
@@ -400,14 +400,12 @@ export const ProfileOrderDetail: React.FC = () => {
                       <p className="font-semibold text-slate-900">
                         {item.product.discount
                           ? formatPriceVND(
-                              ((item.productVariant.price *
-                                (100 - item.product.discount)) /
+                              ((item.currentPrice *
+                                (100 - item.currentDiscount)) /
                                 100) *
                                 item.quantity
                             )
-                          : formatPriceVND(
-                              item.productVariant.price * item.quantity
-                            )}
+                          : formatPriceVND(item.currentPrice * item.quantity)}
                       </p>
                       {order.status === "completed" && !item.isReviewed && (
                         <Button
@@ -465,10 +463,10 @@ export const ProfileOrderDetail: React.FC = () => {
 
             {/* Order Summary */}
             <div className="space-y-2">
-              <div className="flex justify-between text-slate-600">
+              {/* <div className="flex justify-between text-slate-600">
                 <span>Tạm tính</span>
                 <span>{formatPriceVND(order.amount)}</span>
-              </div>
+              </div> */}
               {order.voucher && (
                 <div className="flex justify-between items-center text-green-600 bg-green-50 px-3 py-2 rounded-lg">
                   <div className="flex items-center gap-2">

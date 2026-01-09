@@ -383,15 +383,35 @@ const AdminOrderDetail: React.FC = () => {
                           <span className="font-medium">{item.quantity}</span>
                         </p>
                         <span className="text-slate-400">•</span>
-                        <p className="font-medium text-slate-900">
-                          {formatPriceVND(item.productVariant.price)}
-                        </p>
+                        <div className="flex gap-2">
+                          <p
+                            className={`font-medium ${
+                              item.currentDiscount
+                                ? "text-red-500 line-through"
+                                : "text-slate-900"
+                            }`}
+                          >
+                            {formatPriceVND(item.currentPrice)}
+                          </p>
+                          {item.currentDiscount && (
+                            <p>
+                              {formatPriceVND(
+                                (item.currentPrice *
+                                  (100 - item.currentDiscount)) /
+                                  100
+                              )}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-slate-900">
                         {formatPriceVND(
-                          item.productVariant.price * item.quantity
+                          ((item.currentPrice *
+                            (100 - (item.currentDiscount || 0))) /
+                            100) *
+                            item.quantity
                         )}
                       </p>
                     </div>
@@ -404,10 +424,10 @@ const AdminOrderDetail: React.FC = () => {
 
             {/* Order Summary */}
             <div className="space-y-2">
-              <div className="flex justify-between text-slate-600">
+              {/* <div className="flex justify-between text-slate-600">
                 <span>Subtotal</span>
                 <span>{formatPriceVND(order.amount)}</span>
-              </div>
+              </div> */}
               {order.voucher && (
                 <div className="flex justify-between items-center text-green-600 bg-green-50 px-3 py-2 rounded-lg">
                   <div className="flex items-center gap-2">

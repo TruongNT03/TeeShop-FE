@@ -539,6 +539,8 @@ export interface OrderItemResponseDto {
   id: string;
   product: OrderItemProductResponseDto;
   productVariant: OrderItemProductVariantResponseDto;
+  currentPrice: number;
+  currentDiscount: number;
   quantity: number;
   isReviewed: boolean;
 }

@@ -106,22 +106,26 @@ const ProductSection = (props: ProductSectionProps) => {
                   )}
                   <div
                     className="
-                                  text-center pb-0
+                                  text-center pb-0 h-12
                                   md:pb-3 px-2"
                   >
                     {item.price ? (
                       <div className="flex flex-col items-center gap-0.5">
                         <span
                           className={`font-medium ${
-                            item.discount ? "line-through text-red-500 text-xs opacity-70" : "text-base"
+                            item.discount
+                              ? "line-through text-red-500 text-xs opacity-70"
+                              : "text-base"
                           }`}
                         >
                           {formatPriceVND(item.price)}
                         </span>
-                        
+
                         {item.discount ? (
-                          <span className="text-base font-bold text-slate-900">
-                            {formatPriceVND((item.price * (100 - item.discount)) / 100)}
+                          <span className="text-base font-medium text-slate-900">
+                            {formatPriceVND(
+                              (item.price * (100 - item.discount)) / 100
+                            )}
                           </span>
                         ) : null}
                       </div>
