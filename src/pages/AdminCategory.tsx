@@ -99,7 +99,7 @@ const AdminCategory = () => {
   const tableHeaderTitles = [
     {
       key: "image",
-      title: "Ảnh",
+      title: "Image",
       sortable: false,
       widthClass: "w-[50px]",
       render: (value: string): React.ReactNode => (
@@ -114,7 +114,7 @@ const AdminCategory = () => {
     },
     {
       key: "title",
-      title: "Tiêu đề",
+      title: "Title",
       sortable: true,
       widthClass: "w-[300px]",
       render: (value: string): React.ReactNode => (
@@ -123,7 +123,7 @@ const AdminCategory = () => {
     },
     {
       key: "description",
-      title: "Mô tả",
+      title: "Description",
       sortable: false,
       widthClass: "w-auto",
       render: (value: string): React.ReactNode => (
@@ -132,7 +132,7 @@ const AdminCategory = () => {
     },
     {
       key: "createdAt",
-      title: "Ngày tạo",
+      title: "Created At",
       sortable: true,
       widthClass: "w-auto whitespace-nowrap",
       render: (value: string): React.ReactNode => (
@@ -146,7 +146,7 @@ const AdminCategory = () => {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-medium uppercase">Quản lý Danh mục</h1>
+        <h1 className="text-2xl font-medium uppercase">Category Master</h1>
       </div>
 
       <div className="flex justify-between">
@@ -166,7 +166,7 @@ const AdminCategory = () => {
         <div>
           <Button variant="default" onClick={() => setIsCreateModalOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Thêm danh mục
+              Create Category
           </Button>
         </div>
       </div>
@@ -191,7 +191,7 @@ const AdminCategory = () => {
                 />
               </TableHead>
               <TableHead className="w-[60px]">
-                <div>STT</div>
+                <div>No.</div>
               </TableHead>
               {tableHeaderTitles.map((value, index) => (
                 <TableHead key={index} className={cn("py-5", value.widthClass)}>

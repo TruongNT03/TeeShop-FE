@@ -46,7 +46,7 @@ import { useAdminListLocation } from "@/queries/admin/useAdminListLocation";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [statisticBy, setStatisticBy] = useState<"day" | "month" | "year">(
+  const [statisticBy, setStatisticBy] = useState<"day" | "mouth" | "year">(
     "day"
   );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -54,7 +54,7 @@ const AdminDashboard = () => {
 
   const statisticOptions = {
     day: "Hôm nay",
-    month: "Tháng này",
+    mouth: "Tháng này",
     year: "Năm nay",
   };
 
@@ -166,7 +166,7 @@ const AdminDashboard = () => {
   return (
     <div className="p-8 space-y-3">
       <div>
-        <h1 className="text-2xl font-medium uppercase">Bảng điều khiển</h1>
+        <h1 className="text-2xl font-medium uppercase">Dashboard</h1>
       </div>
 
       {/* Statistics */}
@@ -265,7 +265,7 @@ const AdminDashboard = () => {
                 : userInfo?.location?.hotline || "N/A"}
             </div>
             <div className="flex gap-2">
-              <span className="font-semibold">Giờ mở cửa:</span>
+              <span className="font-semibold">Open time:</span>
               {isAdmin
                 ? `${
                     adminListLocationQuery.data?.data.find(
@@ -281,7 +281,7 @@ const AdminDashboard = () => {
                   }`}
             </div>
             <div className="flex gap-2">
-              <span className="font-semibold">Ngày mở cửa:</span>
+              <span className="font-semibold">Open date:</span>
               {isAdmin
                 ? adminListLocationQuery.data?.data.find(
                     (loc) => loc.id === selectedLocationId

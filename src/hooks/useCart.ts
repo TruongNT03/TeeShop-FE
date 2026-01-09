@@ -1,21 +1,20 @@
 import { findAllCartItemsQuery } from "@/queries/cartQueries";
 import { useState, useMemo, useCallback, useEffect } from "react";
 
-export const useCart = () => {
+export const useCart = (initialPage: number = 1, pageSize: number = 10) => {
   const [selectedCartItemIds, setSelectedCartItemIds] = useState<string[]>(
     () => {
       const saved = localStorage.getItem("selectedCartItemIds");
       return saved ? JSON.parse(saved) : [];
     }
   );
+  const [currentPage, setCurrentPage] = useState(initialPage);
 
   const {
-    data: listCartItems,
+    data: cartData,
     isSuccess: isCartItemSuccess,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = findAllCartItemsQuery({ pageSize: 10 });
+    isLoading: isCartLoading,
+  } = findAllCartItemsQuery({ page: currentPage, pageSize });
 
   // Sync to localStorage whenever selection changes
   useEffect(() => {
@@ -25,11 +24,22 @@ export const useCart = () => {
     );
   }, [selectedCartItemIds]);
 
-  // Memoize flattened cart items
-  const flatCartItems = useMemo(
-    () => listCartItems?.pages.flatMap((page) => page.data.data) || [],
-    [listCartItems]
+  // Cart items from current page
+  const flatCartItems = useMemo(() => cartData?.data.data || [], [cartData]);
+
+  // Pagination info
+  const pagination = useMemo(
+    () => ({
+      page: cartData?.data.paginate?.page || 1,
+      totalPage: cartData?.data.paginate?.totalPage || 1,
+    }),
+    [cartData]
   );
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const handleCheckedChange = useCallback(
     (checkboxValue: string | boolean, selectedCartItemId: string) => {
@@ -89,9 +99,10 @@ export const useCart = () => {
   return {
     listCartItems: flatCartItems,
     isCartItemSuccess,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
+    isCartLoading,
+    pagination,
+    currentPage,
+    handlePageChange,
     selectedCartItemIds,
     setSelectedCartItemIds,
     handleCheckedChange,

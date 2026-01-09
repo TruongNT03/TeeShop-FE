@@ -1,9 +1,4 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cartApi } from "@/services/cartApi";
 import type {
@@ -101,19 +96,10 @@ export const deleteCartItemMutation = () => {
 export const findAllCartItemsQuery = (
   query: Parameters<typeof apiClient.api.cartControllerGetAllCartItem>[0]
 ) => {
-  return useInfiniteQuery({
+  return useQuery({
     queryKey: ["cartItems", query],
-    initialPageParam: 1,
-    queryFn: ({ pageParam = 1 }) =>
-      apiClient.api.cartControllerGetAllCartItem({
-        ...query,
-        page: pageParam,
-      }),
-    getNextPageParam: (lastPage: any) => {
-      const page = lastPage.data.paginate.page;
-      const total = lastPage.data.paginate.totalPage;
-      return page < total ? page + 1 : undefined;
-    },
+    queryFn: () => apiClient.api.cartControllerGetAllCartItem(query),
+    placeholderData: (prev) => prev,
   });
 };
 
