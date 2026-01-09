@@ -327,13 +327,25 @@ const CartPage = () => {
                       </div>
                     </td>
                     <td className="align-middle text-center text-sm border-b-1">
-                      <div>
-                        {cartItem.product.discount
-                          ? formatPriceVND(
-                              cartItem.productVariant.price -
-                                cartItem.product.discount
-                            )
-                          : formatPriceVND(cartItem.productVariant.price)}
+                      <div className="flex flex-col">
+                        <div
+                          className={`${
+                            cartItem.product?.discount
+                              ? "text-red-500 line-through"
+                              : ""
+                          }`}
+                        >
+                          {formatPriceVND(cartItem.productVariant.price)}
+                        </div>
+                        {cartItem.product.discount && (
+                          <div>
+                            {formatPriceVND(
+                              (cartItem.productVariant.price *
+                                (100 - cartItem.product.discount)) /
+                                100
+                            )}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="align-middle text-center border-b-1">
@@ -351,8 +363,9 @@ const CartPage = () => {
                     <td className="align-middle text-center text-sm border-b-1">
                       {cartItem.product.discount
                         ? formatPriceVND(
-                            (cartItem.productVariant.price -
-                              cartItem.product.discount) *
+                            ((cartItem.productVariant.price *
+                              (100 - cartItem.product.discount)) /
+                              100) *
                               cartItem.quantity
                           )
                         : formatPriceVND(

@@ -289,15 +289,19 @@ const ProductDetail = () => {
             <div className="py-6 border-y border-slate-200">
               <div className="flex items-center gap-5">
                 <div
-                  className={`text-3xl font-semibold text-slate-900 mb-2 ${
-                    product.discount ? "line-through" : ""
+                  className={`text-3xl   mb-2 ${
+                    product.discount
+                      ? "line-through text-red-500 font-light"
+                      : "text-slate-900 font-semibold"
                   }`}
                 >
                   {formatPriceVND(currentPrice)}
                 </div>
                 {!!product.discount && (
                   <div className="text-3xl font-semibold text-slate-900 mb-2">
-                    {formatPriceVND(currentPrice - product.discount)}
+                    {formatPriceVND(
+                      (currentPrice * (100 - product.discount)) / 100
+                    )}
                   </div>
                 )}
               </div>

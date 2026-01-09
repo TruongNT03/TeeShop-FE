@@ -51,7 +51,14 @@ export const useCart = () => {
 
     flatCartItems.forEach((item) => {
       if (selectedCartItemIds.includes(item.id)) {
-        totalAmount += item.productVariant.price * item.quantity;
+        if (item.product.discount) {
+          totalAmount +=
+            ((item.productVariant.price * (100 - item.product.discount)) /
+              100) *
+            item.quantity;
+        } else {
+          totalAmount += item.productVariant.price * item.quantity;
+        }
         totalQuantity += item.quantity;
       }
     });

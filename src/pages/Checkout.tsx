@@ -114,9 +114,10 @@ const Checkout = () => {
   const subtotal = useMemo(
     () =>
       checkoutItems.reduce(
-        (acc: number, item: any) =>
+        (acc: number, item) =>
           acc +
-          ((item.productVariant?.price || 0) - (item.product.discount || 0)) *
+          ((item.productVariant.price * (100 - (item.product.discount || 0))) /
+            100) *
             item.quantity,
         0
       ),
@@ -526,11 +527,8 @@ const Checkout = () => {
                   <Loader className="w-6 h-6 animate-spin" />
                 </div>
               ) : checkoutItems.length > 0 ? (
-                checkoutItems.map((item: any) => {
+                checkoutItems.map((item) => {
                   const productName = item.product?.name || "Unknown Product";
-                  const productImage =
-                    item.product?.productImages?.[0]?.url ||
-                    "https://via.placeholder.com/80";
                   const productPrice = item.productVariant?.price || 0;
                   const variantText =
                     item.productVariant?.variantValues
@@ -542,16 +540,16 @@ const Checkout = () => {
                       key={item.id}
                       className="flex gap-2 sm:gap-3 pb-3 sm:pb-4 border-b last:border-b-0"
                     >
-                      {loadingImages[item.id] !== false ? (
+                      {item.product.productImages[0].url ? (
+                        <img
+                          src={item.product.productImages[0].url}
+                          alt={productName}
+                          className={`w-12 h-12 sm:w-16 sm:h-16 object-cover rounded flex-shrink-0`}
+                        />
+                      ) : (
                         <Skeleton className="w-12 h-12 sm:w-16 sm:h-16 rounded flex-shrink-0" />
-                      ) : null}
-                      <img
-                        src={productImage}
-                        alt={productName}
-                        className={`w-12 h-12 sm:w-16 sm:h-16 object-cover rounded flex-shrink-0 ${
-                          loadingImages[item.id] !== false ? "hidden" : ""
-                        }`}
-                      />
+                      )}
+
                       <div className="flex-1 min-w-0">
                         <div className="font-medium uppercase text-xs sm:text-sm line-clamp-2">
                           {productName}
@@ -561,13 +559,25 @@ const Checkout = () => {
                             {variantText}
                           </div>
                         )}
-                        <div className="text-xs sm:text-sm">
+                        <div className="text-xs sm:text-sm flex gap-2">
                           {item.quantity} ×{" "}
-                          {item.product.discount
-                            ? formatPriceVND(
-                                productPrice - item.product.discount
-                              )
-                            : formatPriceVND(productPrice)}
+                          <div
+                            className={`${
+                              item.product.discount
+                                ? "text-red-500 line-through"
+                                : ""
+                            }`}
+                          >
+                            {formatPriceVND(productPrice)}
+                          </div>
+                          {item.product.discount && (
+                            <div>
+                              {formatPriceVND(
+                                (productPrice * (100 - item.product.discount)) /
+                                  100
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
