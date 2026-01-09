@@ -31,6 +31,7 @@ import type { NotificationResponseDto } from "@/api";
 import { useChatContext } from "@/contexts/ChatContext";
 import { useAdminChatContext } from "@/contexts/AdminChatContext";
 import { Badge } from "./ui/badge";
+import { RoleType } from "@/types/userRequestPayload";
 
 const Notification = () => {
   const navigate = useNavigate();
@@ -103,7 +104,12 @@ const Notification = () => {
           const orderId = (notification.meta as any).orderId;
 
           // Navigate to appropriate order detail page based on user role
-          if (profile?.roles?.includes("admin")) {
+          if (
+            profile?.roles?.includes(RoleType.ADMIN) ||
+            profile?.roles?.includes(RoleType.ORDER_MANAGER) ||
+            profile?.roles?.includes(RoleType.PRODUCT_MANAGER) ||
+            profile?.roles?.includes(RoleType.TECHNICIAN)
+          ) {
             navigate(`/admin/order/${orderId}`);
           } else {
             navigate(`/profile/orders/${orderId}`);
