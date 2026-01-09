@@ -285,25 +285,25 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Price */}
             <div className="py-6 border-y border-slate-200">
-              <div className="flex items-center gap-5">
-                <div
-                  className={`text-3xl   mb-2 ${
-                    product.discount
-                      ? "line-through text-red-500 font-light"
-                      : "text-slate-900 font-semibold"
-                  }`}
-                >
-                  {formatPriceVND(currentPrice)}
-                </div>
+              <div className="flex flex-col gap-2">
                 {!!product.discount && (
-                  <div className="text-3xl font-semibold text-slate-900 mb-2">
-                    {formatPriceVND(
-                      (currentPrice * (100 - product.discount)) / 100
-                    )}
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg line-through text-slate-400 font-light">
+                      {formatPriceVND(currentPrice)}
+                    </span>
+                    <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-sm shadow-sm">
+                      -{product.discount}%
+                    </span>
                   </div>
                 )}
+                <div className="text-4xl font-bold text-slate-900">
+                  {formatPriceVND(
+                    product.discount
+                      ? (currentPrice * (100 - product.discount)) / 100
+                      : currentPrice
+                  )}
+                </div>
               </div>
               {currentStock > 0 ? (
                 <p className="text-sm text-slate-600">

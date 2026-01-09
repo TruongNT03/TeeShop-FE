@@ -39,13 +39,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <div>
-      <Card className="flex flex-col items-center hover:shadow-lg transition-all duration-300 h-full shadow-none">
+      <Card className="flex flex-col items-center hover:shadow-lg transition-all duration-300 h-full shadow-none relative">
         <Link to={`/product/${product.id}`} className="w-full">
           <h3 className="text-center px-2 h-[32px] text-wrap truncate pt-3 uppercase font-medium">
             {capitalizeWords(product.name)}
           </h3>
         </Link>
-        <Link to={`/product/${product.id}`} className="w-full">
+        <Link to={`/product/${product.id}`} className="w-full relative">
+          {product.discount && product.discount > 0 && (
+            <div className="absolute bg-red-600 text-white px-2 py-1 rounded-sm font-bold -rotate-12 top-4 left-5 z-10 shadow-md pointer-events-none text-[11px]">
+              -{product.discount}%
+            </div>
+          )}
+
           <div className="relative overflow-hidden">
             {mainImage ? (
               <img
@@ -69,12 +75,24 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         </Link>
 
-        {/* Price */}
-        <div className="text-center pb-3 px-2">
+        <div className="text-center pb-3 px-2 flex flex-col items-center gap-0.5">
           {product.price ? (
-            <span className="text-base font-medium">
-              {formatPriceVND(product.price)}
-            </span>
+            <>
+              {product.discount && product.discount > 0 ? (
+                <>
+                  <span className="text-xs line-through text-red-500 opacity-70">
+                    {formatPriceVND(product.price)}
+                  </span>
+                  <span className="text-base font-bold text-slate-900">
+                    {formatPriceVND((product.price * (100 - product.discount)) / 100)}
+                  </span>
+                </>
+              ) : (
+                <span className="text-base font-medium">
+                  {formatPriceVND(product.price)}
+                </span>
+              )}
+            </>
           ) : (
             <span className="text-sm text-slate-500">Liên hệ</span>
           )}

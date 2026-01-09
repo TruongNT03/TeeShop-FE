@@ -172,7 +172,7 @@ const AdminProductEdit = () => {
       }) || [];
 
     const finalData = {
-      ...data, // spread data sẽ bao gồm cả discountPrice từ form
+      ...data, 
       description,
       imageUrls: transformedImageUrls,
     };
