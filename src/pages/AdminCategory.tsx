@@ -1,13 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
   PaginationControl,
 } from "@/components/ui/pagination";
 import {
@@ -30,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getAllCategoryQuery } from "@/queries/adminProductQueries";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
+import CategoryCreateModal from "@/components/admin/CategoryCreateModal"; 
 
 export enum ListCategorySortField {
   TITLE = "title",
@@ -62,6 +56,8 @@ const AdminCategory = () => {
 
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [isSelectedAll, setIsSelectedAll] = useState<boolean>(false);
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const { data: categoriesData, isLoading } = getAllCategoryQuery(query as any);
   const categories = categoriesData?.data.data || [];
@@ -107,7 +103,7 @@ const AdminCategory = () => {
       sortable: false,
       widthClass: "w-[50px]",
       render: (value: string): React.ReactNode => (
-        <TableCell className="w-[50px]">
+        <TableCell className="w-[50px]" key="image">
           <img
             src={value}
             alt="category"
@@ -122,7 +118,7 @@ const AdminCategory = () => {
       sortable: true,
       widthClass: "w-[300px]",
       render: (value: string): React.ReactNode => (
-        <TableCell className="w-[300px] font-medium">{value}</TableCell>
+        <TableCell className="w-[300px] font-medium" key="title">{value}</TableCell>
       ),
     },
     {
@@ -131,7 +127,7 @@ const AdminCategory = () => {
       sortable: false,
       widthClass: "w-auto",
       render: (value: string): React.ReactNode => (
-        <TableCell className="max-w-xs truncate">{value}</TableCell>
+        <TableCell className="max-w-xs truncate" key="desc">{value}</TableCell>
       ),
     },
     {
@@ -140,7 +136,7 @@ const AdminCategory = () => {
       sortable: true,
       widthClass: "w-auto whitespace-nowrap",
       render: (value: string): React.ReactNode => (
-        <TableCell className="w-auto whitespace-nowrap">
+        <TableCell className="w-auto whitespace-nowrap" key="date">
           {convertDateTime(value)}
         </TableCell>
       ),
@@ -168,12 +164,10 @@ const AdminCategory = () => {
         </div>
 
         <div>
-          <Link to="/admin/category/create">
-            <Button variant="default">
-              <Plus />
-              Thêm danh mục
-            </Button>
-          </Link>
+          <Button variant="default" onClick={() => setIsCreateModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Thêm danh mục
+          </Button>
         </div>
       </div>
       {/* Table */}
@@ -183,7 +177,6 @@ const AdminCategory = () => {
             <TableRow>
               <TableHead className="px-5">
                 <Checkbox
-                  className=""
                   checked={isSelectedAll}
                   onCheckedChange={(checked) => {
                     if (checked && categories) {
@@ -242,12 +235,6 @@ const AdminCategory = () => {
                   <TableCell>
                     <Skeleton className="h-4 w-24" />
                   </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Skeleton className="h-8 w-8" />
-                      <Skeleton className="h-8 w-8" />
-                    </div>
-                  </TableCell>
                 </TableRow>
               ))
             ) : categories.length === 0 ? (
@@ -267,7 +254,6 @@ const AdminCategory = () => {
                 >
                   <TableCell className="px-5 py-3">
                     <Checkbox
-                      className=""
                       checked={selectedItems.includes(category.id)}
                       onCheckedChange={(checked) => {
                         if (checked) {
@@ -298,17 +284,6 @@ const AdminCategory = () => {
                 </TableRow>
               ))
             )}
-            {categories.length > 0 &&
-              categories.length < query.pageSize &&
-              Array.from({ length: query.pageSize - categories.length }).map(
-                (_, index) => (
-                  <TableRow key={`empty-${index}`} className="border-none h-16">
-                    <TableCell colSpan={tableHeaderTitles.length + 2}>
-                      &nbsp;
-                    </TableCell>
-                  </TableRow>
-                )
-              )}
           </TableBody>
         </Table>
 
@@ -324,6 +299,11 @@ const AdminCategory = () => {
           />
         </div>
       </Card>
+
+      <CategoryCreateModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+      />
     </div>
   );
 };
