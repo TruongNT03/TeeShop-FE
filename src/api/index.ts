@@ -320,7 +320,7 @@ export interface AdminProductDetailResponseDto {
   /** @example "Chất liệu cao cấp" */
   description: string;
   hasVariant: boolean;
-  discount: number;
+  discount?: number;
   status: "unpublished" | "published";
   categories: CategoryResponseDto[];
   productImages: ProductImageDetailResponseDto[];
@@ -519,6 +519,7 @@ export interface AdminOrderDetailAddressResponseDto {
 export interface OrderItemProductResponseDto {
   id: string;
   name: string;
+  discount?: number;
   description: string;
   productImages: ProductImageDetailResponseDto[];
 }

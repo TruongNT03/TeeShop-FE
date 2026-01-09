@@ -37,6 +37,7 @@ import {
 import { useCreateReview } from "@/queries/reviewQueries";
 import { Spinner } from "@/components/ui/spinner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { it } from "zod/v4/locales";
 
 const getStatusConfig = (
   status: "pending" | "shipping" | "confirmed" | "completed" | "cancel"
@@ -371,18 +372,42 @@ export const ProfileOrderDetail: React.FC = () => {
                             <span className="font-medium">{item.quantity}</span>
                           </p>
                           <span className="text-slate-400">•</span>
-                          <p className="font-medium text-slate-900">
-                            {formatPriceVND(item.productVariant.price)}
-                          </p>
+                          <div className="flex gap-2">
+                            <p
+                              className={`font-medium ${
+                                item.product?.discount
+                                  ? "text-red-500 line-through"
+                                  : ""
+                              }`}
+                            >
+                              {formatPriceVND(item.productVariant.price)}
+                            </p>
+                            {item.product.discount && (
+                              <p className="font-medium text-slate-900">
+                                {formatPriceVND(
+                                  (item.productVariant.price *
+                                    (100 - item.product.discount)) /
+                                    100
+                                )}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}
 
                     <div className="text-right flex flex-col items-end gap-2">
                       <p className="font-semibold text-slate-900">
-                        {formatPriceVND(
-                          item.productVariant.price * item.quantity
-                        )}
+                        {item.product.discount
+                          ? formatPriceVND(
+                              ((item.productVariant.price *
+                                (100 - item.product.discount)) /
+                                100) *
+                                item.quantity
+                            )
+                          : formatPriceVND(
+                              item.productVariant.price * item.quantity
+                            )}
                       </p>
                       {order.status === "completed" && !item.isReviewed && (
                         <Button
