@@ -77,9 +77,8 @@ const ProductSection = (props: ProductSectionProps) => {
                     </CardTitle>
                   </Link>
 
-                  {/* THAY THẾ CHỮ "KHUYẾN MẠI" TẠI ĐÚNG VỊ TRÍ CŨ */}
                   {item.discount && item.discount > 0 && (
-                    <div className="absolute bg-red-600 text-white px-2 py-1 rounded-sm font-bold -rotate-12 top-24 left-4 z-10 shadow-md pointer-events-none">
+                    <div className="absolute bg-red-600 text-white px-2 py-1 rounded-sm font-bold -rotate-12 top-24 left-4 z-10 shadow-md pointer-events-none text-[11px]">
                       -{item.discount}%
                     </div>
                   )}
@@ -111,23 +110,20 @@ const ProductSection = (props: ProductSectionProps) => {
                                   md:pb-3 px-2"
                   >
                     {item.price ? (
-                      <div className="flex flex-col">
+                      <div className="flex flex-col items-center gap-0.5">
                         <span
-                          className={`text-base font-medium ${
-                            item.discount ? "line-through text-red-500" : ""
+                          className={`font-medium ${
+                            item.discount ? "line-through text-red-500 text-xs opacity-70" : "text-base"
                           }`}
                         >
                           {formatPriceVND(item.price)}
                         </span>
-                        {
-                          <span className="h-2 text-base font-medium">
-                            {item.discount
-                              ? formatPriceVND(
-                                  (item.price * (100 - item.discount)) / 100
-                                )
-                              : ""}
+                        
+                        {item.discount ? (
+                          <span className="text-base font-bold text-slate-900">
+                            {formatPriceVND((item.price * (100 - item.discount)) / 100)}
                           </span>
-                        }
+                        ) : null}
                       </div>
                     ) : (
                       <span className="text-sm text-slate-500">Liên hệ</span>
