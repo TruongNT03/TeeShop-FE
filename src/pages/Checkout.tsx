@@ -215,7 +215,7 @@ const Checkout = () => {
   // Handle place order
   const handlePlaceOrder = () => {
     if (cartItemIds.length === 0) {
-      toast.error("Your cart is empty");
+      toast.error("Giỏ hàng của bạn đang trống");
       return;
     }
 
@@ -231,7 +231,7 @@ const Checkout = () => {
   // Handle confirm order (after modal confirmation for COD, or direct for QR)
   const handleConfirmOrder = () => {
     if (!selectedAddressId) {
-      toast.error("Please select a delivery address");
+toast.error("Vui lòng chọn địa chỉ giao hàng");
       return;
     }
 
@@ -263,7 +263,7 @@ const Checkout = () => {
                 setPaymentId(paymentResponse.data.id);
                 setPaymentStatus("pending");
               } else {
-                toast.error("Failed to get QR code");
+                toast.error("Không thể lấy mã QR");
                 setShowPaymentModal(false);
               }
             } catch (error) {
@@ -426,10 +426,10 @@ const Checkout = () => {
                     <MapPin className="w-5 h-5 text-amber-600 mt-0.5" />
                     <div>
                       <p className="font-medium text-amber-900 text-sm">
-                        No address selected
+                        Chưa chọn địa chỉ
                       </p>
                       <p className="text-sm text-amber-700">
-                        Please select or add a delivery address
+                        Vui lòng chọn hoặc thêm địa chỉ giao hàng
                       </p>
                     </div>
                   </div>
@@ -528,7 +528,7 @@ const Checkout = () => {
                 </div>
               ) : checkoutItems.length > 0 ? (
                 checkoutItems.map((item) => {
-                  const productName = item.product?.name || "Unknown Product";
+                  const productName = item.product?.name || "Sản phẩm không xác định";
                   const productPrice = item.productVariant?.price || 0;
                   const variantText =
                     item.productVariant?.variantValues
@@ -585,7 +585,7 @@ const Checkout = () => {
                 })
               ) : (
                 <div className="text-center text-gray-500 py-4 text-sm">
-                  No items in cart
+                  Không có sản phẩm trong giỏ hàng
                 </div>
               )}
             </div>
@@ -721,11 +721,11 @@ const Checkout = () => {
 
               <div className="space-y-2 text-xs sm:text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Order Total:</span>
+                  <span className="text-gray-600">Tổng đơn hàng:</span>
                   <span className="font-semibold">{formatPriceVND(total)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Items:</span>
+                  <span className="text-gray-600">Sản phẩm:</span>
                   <span>{checkoutItems.length}</span>
                 </div>
               </div>
@@ -739,7 +739,7 @@ const Checkout = () => {
                   onClick={() => setShowPaymentModal(false)}
                   disabled={isCreatingOrder}
                 >
-                  Cancel
+                  Hủy
                 </Button>
                 <Button
                   className="flex-1 text-xs sm:text-sm"
@@ -749,10 +749,10 @@ const Checkout = () => {
                   {isCreatingOrder ? (
                     <>
                       <Loader className="w-3 h-3 sm:w-4 sm:h-4 animate-spin mr-1 sm:mr-2" />
-                      Processing...
+                      Đang xử lý...
                     </>
                   ) : (
-                    "Confirm Order"
+                    "Xác nhận"
                   )}
                 </Button>
               </div>
@@ -882,7 +882,7 @@ const Checkout = () => {
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Items:</span>
+                      <span className="text-gray-600">Sản phẩm:</span>
                       <span>{checkoutItems.length}</span>
                     </div>
                   </div>

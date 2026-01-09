@@ -2459,7 +2459,7 @@ export class Api<
      */
     adminDashboardControllerGetDashboardStatistic: (
       query?: {
-        statisticBy?: "day" | "mouth" | "year";
+        statisticBy?: "day" | "month" | "year";
       },
       params: RequestParams = {},
     ) =>

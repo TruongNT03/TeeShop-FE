@@ -103,7 +103,7 @@ const AdminCategory = () => {
   const tableHeaderTitles = [
     {
       key: "image",
-      title: "Image",
+      title: "Ảnh",
       sortable: false,
       widthClass: "w-[50px]",
       render: (value: string): React.ReactNode => (
@@ -118,7 +118,7 @@ const AdminCategory = () => {
     },
     {
       key: "title",
-      title: "Title",
+      title: "Tiêu đề",
       sortable: true,
       widthClass: "w-[300px]",
       render: (value: string): React.ReactNode => (
@@ -127,7 +127,7 @@ const AdminCategory = () => {
     },
     {
       key: "description",
-      title: "Description",
+      title: "Mô tả",
       sortable: false,
       widthClass: "w-auto",
       render: (value: string): React.ReactNode => (
@@ -136,7 +136,7 @@ const AdminCategory = () => {
     },
     {
       key: "createdAt",
-      title: "Created At",
+      title: "Ngày tạo",
       sortable: true,
       widthClass: "w-auto whitespace-nowrap",
       render: (value: string): React.ReactNode => (
@@ -150,7 +150,7 @@ const AdminCategory = () => {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-medium uppercase">Category Master</h1>
+        <h1 className="text-2xl font-medium uppercase">Quản lý Danh mục</h1>
       </div>
 
       <div className="flex justify-between">
@@ -171,7 +171,7 @@ const AdminCategory = () => {
           <Link to="/admin/category/create">
             <Button variant="default">
               <Plus />
-              Create Category
+              Thêm danh mục
             </Button>
           </Link>
         </div>
@@ -198,7 +198,7 @@ const AdminCategory = () => {
                 />
               </TableHead>
               <TableHead className="w-[60px]">
-                <div>No.</div>
+                <div>STT</div>
               </TableHead>
               {tableHeaderTitles.map((value, index) => (
                 <TableHead key={index} className={cn("py-5", value.widthClass)}>
