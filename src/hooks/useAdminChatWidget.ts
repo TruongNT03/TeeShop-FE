@@ -13,6 +13,7 @@ export const useAdminChatWidget = () => {
   const [selectedConversationId, setSelectedConversationId] =
     useState<string>("");
   const [messageInput, setMessageInput] = useState<string>("");
+  const [hasNewMessage, setHasNewMessage] = useState<boolean>(false);
   const [unreadConversations, setUnreadConversations] = useState<Set<string>>(
     new Set()
   );
@@ -84,6 +85,7 @@ export const useAdminChatWidget = () => {
     // Listen for new messages
     socket.on(import.meta.env.VITE_CHAT_EVENT, (data: MessageResponseDto) => {
       // If message belongs to current conversation, refetch messages
+      setHasNewMessage(true);
       if (data.conversationId === selectedConversationId) {
         refetchMessages();
       } else {
@@ -175,5 +177,9 @@ export const useAdminChatWidget = () => {
     // Refetch
     refetchConversations,
     refetchMessages,
+
+    // Mark new message
+    setHasNewMessage,
+    hasNewMessage,
   };
 };

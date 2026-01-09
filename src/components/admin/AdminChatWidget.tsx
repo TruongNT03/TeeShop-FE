@@ -24,6 +24,8 @@ const AdminChatWidget = () => {
     setMessageInput,
     isSending,
     handleSendMessage,
+    hasNewMessage,
+    setHasNewMessage,
   } = useAdminChatWidget();
 
   // Auto-scroll to bottom when messages change
@@ -58,16 +60,15 @@ const AdminChatWidget = () => {
           transition={{ duration: 0.2 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setIsOpen(true);
+            setHasNewMessage(false);
+          }}
           className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/80 flex justify-center items-center text-white shadow-lg hover:shadow-xl transition-shadow relative"
         >
           {/* Unread indicator badge */}
-          {unreadConversations.size > 0 && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
-              <span className="text-white text-xs font-bold">
-                {unreadConversations.size}
-              </span>
-            </div>
+          {hasNewMessage && (
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center"></div>
           )}
           <MessageSquareText className="w-7 h-7" />
         </motion.button>
