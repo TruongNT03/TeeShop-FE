@@ -46,7 +46,7 @@ import { useAdminListLocation } from "@/queries/admin/useAdminListLocation";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [statisticBy, setStatisticBy] = useState<"day" | "month" | "year">(
+  const [statisticBy, setStatisticBy] = useState<"day" | "mouth" | "year">(
     "day"
   );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -54,7 +54,7 @@ const AdminDashboard = () => {
 
   const statisticOptions = {
     day: "Hôm nay",
-    month: "Tháng này",
+    mouth: "Tháng này",
     year: "Năm nay",
   };
 

@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { apiClient } from "@/services/apiClient";
 
 export const getDashboardStatisticQuery = (
-  statisticBy: "day" | "month" | "year" = "day"
+  statisticBy: "day" | "mouth" | "year" = "day"
 ) =>
   queryOptions({
     queryKey: ["admin", "dashboard", "statistic", statisticBy],
