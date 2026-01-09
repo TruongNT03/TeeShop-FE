@@ -506,15 +506,18 @@ export const ProductForm = ({
                   control={form.control}
                   name="discount"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                          Giảm giá sản phẩm
-                        </FormLabel>
-                      </div>
+                    <FormItem className="rounded-lg border p-4">
+                      <FormLabel className="text-base">
+                        <div>Giảm giá sản phẩm</div>
+                      </FormLabel>
+                      <FormDescription>
+                        Phần trăm giảm giá sản phẩm 0-100% (kích thích hứng thú
+                        mua hàng của khách hàng)
+                      </FormDescription>
                       <FormControl>
                         <Input
                           {...field}
+                          className="w-full"
                           type="number"
                           placeholder="100"
                           onChange={(e) =>
@@ -522,6 +525,7 @@ export const ProductForm = ({
                           }
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 ></FormField>
@@ -545,6 +549,7 @@ export const ProductForm = ({
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

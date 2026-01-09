@@ -29,9 +29,10 @@ const transformDtoToFormData = (
     name: data.name,
     description: data.description,
     status: data.status,
+    discount: data.discount,
     categoryIds: data.categories.map((c: { id: number }) => c.id),
     imageUrls: data.productImages.map((img) => img.url),
-    discountPrice: (data as any).discountPrice ?? null, 
+    discountPrice: (data as any).discountPrice ?? null,
   };
 
   if (!hasVariants) {

@@ -27,7 +27,11 @@ const baseProductSchema = z.object({
   name: z.string().min(1, "Tên sản phẩm là bắt buộc"),
   description: z.string().optional(),
   status: z.enum(["published", "unpublished"]),
-  discount: z.number().optional(),
+  discount: z
+    .number()
+    .min(0, "Giá trị nằm trong khoảng 0-100")
+    .max(100, "Giá trị nằm trong khoảng 0-100")
+    .optional(),
   categoryIds: z.array(z.number()).min(1, "Phải chọn ít nhất 1 danh mục"),
   imageUrls: z.array(z.string().url()).optional(),
   discountPrice: z
