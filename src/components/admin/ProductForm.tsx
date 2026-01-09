@@ -27,9 +27,8 @@ import {
   ChevronDown,
   Loader2,
   Plus,
-  Search,
-  Trash2,
   X,
+  Trash2,
 } from "lucide-react";
 import { Editor } from "@tinymce/tinymce-react";
 import React, { useEffect } from "react";
@@ -70,11 +69,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/services/apiClient";
-import type { SaveCategoryDto } from "@/api";
 import { toast } from "sonner";
+import CategoryCreateModal from "./CategoryCreateModal"; 
 
 export type VariantOption = {
   variantId: number;
@@ -131,13 +129,6 @@ export const ProductForm = ({
   const queryClient = useQueryClient();
 
   const [createCategoryOpen, setCreateCategoryOpen] = React.useState(false);
-  const [newCategoryData, setNewCategoryData] = React.useState<SaveCategoryDto>(
-    {
-      title: "",
-      description: "",
-      image: "",
-    }
-  );
 
   const [createVariantOpen, setCreateVariantOpen] = React.useState(false);
   const [newVariantName, setNewVariantName] = React.useState("");
@@ -148,25 +139,10 @@ export const ProductForm = ({
   const [selectedVariantIdForValue, setSelectedVariantIdForValue] =
     React.useState<number>(0);
 
-  const createCategoryMutation = useMutation({
-    mutationFn: (data: SaveCategoryDto) =>
-      apiClient.api.adminCategoriesControllerCreate(data),
-    onSuccess: (response) => {
-      toast.success("Tạo danh mục thành công!");
-      queryClient.invalidateQueries({ queryKey: ["category"] });
-
-      // Auto-select the newly created category
-      const currentIds = form.getValues("categoryIds") || [];
-      form.setValue("categoryIds", [...currentIds, response.data.id]);
-
-      // Reset and close dialog
-      setNewCategoryData({ title: "", description: "", image: "" });
-      setCreateCategoryOpen(false);
-    },
-    onError: () => {
-      toast.error("Tạo danh mục thất bại!");
-    },
-  });
+  const handleCategoryCreated = (newId: number) => {
+    const currentIds = form.getValues("categoryIds") || [];
+    form.setValue("categoryIds", [...currentIds, newId]);
+  };
 
   const createVariantMutation = useMutation({
     mutationFn: (name: string) =>
@@ -252,18 +228,6 @@ export const ProductForm = ({
     setSelectedVariantIdForValue(variantId);
     setNewVariantValue("");
     setCreateVariantValueOpen(true);
-  };
-
-  const handleCreateCategory = () => {
-    if (
-      !newCategoryData.title.trim() ||
-      !newCategoryData.description.trim() ||
-      !newCategoryData.image
-    ) {
-      toast.error("Vui lòng điền đầy đủ thông tin!");
-      return;
-    }
-    createCategoryMutation.mutate(newCategoryData);
   };
 
   const handleAddVariantOption = (variantId: number) => {
@@ -874,11 +838,6 @@ export const ProductForm = ({
                                     size="sm"
                                     className="gap-2"
                                     onClick={() => {
-                                      setNewCategoryData({
-                                        title: categorySearch || "",
-                                        description: "",
-                                        image: "",
-                                      });
                                       setCreateCategoryOpen(true);
                                     }}
                                   >
@@ -890,11 +849,6 @@ export const ProductForm = ({
                               <CommandGroup>
                                 <CommandItem
                                   onSelect={() => {
-                                    setNewCategoryData({
-                                      title: categorySearch || "",
-                                      description: "",
-                                      image: "",
-                                    });
                                     setCreateCategoryOpen(true);
                                   }}
                                   className="gap-2"
@@ -959,102 +913,12 @@ export const ProductForm = ({
         </div>
       </form>
 
-      {/* Create Category Dialog */}
-      <Dialog open={createCategoryOpen} onOpenChange={setCreateCategoryOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tạo danh mục mới</DialogTitle>
-            <DialogDescription>
-              Nhập thông tin danh mục mới. Sau khi tạo, danh mục sẽ tự động được
-              thêm vào sản phẩm.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label htmlFor="category-title" className="text-sm font-medium">
-                Tên danh mục
-              </label>
-              <Input
-                id="category-title"
-                placeholder="Nhập tên danh mục..."
-                value={newCategoryData.title}
-                onChange={(e) =>
-                  setNewCategoryData({
-                    ...newCategoryData,
-                    title: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="category-description"
-                className="text-sm font-medium"
-              >
-                Mô tả
-              </label>
-              <Textarea
-                id="category-description"
-                placeholder="Nhập mô tả danh mục..."
-                value={newCategoryData.description}
-                onChange={(e) =>
-                  setNewCategoryData({
-                    ...newCategoryData,
-                    description: e.target.value,
-                  })
-                }
-                rows={3}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Hình ảnh</label>
-              <CustomUpload
-                value={newCategoryData.image ? [newCategoryData.image] : []}
-                onChange={(urls) =>
-                  setNewCategoryData({
-                    ...newCategoryData,
-                    image: urls[0] || "",
-                  })
-                }
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setCreateCategoryOpen(false)}
-              disabled={createCategoryMutation.isPending}
-            >
-              Hủy
-            </Button>
-            <Button
-              type="button"
-              onClick={handleCreateCategory}
-              disabled={
-                !newCategoryData.title.trim() ||
-                !newCategoryData.description.trim() ||
-                !newCategoryData.image ||
-                createCategoryMutation.isPending
-              }
-            >
-              {createCategoryMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Đang tạo...
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Tạo danh mục
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <CategoryCreateModal
+        open={createCategoryOpen}
+        onOpenChange={setCreateCategoryOpen}
+        onSuccess={handleCategoryCreated}
+      />
 
-      {/* Create Variant Dialog */}
       <Dialog open={createVariantOpen} onOpenChange={setCreateVariantOpen}>
         <DialogContent>
           <DialogHeader>

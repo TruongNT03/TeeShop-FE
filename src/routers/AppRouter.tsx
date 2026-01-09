@@ -27,7 +27,6 @@ import { ProfileChangePassword } from "@/pages/profile/ProfileChangePassword";
 import { ProfileAddresses } from "@/pages/profile/ProfileAddresses";
 
 import AdminCategory from "@/pages/AdminCategory";
-import AdminCategoryCreate from "@/pages/AdminCategoryCreate";
 import ProductList from "@/pages/ProductList";
 import AdminOrder from "@/pages/AdminOrder";
 import AdminOrderDetail from "@/pages/AdminOrderDetail";
@@ -103,16 +102,6 @@ const AppRouter = () => {
               path="/admin/category"
               element={
                 canRead("Category") ? <AdminCategory /> : <AccessDenied />
-              }
-            />
-            <Route
-              path="/admin/category/create"
-              element={
-                canCreate("Category") ? (
-                  <AdminCategoryCreate />
-                ) : (
-                  <AccessDenied />
-                )
               }
             />
             <Route
