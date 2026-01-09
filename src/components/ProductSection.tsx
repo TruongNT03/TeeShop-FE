@@ -77,11 +77,13 @@ const ProductSection = (props: ProductSectionProps) => {
                     </CardTitle>
                   </Link>
 
-                  {item.discount && (
-                    <div className="absolute text-red-500 font-bold -rotate-45 top-24 z-10">
-                      Khuyến mại
+                  {/* THAY THẾ CHỮ "KHUYẾN MẠI" TẠI ĐÚNG VỊ TRÍ CŨ */}
+                  {item.discount && item.discount > 0 && (
+                    <div className="absolute bg-red-600 text-white px-2 py-1 rounded-sm font-bold -rotate-12 top-24 left-4 z-10 shadow-md pointer-events-none">
+                      -{item.discount}%
                     </div>
                   )}
+
                   {item.productImages[0]?.url ? (
                     <Image
                       height={300}
@@ -121,7 +123,7 @@ const ProductSection = (props: ProductSectionProps) => {
                           <span className="h-2 text-base font-medium">
                             {item.discount
                               ? formatPriceVND(
-                                  (item.price * item.discount) / 100
+                                  (item.price * (100 - item.discount)) / 100
                                 )
                               : ""}
                           </span>
